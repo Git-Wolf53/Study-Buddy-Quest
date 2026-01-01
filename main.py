@@ -985,13 +985,10 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             st.markdown("*Select your answer for each question below!*")
             st.markdown("")
             
-            with st.form(key="quiz_answers_form"):
-                user_answers = []
+            for idx, q in enumerate(parsed_questions):
+                emoji = question_emojis[idx] if idx < len(question_emojis) else "❓"
                 
-                for idx, q in enumerate(parsed_questions):
-                    emoji = question_emojis[idx] if idx < len(question_emojis) else "❓"
-                    
-                    st.markdown(f"""
+                st.markdown(f"""
 <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
             padding: 20px; 
             border-radius: 15px; 
@@ -1000,72 +997,70 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
     <h4 style="color: #667eea; margin-bottom: 10px;">Question {q['number']} {emoji}</h4>
     <p style="font-size: 1.15rem; font-weight: 600; color: #2d3436;">{q['text']}</p>
 </div>
-                    """, unsafe_allow_html=True)
-                    
-                    st.markdown("**👆 Pick your answer:**")
-                    st.markdown("")
-                    
-                    option_emojis = {letter: get_emoji_for_answer(q['options'][letter]) for letter in ['A', 'B', 'C', 'D']}
-                    
-                    answer = st.radio(
-                        f"Your answer for Q{q['number']}:",
-                        options=["A", "B", "C", "D"],
-                        format_func=lambda x, opts=q['options'], emojis=option_emojis: f"{emojis[x]} {x}) {opts[x]}",
-                        horizontal=True,
-                        key=f"q{idx+1}",
-                        index=None,
-                        label_visibility="collapsed"
-                    )
-                    user_answers.append(answer)
-                    
-                    if idx < 4:
-                        st.markdown("---")
+                """, unsafe_allow_html=True)
                 
-                st.markdown("")
+                st.markdown("**👆 Pick your answer:**")
                 st.markdown("")
                 
-                submitted = st.form_submit_button("📨 SUBMIT ALL ANSWERS!", use_container_width=True)
+                option_emojis = {letter: get_emoji_for_answer(q['options'][letter]) for letter in ['A', 'B', 'C', 'D']}
                 
-                if submitted:
-                    unanswered = [i+1 for i, ans in enumerate(user_answers) if ans is None]
+                answer = st.radio(
+                    f"Your answer for Q{q['number']}:",
+                    options=["A", "B", "C", "D"],
+                    format_func=lambda x, opts=q['options'], emojis=option_emojis: f"{emojis[x]} {x}) {opts[x]}",
+                    horizontal=True,
+                    key=f"q{idx+1}",
+                    index=None,
+                    label_visibility="collapsed"
+                )
+                
+                if idx < 4:
+                    st.markdown("---")
+            
+            st.markdown("")
+            st.markdown("")
+            
+            if st.button("📨 SUBMIT ALL ANSWERS!", use_container_width=True):
+                user_answers = [st.session_state.get(f"q{i+1}") for i in range(5)]
+                unanswered = [i+1 for i, ans in enumerate(user_answers) if ans is None]
+                
+                if unanswered:
+                    st.error(f"⚠️ Please answer all questions! You haven't picked an answer for: Question {', '.join(map(str, unanswered))}")
+                else:
+                    st.session_state.user_answers = user_answers
                     
-                    if unanswered:
-                        st.error(f"⚠️ Please answer all questions! You haven't picked an answer for: Question {', '.join(map(str, unanswered))}")
-                    else:
-                        st.session_state.user_answers = user_answers
-                        
-                        correct_count = 0
-                        wrong_questions = []
-                        correct_answers = st.session_state.correct_answers
-                        
-                        num_questions = min(len(user_answers), len(correct_answers))
-                        
-                        for i in range(num_questions):
-                            if user_answers[i].upper() == correct_answers[i].upper():
-                                correct_count += 1
-                            else:
-                                wrong_questions.append(i + 1)
-                        
-                        st.session_state.wrong_questions = wrong_questions
-                        
-                        quiz_score = correct_count * 10
-                        st.session_state.score = quiz_score
-                        
-                        if correct_count == 5:
-                            st.session_state.perfect_scores += 1
-                        
-                        if correct_count < 3 and st.session_state.current_topic:
-                            if st.session_state.current_topic not in st.session_state.weak_topics:
-                                st.session_state.weak_topics.append(st.session_state.current_topic)
-                        
-                        st.session_state.total_score += quiz_score
-                        st.session_state.quizzes_completed += 1
-                        
-                        check_and_award_badges()
-                        
-                        st.session_state.answers_submitted = True
-                        
-                        st.rerun()
+                    correct_count = 0
+                    wrong_questions = []
+                    correct_answers = st.session_state.correct_answers
+                    
+                    num_questions = min(len(user_answers), len(correct_answers))
+                    
+                    for i in range(num_questions):
+                        if user_answers[i].upper() == correct_answers[i].upper():
+                            correct_count += 1
+                        else:
+                            wrong_questions.append(i + 1)
+                    
+                    st.session_state.wrong_questions = wrong_questions
+                    
+                    quiz_score = correct_count * 10
+                    st.session_state.score = quiz_score
+                    
+                    if correct_count == 5:
+                        st.session_state.perfect_scores += 1
+                    
+                    if correct_count < 3 and st.session_state.current_topic:
+                        if st.session_state.current_topic not in st.session_state.weak_topics:
+                            st.session_state.weak_topics.append(st.session_state.current_topic)
+                    
+                    st.session_state.total_score += quiz_score
+                    st.session_state.quizzes_completed += 1
+                    
+                    check_and_award_badges()
+                    
+                    st.session_state.answers_submitted = True
+                    
+                    st.rerun()
         else:
             st.markdown(st.session_state.quiz_questions_only)
             
@@ -1231,6 +1226,20 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             st.session_state.user_answers = []
             st.session_state.score = 0
             st.session_state.wrong_questions = []
+            for i in range(1, 6):
+                if f"q{i}" in st.session_state:
+                    del st.session_state[f"q{i}"]
+            example_topics = [
+                "e.g., dinosaurs, volcanoes, the moon...",
+                "e.g., ancient Egypt, the ocean, math...",
+                "e.g., space exploration, animals, weather...",
+                "e.g., the human body, planets, geography...",
+                "e.g., world history, chemistry, coding...",
+                "e.g., famous scientists, ecosystems, music...",
+                "e.g., inventions, mythology, sports...",
+                "e.g., rainforests, electricity, art history...",
+            ]
+            st.session_state.topic_placeholder = random.choice(example_topics)
             st.rerun()
 
 # ============================================================
