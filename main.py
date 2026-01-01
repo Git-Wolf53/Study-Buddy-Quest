@@ -516,13 +516,14 @@ def parse_quiz_answers(quiz_text: str) -> tuple:
 # QUIZ GENERATION FUNCTION
 # This function calls Gemini AI to create a fun quiz!
 # ============================================================
-def generate_quiz_with_gemini(topic: str, difficulty: str) -> str:
+def generate_quiz_with_gemini(topic: str, difficulty: str, weak_topics: list = None) -> str:
     """
     Uses Google Gemini AI to generate a fun, educational quiz.
     
     Args:
         topic: The subject the student wants to learn about
         difficulty: Easy, Medium, or Hard
+        weak_topics: List of topics the student has struggled with
         
     Returns:
         A string containing the quiz in markdown format
@@ -531,13 +532,23 @@ def generate_quiz_with_gemini(topic: str, difficulty: str) -> str:
     # Clean the difficulty level (remove emoji)
     clean_difficulty = difficulty.split()[0]  # Gets just "Easy", "Medium", or "Hard"
     
+    # Build adaptive learning section if there are weak topics
+    adaptive_section = ""
+    if weak_topics and len(weak_topics) > 0:
+        weak_topics_str = ", ".join(weak_topics[-5:])  # Use last 5 weak topics
+        adaptive_section = f"""
+ADAPTIVE LEARNING NOTE:
+The student has struggled with these topics recently: {weak_topics_str}
+If any of these topics relate to {topic}, please include 1-2 gentle review questions to help reinforce their understanding. Make these questions encouraging and supportive!
+"""
+    
     # Create a detailed prompt for Gemini
     # This tells the AI exactly what kind of quiz we want!
     prompt = f"""You are a fun and encouraging teacher creating a quiz for a 14-year-old student.
 
 Create a 5-question multiple-choice quiz about: {topic}
 Difficulty level: {clean_difficulty}
-
+{adaptive_section}
 Guidelines:
 - Make questions appropriate for a 14-year-old student
 - For Easy: Basic concepts, straightforward questions
@@ -671,7 +682,8 @@ if st.button("🎲 Generate Quiz! 🎲", use_container_width=True):
         with st.spinner(f"🧠 Creating your {difficulty} quiz about {topic}... This is gonna be awesome!"):
             try:
                 # Call our function to generate the quiz with Gemini
-                quiz_content = generate_quiz_with_gemini(topic, difficulty)
+                # Pass weak_topics for adaptive learning
+                quiz_content = generate_quiz_with_gemini(topic, difficulty, st.session_state.weak_topics)
                 
                 # Parse the correct answers and explanations
                 correct_answers, explanations = parse_quiz_answers(quiz_content)
