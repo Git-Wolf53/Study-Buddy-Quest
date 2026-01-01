@@ -31,6 +31,17 @@ st.set_page_config(
 )
 
 # ============================================================
+# SESSION STATE INITIALIZATION
+# We use session state to remember the quiz between interactions
+# ============================================================
+if "quiz_content" not in st.session_state:
+    st.session_state.quiz_content = None
+if "quiz_generated" not in st.session_state:
+    st.session_state.quiz_generated = False
+if "answers_submitted" not in st.session_state:
+    st.session_state.answers_submitted = False
+
+# ============================================================
 # CUSTOM STYLING
 # Adding some colorful CSS to make our app look awesome!
 # ============================================================
@@ -235,23 +246,116 @@ if st.button("🎲 Generate Quiz! 🎲", use_container_width=True):
         # 🎈 BALLOONS! Because learning should be fun!
         st.balloons()
         
+        # Reset the answers submitted state for new quiz
+        st.session_state.answers_submitted = False
+        
         # Show a loading message while Gemini generates the quiz
         with st.spinner(f"🧠 Creating your {difficulty} quiz about {topic}... This is gonna be awesome!"):
             try:
                 # Call our function to generate the quiz with Gemini
                 quiz_content = generate_quiz_with_gemini(topic, difficulty)
                 
+                # Store the quiz in session state so it persists
+                st.session_state.quiz_content = quiz_content
+                st.session_state.quiz_generated = True
+                
                 # Show a success message
                 st.success(f"🎉 Your quiz is ready! Let's see how much you know about **{topic}**!")
-                
-                # Display the quiz
-                st.markdown("---")
-                st.markdown(quiz_content)
                 
             except Exception as e:
                 # If something goes wrong, show a friendly error message
                 st.error(f"😅 Oops! Something went wrong while creating your quiz. Please try again!")
                 st.error(f"Error details: {str(e)}")
+
+# ============================================================
+# DISPLAY QUIZ AND ANSWER FORM
+# Show the quiz and let students submit their answers
+# ============================================================
+
+# Check if we have a quiz to display
+if st.session_state.quiz_generated and st.session_state.quiz_content:
+    
+    # Display the quiz content
+    st.markdown("---")
+    st.markdown(st.session_state.quiz_content)
+    
+    # ============================================================
+    # ANSWER SUBMISSION FORM
+    # Let students select their answers and submit!
+    # ============================================================
+    
+    st.markdown("---")
+    st.markdown("## ✏️ Submit Your Answers!")
+    st.markdown("Select your answer for each question below:")
+    
+    # Create a form for submitting answers
+    # Using a form prevents the page from reloading on each selection
+    with st.form(key="quiz_answers_form"):
+        
+        # Create 5 radio button groups, one for each question
+        # Each group has options A, B, C, D
+        
+        st.markdown("### Your Answers:")
+        
+        # Question 1
+        q1_answer = st.radio(
+            "Question 1 🔢",
+            options=["A", "B", "C", "D"],
+            horizontal=True,
+            key="q1"
+        )
+        
+        # Question 2
+        q2_answer = st.radio(
+            "Question 2 🧮",
+            options=["A", "B", "C", "D"],
+            horizontal=True,
+            key="q2"
+        )
+        
+        # Question 3
+        q3_answer = st.radio(
+            "Question 3 🎯",
+            options=["A", "B", "C", "D"],
+            horizontal=True,
+            key="q3"
+        )
+        
+        # Question 4
+        q4_answer = st.radio(
+            "Question 4 🌟",
+            options=["A", "B", "C", "D"],
+            horizontal=True,
+            key="q4"
+        )
+        
+        # Question 5
+        q5_answer = st.radio(
+            "Question 5 🏆",
+            options=["A", "B", "C", "D"],
+            horizontal=True,
+            key="q5"
+        )
+        
+        # Add some space
+        st.markdown("")
+        
+        # Submit button for the form
+        submitted = st.form_submit_button(
+            "📨 Submit Answers!",
+            use_container_width=True
+        )
+        
+        # Handle form submission
+        if submitted:
+            # Set the flag that answers were submitted
+            st.session_state.answers_submitted = True
+            
+            # Show balloons for fun!
+            st.balloons()
+            
+            # Show success message
+            st.success("🎉 Answers submitted! Great job completing the quiz!")
 
 # ============================================================
 # FOOTER
