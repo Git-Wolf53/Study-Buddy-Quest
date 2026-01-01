@@ -1192,31 +1192,45 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     </div>
                     """, unsafe_allow_html=True)
         
-        if wrong_questions:
-            st.markdown("---")
-            st.markdown("### 📝 Let's Learn From These!")
-            st.markdown("*Here's what you missed and why:*")
+        st.markdown("---")
+        st.markdown("### 📚 Answer Review & Explanations")
+        st.markdown("*Here's the breakdown for each question:*")
+        
+        question_labels = ["Question 1 🔢", "Question 2 🧮", "Question 3 🎯", "Question 4 🌟", "Question 5 🏆"]
+        parsed_questions = st.session_state.parsed_questions
+        
+        for i in range(min(5, len(correct_answers))):
+            user_ans = user_answers[i] if i < len(user_answers) else "?"
+            correct_ans = correct_answers[i] if i < len(correct_answers) else "?"
+            explanation = explanations[i] if i < len(explanations) else "Great job learning!"
+            is_correct = user_ans.upper() == correct_ans.upper()
             
-            question_labels = ["Question 1 🔢", "Question 2 🧮", "Question 3 🎯", "Question 4 🌟", "Question 5 🏆"]
+            question_text = ""
+            if parsed_questions and i < len(parsed_questions):
+                question_text = parsed_questions[i].get('text', '')
             
-            for i in range(min(5, len(correct_answers))):
-                if (i + 1) in wrong_questions:
-                    user_ans = user_answers[i] if i < len(user_answers) else "?"
-                    correct_ans = correct_answers[i] if i < len(correct_answers) else "?"
-                    explanation = explanations[i] if i < len(explanations) else "Keep practicing - you'll get it next time!"
-                    
-                    st.markdown(f"""
+            if is_correct:
+                st.markdown(f"""
+<div class="result-correct">
+<strong>{question_labels[i]}</strong><br>
+<em style="color: #555;">{question_text}</em><br><br>
+✅ You answered: <strong>{user_ans}</strong> - Correct!<br><br>
+💡 <em>{explanation}</em>
+</div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown(f"""
 <div class="result-wrong">
-<strong>{question_labels[i]}</strong><br><br>
+<strong>{question_labels[i]}</strong><br>
+<em style="color: #555;">{question_text}</em><br><br>
 ❌ You answered: <strong>{user_ans}</strong><br>
 ✅ Correct answer: <strong>{correct_ans}</strong><br><br>
 💡 <em>{explanation}</em>
 </div>
-                    """, unsafe_allow_html=True)
-        else:
-            st.markdown("---")
+                """, unsafe_allow_html=True)
+        
+        if not wrong_questions:
             st.markdown("### 🌟 FLAWLESS! You got everything right! 🌟")
-            st.markdown("*No corrections needed - you're already a pro at this! 😎*")
         
         st.markdown("---")
         if correct_count >= 4:
