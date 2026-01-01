@@ -968,17 +968,16 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
 </div>
                     """, unsafe_allow_html=True)
                     
-                    def format_option(x, opts=q['options']):
-                        if x == "—":
-                            return "👆 Choose your answer"
-                        return f"{x}) {opts[x]}"
+                    st.markdown("**👆 Pick your answer:**")
+                    st.markdown("")
                     
                     answer = st.radio(
                         f"Your answer for Q{q['number']}:",
-                        options=["—", "A", "B", "C", "D"],
-                        format_func=format_option,
+                        options=["A", "B", "C", "D"],
+                        format_func=lambda x, opts=q['options']: f"{x}) {opts[x]}",
                         horizontal=True,
                         key=f"q{idx+1}",
+                        index=None,
                         label_visibility="collapsed"
                     )
                     user_answers.append(answer)
@@ -992,7 +991,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 submitted = st.form_submit_button("📨 SUBMIT ALL ANSWERS!", use_container_width=True)
                 
                 if submitted:
-                    unanswered = [i+1 for i, ans in enumerate(user_answers) if ans == "—"]
+                    unanswered = [i+1 for i, ans in enumerate(user_answers) if ans is None]
                     
                     if unanswered:
                         st.error(f"⚠️ Please answer all questions! You haven't picked an answer for: Question {', '.join(map(str, unanswered))}")
