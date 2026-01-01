@@ -175,6 +175,62 @@ def get_random_encouragement():
     return random.choice(ENCOURAGEMENTS)
 
 
+def get_emoji_for_answer(answer_text: str) -> str:
+    """Get a descriptive emoji based on answer content."""
+    text = answer_text.lower()
+    
+    emoji_keywords = {
+        "🏛️": ["roman", "rome", "empire", "ancient", "greek", "greece", "egypt", "pyramid", "pharaoh", "temple", "civilization"],
+        "🌍": ["earth", "world", "globe", "planet", "continent", "geography", "country", "nation"],
+        "🌊": ["ocean", "sea", "water", "wave", "marine", "fish", "whale", "dolphin", "beach", "river", "lake"],
+        "🌋": ["volcano", "lava", "eruption", "magma", "tectonic"],
+        "🔬": ["science", "experiment", "laboratory", "research", "scientist", "microscope", "cell", "bacteria"],
+        "⚗️": ["chemistry", "chemical", "element", "atom", "molecule", "compound", "reaction"],
+        "🧬": ["dna", "gene", "genetic", "biology", "evolution", "species"],
+        "🔭": ["space", "star", "planet", "galaxy", "universe", "astronaut", "nasa", "telescope", "moon", "sun", "solar", "astronomy"],
+        "🚀": ["rocket", "spacecraft", "launch", "mission", "orbit"],
+        "🧮": ["math", "number", "calculate", "equation", "formula", "algebra", "geometry", "fraction", "decimal", "percent"],
+        "📐": ["angle", "triangle", "square", "rectangle", "circle", "shape", "polygon"],
+        "💻": ["computer", "technology", "digital", "software", "internet", "code", "programming", "algorithm"],
+        "📱": ["phone", "mobile", "app", "device", "smart"],
+        "🎨": ["art", "paint", "draw", "color", "artist", "museum", "sculpture", "creative"],
+        "🎵": ["music", "song", "melody", "instrument", "orchestra", "band", "rhythm", "note"],
+        "📚": ["book", "read", "library", "literature", "author", "novel", "story", "write"],
+        "🏰": ["castle", "medieval", "knight", "king", "queen", "royal", "kingdom", "palace"],
+        "⚔️": ["war", "battle", "fight", "army", "soldier", "military", "weapon"],
+        "🦖": ["dinosaur", "fossil", "prehistoric", "extinct", "jurassic"],
+        "🐾": ["animal", "mammal", "wildlife", "zoo", "pet", "dog", "cat", "bird"],
+        "🌱": ["plant", "tree", "forest", "flower", "garden", "grow", "seed", "leaf", "nature"],
+        "☀️": ["sun", "sunny", "solar", "light", "bright", "heat", "warm", "summer"],
+        "❄️": ["ice", "snow", "cold", "winter", "freeze", "arctic", "polar", "glacier"],
+        "⚡": ["electric", "energy", "power", "lightning", "current", "voltage", "battery"],
+        "🧲": ["magnet", "magnetic", "force", "field", "attract"],
+        "🎭": ["theater", "drama", "play", "actor", "performance", "stage"],
+        "🏆": ["win", "champion", "victory", "first", "best", "gold", "trophy"],
+        "🎮": ["game", "video", "play", "player", "gaming"],
+        "⚽": ["soccer", "football", "sport", "ball", "goal", "team"],
+        "🏀": ["basketball", "nba", "court", "dunk"],
+        "🍎": ["food", "fruit", "apple", "eat", "nutrition", "healthy", "diet"],
+        "🧠": ["brain", "think", "mind", "memory", "intelligence", "smart", "learn"],
+        "❤️": ["heart", "love", "blood", "pump", "cardiovascular"],
+        "🦴": ["bone", "skeleton", "body", "muscle", "organ"],
+        "💰": ["money", "economy", "bank", "finance", "dollar", "currency", "trade", "business"],
+        "🗳️": ["vote", "election", "government", "president", "congress", "democracy", "political"],
+        "📜": ["constitution", "law", "document", "declaration", "rights", "amendment"],
+        "🗽": ["america", "american", "usa", "united states", "liberty", "freedom"],
+        "🎪": ["circus", "carnival", "fun", "entertainment"],
+        "🌈": ["rainbow", "color", "spectrum", "light", "prism"],
+    }
+    
+    for emoji, keywords in emoji_keywords.items():
+        for keyword in keywords:
+            if keyword in text:
+                return emoji
+    
+    fun_defaults = ["✨", "🎯", "💫", "🌟", "🔮", "💎", "🎲", "🧩"]
+    return random.choice(fun_defaults)
+
+
 def sanitize_topic(topic: str) -> str:
     """Clean and validate topic input."""
     topic = topic.strip()
@@ -971,12 +1027,12 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     st.markdown("**👆 Pick your answer:**")
                     st.markdown("")
                     
-                    answer_emojis = {"A": "🌟", "B": "🎯", "C": "💡", "D": "🔥"}
+                    option_emojis = {letter: get_emoji_for_answer(q['options'][letter]) for letter in ['A', 'B', 'C', 'D']}
                     
                     answer = st.radio(
                         f"Your answer for Q{q['number']}:",
                         options=["A", "B", "C", "D"],
-                        format_func=lambda x, opts=q['options'], emojis=answer_emojis: f"{emojis[x]} {x}) {opts[x]}",
+                        format_func=lambda x, opts=q['options'], emojis=option_emojis: f"{emojis[x]} {x}) {opts[x]}",
                         horizontal=True,
                         key=f"q{idx+1}",
                         index=None,
