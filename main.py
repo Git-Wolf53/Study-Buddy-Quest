@@ -971,7 +971,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     st.markdown("**👆 Pick your answer:**")
                     st.markdown("")
                     
-                    answer_emojis = {"A": "🅰️", "B": "🅱️", "C": "©️", "D": "🇩"}
+                    answer_emojis = {"A": "🌟", "B": "🎯", "C": "💡", "D": "🔥"}
                     
                     answer = st.radio(
                         f"Your answer for Q{q['number']}:",
