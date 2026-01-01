@@ -1009,13 +1009,20 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 
                 option_emojis = {letter: get_emoji_for_answer(q['options'][letter]) for letter in ['A', 'B', 'C', 'D']}
                 
+                radio_key = f"q{idx+1}"
+                current_val = st.session_state.get(radio_key)
+                if current_val in ["A", "B", "C", "D"]:
+                    current_idx = ["A", "B", "C", "D"].index(current_val)
+                else:
+                    current_idx = 0
+                
                 st.radio(
                     f"Your answer for Q{q['number']}:",
                     options=["A", "B", "C", "D"],
                     format_func=lambda x, opts=q['options'], emojis=option_emojis: f"{emojis[x]} {x}) {opts[x]}",
                     horizontal=True,
-                    key=f"q{idx+1}",
-                    index=0,
+                    key=radio_key,
+                    index=current_idx,
                     label_visibility="collapsed"
                 )
                 
