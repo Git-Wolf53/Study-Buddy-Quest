@@ -796,43 +796,7 @@ st.markdown("""
 st.markdown('<h1 class="mega-title">🎮 Study Buddy Quest 🧠</h1>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">Level up your knowledge, one quiz at a time! 🚀</p>', unsafe_allow_html=True)
 
-# ============================================================
-# ETHICS DISCLAIMER
-# ============================================================
-st.markdown("""
-<div style="background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%); 
-            color: white; 
-            padding: 15px 25px; 
-            border-radius: 15px; 
-            text-align: center; 
-            margin: 15px 0;
-            box-shadow: 0 4px 15px rgba(9, 132, 227, 0.3);">
-    <strong>🎓 Learning Pledge:</strong> This tool helps you learn and understand – always think for yourself and never use it to cheat! 
-    <br><small>Real knowledge comes from real effort! 💪</small>
-</div>
-""", unsafe_allow_html=True)
-
 st.markdown(f'<div class="encourage-box">{get_random_encouragement()}</div>', unsafe_allow_html=True)
-
-# ============================================================
-# UNDERSTANDING INFO BOX
-# ============================================================
-with st.expander("💡 Why Real Understanding Matters"):
-    st.info("""
-    **🧠 Your Brain is Amazing!**
-    
-    This quiz app is designed to help you truly *understand* topics, not just memorize answers. Here's why that matters:
-    
-    ✨ **Deep learning lasts forever** - When you understand WHY something works, you'll remember it for life!
-    
-    🔗 **Connections make you smarter** - Real understanding helps you connect ideas across different subjects.
-    
-    🎯 **Problem-solving power** - Understanding concepts means you can solve NEW problems, not just repeat old ones.
-    
-    💪 **Build confidence** - Knowing you truly understand something feels way better than just guessing!
-    
-    *Use AI as a study buddy to LEARN, not a shortcut to skip learning. Your future self will thank you!* 🚀
-    """)
 
 # ============================================================
 # BADGE DISPLAY
@@ -1254,6 +1218,40 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             st.session_state.score = 0
             st.session_state.wrong_questions = []
             st.rerun()
+
+# ============================================================
+# ETHICS SECTION (Near Bottom)
+# ============================================================
+st.markdown("---")
+st.markdown("""
+<div style="background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%); 
+            color: white; 
+            padding: 15px 25px; 
+            border-radius: 15px; 
+            text-align: center; 
+            margin: 15px 0;
+            box-shadow: 0 4px 15px rgba(9, 132, 227, 0.3);">
+    <strong>🎓 Learning Pledge:</strong> This tool helps you learn and understand – always think for yourself and never use it to cheat! 
+    <br><small>Real knowledge comes from real effort! 💪</small>
+</div>
+""", unsafe_allow_html=True)
+
+with st.expander("💡 Why Real Understanding Matters"):
+    st.info("""
+    **🧠 Your Brain is Amazing!**
+    
+    This quiz app is designed to help you truly *understand* topics, not just memorize answers. Here's why that matters:
+    
+    ✨ **Deep learning lasts forever** - When you understand WHY something works, you'll remember it for life!
+    
+    🔗 **Connections make you smarter** - Real understanding helps you connect ideas across different subjects.
+    
+    🎯 **Problem-solving power** - Understanding concepts means you can solve NEW problems, not just repeat old ones.
+    
+    💪 **Build confidence** - Knowing you truly understand something feels way better than just guessing!
+    
+    *Use AI as a study buddy to LEARN, not a shortcut to skip learning. Your future self will thank you!* 🚀
+    """)
 
 # ============================================================
 # FOOTER
