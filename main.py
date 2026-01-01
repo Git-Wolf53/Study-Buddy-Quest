@@ -218,32 +218,49 @@ def parse_individual_questions(quiz_text: str) -> list:
     """Parse quiz into individual questions with their options."""
     questions = []
     
-    question_pattern = r'###\s*Question\s*(\d+)\s*([^\n]*)\n\*\*(.+?)\*\*\s*\n+((?:[-•]\s*[A-D]\)\s*.+?\n?)+)'
+    question_blocks = re.split(r'###\s*Question\s*', quiz_text)
     
-    matches = re.findall(question_pattern, quiz_text, re.DOTALL)
-    
-    for match in matches:
-        q_num = match[0]
-        emoji = match[1].strip()
-        q_text = match[2].strip()
-        options_block = match[3]
-        
-        options = {}
-        option_pattern = r'[-•]\s*([A-D])\)\s*(.+?)(?=\n[-•]|\n\n|$)'
-        option_matches = re.findall(option_pattern, options_block, re.DOTALL)
-        
-        for opt_match in option_matches:
-            letter = opt_match[0].upper()
-            text = opt_match[1].strip()
-            options[letter] = text
-        
-        if len(options) == 4:
-            questions.append({
-                'number': int(q_num),
-                'emoji': emoji,
-                'text': q_text,
-                'options': options
-            })
+    for block in question_blocks[1:]:
+        try:
+            first_line_match = re.match(r'(\d+)\s*([^\n]*)', block)
+            if not first_line_match:
+                continue
+            
+            q_num = first_line_match.group(1)
+            emoji = first_line_match.group(2).strip()
+            
+            q_text_match = re.search(r'\*\*(.+?)\*\*', block, re.DOTALL)
+            if q_text_match:
+                q_text = q_text_match.group(1).strip()
+            else:
+                lines = block.split('\n')
+                q_text = lines[1].strip() if len(lines) > 1 else "Question"
+            
+            options = {}
+            option_patterns = [
+                r'-\s*([A-Da-d])\)\s*(.+?)(?=\n-\s*[A-Da-d]\)|\n\n|✅|$)',
+                r'\*\s*([A-Da-d])\)\s*(.+?)(?=\n\*\s*[A-Da-d]\)|\n\n|✅|$)',
+                r'([A-Da-d])\)\s*(.+?)(?=\n[A-Da-d]\)|\n\n|✅|$)',
+            ]
+            
+            for pattern in option_patterns:
+                option_matches = re.findall(pattern, block, re.DOTALL)
+                if len(option_matches) >= 4:
+                    for opt_match in option_matches[:4]:
+                        letter = opt_match[0].upper()
+                        text = opt_match[1].strip().rstrip('\n').strip()
+                        options[letter] = text
+                    break
+            
+            if len(options) == 4:
+                questions.append({
+                    'number': int(q_num),
+                    'emoji': emoji,
+                    'text': q_text,
+                    'options': options
+                })
+        except Exception:
+            continue
     
     return questions
 
