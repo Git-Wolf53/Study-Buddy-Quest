@@ -53,6 +53,57 @@ if "score" not in st.session_state:
     st.session_state.score = 0
 
 # ============================================================
+# GAMIFICATION: TOTAL SCORE AND LEVEL TRACKING
+# Keep track of points across all quizzes!
+# ============================================================
+if "total_score" not in st.session_state:
+    st.session_state.total_score = 0
+if "quizzes_completed" not in st.session_state:
+    st.session_state.quizzes_completed = 0
+
+
+def calculate_level(total_points: int) -> int:
+    """
+    Calculate the player's level based on total points.
+    Level 1 starts at 0 points, +1 level every 50 points.
+    """
+    return 1 + (total_points // 50)
+
+
+def get_points_for_next_level(total_points: int) -> tuple:
+    """
+    Calculate progress toward the next level.
+    Returns (points_into_current_level, points_needed_for_next_level)
+    """
+    current_level = calculate_level(total_points)
+    points_at_current_level_start = (current_level - 1) * 50
+    points_into_level = total_points - points_at_current_level_start
+    points_needed = 50  # Always 50 points per level
+    return points_into_level, points_needed
+
+
+def get_level_title(level: int) -> str:
+    """
+    Get a fun title based on the player's level!
+    """
+    titles = {
+        1: "Curious Beginner 🌱",
+        2: "Knowledge Seeker 📖",
+        3: "Quiz Explorer 🗺️",
+        4: "Brain Builder 🧱",
+        5: "Study Champion 🏅",
+        6: "Wisdom Warrior ⚔️",
+        7: "Master Learner 🎓",
+        8: "Knowledge Knight 🛡️",
+        9: "Quiz Legend 🌟",
+        10: "Ultimate Genius 👑"
+    }
+    if level >= 10:
+        return titles[10]
+    return titles.get(level, f"Level {level} Hero 🦸")
+
+
+# ============================================================
 # CUSTOM STYLING
 # Adding some colorful CSS to make our app look awesome!
 # ============================================================
@@ -110,6 +161,34 @@ st.markdown("""
         margin: 10px 0;
         border-radius: 5px;
     }
+    
+    /* Level display styling */
+    .level-display {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .level-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin: 0;
+    }
+    
+    .level-title {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin: 5px 0;
+    }
+    
+    .points-display {
+        font-size: 1.1rem;
+        margin-top: 10px;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -123,6 +202,30 @@ st.markdown('<h1 class="big-title">🎮 Study Buddy Quest 🧠</h1>', unsafe_all
 
 # Show an encouraging message to motivate students
 st.markdown('<p class="encourage-msg">Level up your knowledge, one quiz at a time! 🚀✨</p>', unsafe_allow_html=True)
+
+# ============================================================
+# GAMIFICATION DISPLAY
+# Show current level, total points, and progress to next level
+# ============================================================
+
+# Calculate current level and progress
+current_level = calculate_level(st.session_state.total_score)
+level_title = get_level_title(current_level)
+points_into_level, points_needed = get_points_for_next_level(st.session_state.total_score)
+progress_percentage = points_into_level / points_needed
+
+# Display the level card
+st.markdown(f"""
+<div class="level-display">
+    <p class="level-number">⭐ Level {current_level} ⭐</p>
+    <p class="level-title">{level_title}</p>
+    <p class="points-display">🏆 Total Points: {st.session_state.total_score} | 📚 Quizzes: {st.session_state.quizzes_completed}</p>
+</div>
+""", unsafe_allow_html=True)
+
+# Progress bar toward next level
+st.markdown(f"**Progress to Level {current_level + 1}:** {points_into_level}/{points_needed} points")
+st.progress(progress_percentage)
 
 # Add some space
 st.markdown("---")
@@ -349,7 +452,7 @@ if st.button("🎲 Generate Quiz! 🎲", use_container_width=True):
         # 🎈 BALLOONS! Because learning should be fun!
         st.balloons()
         
-        # Reset all quiz-related state for new quiz
+        # Reset quiz-specific state for new quiz (but keep total score!)
         st.session_state.answers_submitted = False
         st.session_state.correct_answers = []
         st.session_state.explanations = []
@@ -476,8 +579,12 @@ if st.session_state.quiz_generated and st.session_state.quiz_content:
                         correct_count += 1
                 
                 # Calculate score (10 points per correct answer)
-                score = correct_count * 10
-                st.session_state.score = score
+                quiz_score = correct_count * 10
+                st.session_state.score = quiz_score
+                
+                # Add to total score and increment quiz count
+                st.session_state.total_score += quiz_score
+                st.session_state.quizzes_completed += 1
                 
                 # Set the flag that answers were submitted
                 st.session_state.answers_submitted = True
@@ -509,13 +616,17 @@ if st.session_state.quiz_generated and st.session_state.quiz_content:
         
         # Display score prominently
         if correct_count == 5:
-            st.success(f"## 🏆 PERFECT SCORE! 🏆\n### You got **{correct_count}/5** correct!\n### **{score} points** earned! 🌟")
+            st.success(f"## 🏆 PERFECT SCORE! 🏆\n### You got **{correct_count}/5** correct!\n### **+{score} points** earned! 🌟")
         elif correct_count >= 4:
-            st.success(f"## 🎉 Amazing Job! 🎉\n### You got **{correct_count}/5** correct!\n### **{score} points** earned! 🌟")
+            st.success(f"## 🎉 Amazing Job! 🎉\n### You got **{correct_count}/5** correct!\n### **+{score} points** earned! 🌟")
         elif correct_count >= 3:
-            st.info(f"## 👍 Good Work!\n### You got **{correct_count}/5** correct!\n### **{score} points** earned!")
+            st.info(f"## 👍 Good Work!\n### You got **{correct_count}/5** correct!\n### **+{score} points** earned!")
         else:
-            st.warning(f"## 💪 Keep Practicing!\n### You got **{correct_count}/5** correct.\n### **{score} points** earned.\n### You'll do better next time!")
+            st.warning(f"## 💪 Keep Practicing!\n### You got **{correct_count}/5** correct.\n### **+{score} points** earned.\n### You'll do better next time!")
+        
+        # Show updated total
+        new_level = calculate_level(st.session_state.total_score)
+        st.markdown(f"### 📈 New Total: **{st.session_state.total_score} points** | Level **{new_level}**")
         
         st.markdown("---")
         st.markdown("### 📝 Detailed Results:")
@@ -560,7 +671,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_content:
         # Button to try again
         st.markdown("")
         if st.button("🔄 Try Another Quiz!", use_container_width=True):
-            # Reset for new quiz
+            # Reset for new quiz (keep total score!)
             st.session_state.quiz_generated = False
             st.session_state.quiz_content = None
             st.session_state.answers_submitted = False
