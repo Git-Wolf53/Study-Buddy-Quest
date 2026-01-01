@@ -985,8 +985,6 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             st.markdown("*Select your answer for each question below, then click Submit!*")
             st.markdown("")
             
-            if 'saved_answers' not in st.session_state:
-                st.session_state.saved_answers = [None, None, None, None, None]
             if 'quiz_error' not in st.session_state:
                 st.session_state.quiz_error = None
             
@@ -1011,26 +1009,22 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 
                 option_emojis = {letter: get_emoji_for_answer(q['options'][letter]) for letter in ['A', 'B', 'C', 'D']}
                 
-                saved_val = st.session_state.saved_answers[idx]
-                default_idx = ["A", "B", "C", "D"].index(saved_val) if saved_val in ["A", "B", "C", "D"] else None
-                
-                selected = st.radio(
+                st.radio(
                     f"Your answer for Q{q['number']}:",
                     options=["A", "B", "C", "D"],
                     format_func=lambda x, opts=q['options'], emojis=option_emojis: f"{emojis[x]} {x}) {opts[x]}",
                     horizontal=True,
                     key=f"q{idx+1}",
-                    index=default_idx,
+                    index=0,
                     label_visibility="collapsed"
                 )
-                st.session_state.saved_answers[idx] = selected
                 
                 if idx < 4:
                     st.markdown("---")
             
             st.markdown("")
             if st.button("📨 SUBMIT ALL ANSWERS!", use_container_width=True):
-                user_answers = st.session_state.saved_answers.copy()
+                user_answers = [st.session_state.get(f"q{i+1}") for i in range(5)]
                 unanswered = [i+1 for i, ans in enumerate(user_answers) if ans is None]
                 
                 if unanswered:
@@ -1237,7 +1231,6 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             st.session_state.user_answers = []
             st.session_state.score = 0
             st.session_state.wrong_questions = []
-            st.session_state.saved_answers = [None, None, None, None, None]
             st.session_state.quiz_error = None
             for i in range(1, 6):
                 if f"q{i}" in st.session_state:
