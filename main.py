@@ -49,6 +49,7 @@ client = genai.Client(api_key=GEMINI_API_KEY)
 defaults = {
     "quiz_content": None,
     "quiz_questions_only": None,
+    "parsed_questions": [],
     "quiz_generated": False,
     "answers_submitted": False,
     "correct_answers": [],
@@ -211,6 +212,40 @@ def validate_quiz_data(correct_answers: list, explanations: list) -> bool:
         if ans not in ['A', 'B', 'C', 'D']:
             return False
     return True
+
+
+def parse_individual_questions(quiz_text: str) -> list:
+    """Parse quiz into individual questions with their options."""
+    questions = []
+    
+    question_pattern = r'###\s*Question\s*(\d+)\s*([^\n]*)\n\*\*(.+?)\*\*\s*\n+((?:[-•]\s*[A-D]\)\s*.+?\n?)+)'
+    
+    matches = re.findall(question_pattern, quiz_text, re.DOTALL)
+    
+    for match in matches:
+        q_num = match[0]
+        emoji = match[1].strip()
+        q_text = match[2].strip()
+        options_block = match[3]
+        
+        options = {}
+        option_pattern = r'[-•]\s*([A-D])\)\s*(.+?)(?=\n[-•]|\n\n|$)'
+        option_matches = re.findall(option_pattern, options_block, re.DOTALL)
+        
+        for opt_match in option_matches:
+            letter = opt_match[0].upper()
+            text = opt_match[1].strip()
+            options[letter] = text
+        
+        if len(options) == 4:
+            questions.append({
+                'number': int(q_num),
+                'emoji': emoji,
+                'text': q_text,
+                'options': options
+            })
+    
+    return questions
 
 
 def generate_quiz_with_gemini(topic: str, difficulty: str, weak_topics: list = None) -> str:
@@ -855,9 +890,11 @@ if st.button("🎲 START QUIZ! 🎲", use_container_width=True):
                 raise ValueError("Quiz generation incomplete. Please try again!")
             
             quiz_questions_only = strip_answers_from_quiz(quiz_content)
+            parsed_questions = parse_individual_questions(quiz_content)
             
             st.session_state.quiz_content = quiz_content
             st.session_state.quiz_questions_only = quiz_questions_only
+            st.session_state.parsed_questions = parsed_questions
             st.session_state.quiz_generated = True
             st.session_state.correct_answers = correct_answers
             st.session_state.explanations = explanations
@@ -882,67 +919,137 @@ if st.button("🎲 START QUIZ! 🎲", use_container_width=True):
             st.info("💡 **Tip:** Try a different topic or refresh the page!")
 
 # ============================================================
-# DISPLAY QUIZ AND ANSWER FORM
+# DISPLAY QUIZ WITH INLINE RADIO BUTTONS
 # ============================================================
 if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
     
     if not st.session_state.answers_submitted:
         st.markdown("---")
-        st.markdown(st.session_state.quiz_questions_only)
         
-        st.markdown("---")
-        st.markdown("## ✏️ Lock In Your Answers!")
-        st.markdown("*Choose wisely... or guess boldly! 😄*")
+        parsed_questions = st.session_state.parsed_questions
+        question_emojis = ["🔢", "🧮", "🎯", "🌟", "🏆"]
         
-        with st.form(key="quiz_answers_form"):
-            st.markdown("### Your Answers:")
-            
-            q1_answer = st.radio("Question 1 🔢", options=["A", "B", "C", "D"], horizontal=True, key="q1")
-            q2_answer = st.radio("Question 2 🧮", options=["A", "B", "C", "D"], horizontal=True, key="q2")
-            q3_answer = st.radio("Question 3 🎯", options=["A", "B", "C", "D"], horizontal=True, key="q3")
-            q4_answer = st.radio("Question 4 🌟", options=["A", "B", "C", "D"], horizontal=True, key="q4")
-            q5_answer = st.radio("Question 5 🏆", options=["A", "B", "C", "D"], horizontal=True, key="q5")
-            
+        if parsed_questions and len(parsed_questions) == 5:
+            st.markdown(f"## 📝 Quiz Time!")
+            st.markdown("*Select your answer for each question below!*")
             st.markdown("")
             
-            submitted = st.form_submit_button("📨 SUBMIT ANSWERS!", use_container_width=True)
+            with st.form(key="quiz_answers_form"):
+                user_answers = []
+                
+                for idx, q in enumerate(parsed_questions):
+                    emoji = question_emojis[idx] if idx < len(question_emojis) else "❓"
+                    
+                    st.markdown(f"""
+<div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
+            padding: 20px; 
+            border-radius: 15px; 
+            margin: 15px 0;
+            border-left: 5px solid #667eea;">
+    <h4 style="color: #667eea; margin-bottom: 10px;">Question {q['number']} {emoji}</h4>
+    <p style="font-size: 1.15rem; font-weight: 600; color: #2d3436;">{q['text']}</p>
+</div>
+                    """, unsafe_allow_html=True)
+                    
+                    options_list = [f"{letter}) {q['options'][letter]}" for letter in ['A', 'B', 'C', 'D']]
+                    
+                    answer = st.radio(
+                        f"Your answer for Q{q['number']}:",
+                        options=['A', 'B', 'C', 'D'],
+                        format_func=lambda x, opts=q['options']: f"{x}) {opts[x]}",
+                        horizontal=True,
+                        key=f"q{idx+1}",
+                        label_visibility="collapsed"
+                    )
+                    user_answers.append(answer)
+                    
+                    if idx < 4:
+                        st.markdown("---")
+                
+                st.markdown("")
+                st.markdown("")
+                
+                submitted = st.form_submit_button("📨 SUBMIT ALL ANSWERS!", use_container_width=True)
+                
+                if submitted:
+                    st.session_state.user_answers = user_answers
+                    
+                    correct_count = 0
+                    wrong_questions = []
+                    correct_answers = st.session_state.correct_answers
+                    
+                    num_questions = min(len(user_answers), len(correct_answers))
+                    
+                    for i in range(num_questions):
+                        if user_answers[i].upper() == correct_answers[i].upper():
+                            correct_count += 1
+                        else:
+                            wrong_questions.append(i + 1)
+                    
+                    st.session_state.wrong_questions = wrong_questions
+                    
+                    quiz_score = correct_count * 10
+                    st.session_state.score = quiz_score
+                    
+                    if correct_count == 5:
+                        st.session_state.perfect_scores += 1
+                    
+                    if correct_count < 3 and st.session_state.current_topic:
+                        if st.session_state.current_topic not in st.session_state.weak_topics:
+                            st.session_state.weak_topics.append(st.session_state.current_topic)
+                    
+                    st.session_state.total_score += quiz_score
+                    st.session_state.quizzes_completed += 1
+                    
+                    check_and_award_badges()
+                    
+                    st.session_state.answers_submitted = True
+                    
+                    st.rerun()
+        else:
+            st.markdown(st.session_state.quiz_questions_only)
             
-            if submitted:
-                user_answers = [q1_answer, q2_answer, q3_answer, q4_answer, q5_answer]
-                st.session_state.user_answers = user_answers
+            st.markdown("---")
+            st.markdown("## ✏️ Lock In Your Answers!")
+            
+            with st.form(key="quiz_answers_form_fallback"):
+                q1 = st.radio("Question 1 🔢", options=["A", "B", "C", "D"], horizontal=True, key="q1_fb")
+                q2 = st.radio("Question 2 🧮", options=["A", "B", "C", "D"], horizontal=True, key="q2_fb")
+                q3 = st.radio("Question 3 🎯", options=["A", "B", "C", "D"], horizontal=True, key="q3_fb")
+                q4 = st.radio("Question 4 🌟", options=["A", "B", "C", "D"], horizontal=True, key="q4_fb")
+                q5 = st.radio("Question 5 🏆", options=["A", "B", "C", "D"], horizontal=True, key="q5_fb")
                 
-                correct_count = 0
-                wrong_questions = []
-                correct_answers = st.session_state.correct_answers
+                submitted = st.form_submit_button("📨 SUBMIT ANSWERS!", use_container_width=True)
                 
-                num_questions = min(len(user_answers), len(correct_answers))
-                
-                for i in range(num_questions):
-                    if user_answers[i].upper() == correct_answers[i].upper():
-                        correct_count += 1
-                    else:
-                        wrong_questions.append(i + 1)
-                
-                st.session_state.wrong_questions = wrong_questions
-                
-                quiz_score = correct_count * 10
-                st.session_state.score = quiz_score
-                
-                if correct_count == 5:
-                    st.session_state.perfect_scores += 1
-                
-                if correct_count < 3 and st.session_state.current_topic:
-                    if st.session_state.current_topic not in st.session_state.weak_topics:
-                        st.session_state.weak_topics.append(st.session_state.current_topic)
-                
-                st.session_state.total_score += quiz_score
-                st.session_state.quizzes_completed += 1
-                
-                check_and_award_badges()
-                
-                st.session_state.answers_submitted = True
-                
-                st.rerun()
+                if submitted:
+                    user_answers = [q1, q2, q3, q4, q5]
+                    st.session_state.user_answers = user_answers
+                    
+                    correct_count = 0
+                    wrong_questions = []
+                    correct_answers = st.session_state.correct_answers
+                    
+                    for i in range(min(len(user_answers), len(correct_answers))):
+                        if user_answers[i].upper() == correct_answers[i].upper():
+                            correct_count += 1
+                        else:
+                            wrong_questions.append(i + 1)
+                    
+                    st.session_state.wrong_questions = wrong_questions
+                    st.session_state.score = correct_count * 10
+                    
+                    if correct_count == 5:
+                        st.session_state.perfect_scores += 1
+                    
+                    if correct_count < 3 and st.session_state.current_topic:
+                        if st.session_state.current_topic not in st.session_state.weak_topics:
+                            st.session_state.weak_topics.append(st.session_state.current_topic)
+                    
+                    st.session_state.total_score += st.session_state.score
+                    st.session_state.quizzes_completed += 1
+                    check_and_award_badges()
+                    st.session_state.answers_submitted = True
+                    st.rerun()
     
     # ============================================================
     # SHOW RESULTS AFTER SUBMISSION
@@ -1057,6 +1164,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             st.session_state.quiz_generated = False
             st.session_state.quiz_content = None
             st.session_state.quiz_questions_only = None
+            st.session_state.parsed_questions = []
             st.session_state.answers_submitted = False
             st.session_state.correct_answers = []
             st.session_state.explanations = []
