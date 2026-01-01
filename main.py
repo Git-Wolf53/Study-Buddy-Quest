@@ -7,6 +7,19 @@
 # Import the Streamlit library - this is what makes our web app work!
 import streamlit as st
 
+# Import os to access our secret API key
+import os
+
+# Import Google's Generative AI library for Gemini
+# Blueprint: python_gemini - using direct API key integration
+from google import genai
+
+# ============================================================
+# GEMINI CONFIGURATION
+# Set up the Gemini AI client with our API key from Replit Secrets
+# ============================================================
+client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+
 # ============================================================
 # PAGE CONFIGURATION
 # This sets up how our page looks in the browser tab
@@ -109,6 +122,96 @@ elif difficulty == "Medium 🌿":
 else:
     st.info("🏆 Wow! You're going for the tough stuff! Respect!")
 
+
+# ============================================================
+# QUIZ GENERATION FUNCTION
+# This function calls Gemini AI to create a fun quiz!
+# ============================================================
+def generate_quiz_with_gemini(topic: str, difficulty: str) -> str:
+    """
+    Uses Google Gemini AI to generate a fun, educational quiz.
+    
+    Args:
+        topic: The subject the student wants to learn about
+        difficulty: Easy, Medium, or Hard
+        
+    Returns:
+        A string containing the quiz in markdown format
+    """
+    
+    # Clean the difficulty level (remove emoji)
+    clean_difficulty = difficulty.split()[0]  # Gets just "Easy", "Medium", or "Hard"
+    
+    # Create a detailed prompt for Gemini
+    # This tells the AI exactly what kind of quiz we want!
+    prompt = f"""You are a fun and encouraging teacher creating a quiz for a 14-year-old student.
+
+Create a 5-question multiple-choice quiz about: {topic}
+Difficulty level: {clean_difficulty}
+
+Guidelines:
+- Make questions appropriate for a 14-year-old student
+- For Easy: Basic concepts, straightforward questions
+- For Medium: Requires some thinking, applies concepts
+- For Hard: Challenging questions that require deeper understanding
+- Use friendly, encouraging language with emojis
+- Make it fun and engaging!
+
+Format your response EXACTLY like this in clean markdown:
+
+## 📝 Your {clean_difficulty} Quiz on {topic}!
+
+### Question 1 🔢
+**[Question text here]**
+
+- A) [Option A]
+- B) [Option B]
+- C) [Option C]
+- D) [Option D]
+
+✅ **Correct Answer: [Letter]**
+
+> 💡 **Explanation:** [Short, friendly explanation that helps the student understand why this is correct. Keep it encouraging!]
+
+---
+
+### Question 2 🧮
+[Continue same format...]
+
+---
+
+### Question 3 🎯
+[Continue same format...]
+
+---
+
+### Question 4 🌟
+[Continue same format...]
+
+---
+
+### Question 5 🏆
+[Continue same format...]
+
+---
+
+## 🎊 Quiz Complete!
+
+**Great job working through this quiz!** Keep learning and growing! 🌟
+
+Remember: Every question you tackle makes you smarter! 💪🧠
+"""
+    
+    # Call the Gemini API to generate the quiz
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",  # Using the fast, efficient model
+        contents=prompt
+    )
+    
+    # Return the generated quiz text
+    return response.text if response.text else "Sorry, couldn't generate a quiz. Please try again!"
+
+
 # ============================================================
 # GENERATE QUIZ BUTTON
 # The main action button that creates the quiz
@@ -119,7 +222,7 @@ st.markdown("")
 st.markdown("")
 
 # Create the big "Generate Quiz!" button
-# When clicked, this will show our sample quiz
+# When clicked, this will call Gemini to generate a real quiz!
 if st.button("🎲 Generate Quiz! 🎲", use_container_width=True):
     
     # Check if the user entered a topic
@@ -127,106 +230,28 @@ if st.button("🎲 Generate Quiz! 🎲", use_container_width=True):
         # If no topic, show a friendly warning
         st.warning("⚠️ Oops! Please enter a topic first! What do you want to learn about?")
     else:
-        # Topic was entered - let's show the quiz!
+        # Topic was entered - let's generate the quiz!
         
         # 🎈 BALLOONS! Because learning should be fun!
         st.balloons()
         
-        # Show a success message
-        st.success(f"🎉 Awesome! Here's your {difficulty} quiz about **{topic}**!")
-        
-        # ============================================================
-        # SAMPLE QUIZ DISPLAY
-        # This shows a placeholder quiz with 5 questions
-        # Later, we can replace this with AI-generated questions!
-        # ============================================================
-        
-        st.markdown("---")
-        st.markdown("## 📝 Your Quiz")
-        
-        # Question 1
-        st.markdown(f"""
-### Question 1 🔢
-**What is the main concept of {topic}?**
-
-- A) The first option about {topic}
-- B) The second option explaining {topic}
-- C) The third possible answer ✅ **(Correct!)**
-- D) The fourth choice
-
-> 💡 **Explanation:** This is the correct answer because it best describes the fundamental concept of {topic}. Great job if you got it right!
-        """)
-        
-        st.markdown("---")
-        
-        # Question 2
-        st.markdown(f"""
-### Question 2 🧮
-**Which example best demonstrates {topic}?**
-
-- A) Example one
-- B) Example two ✅ **(Correct!)**
-- C) Example three
-- D) Example four
-
-> 💡 **Explanation:** Option B is correct because it shows a real-world application of {topic}. Understanding examples helps you remember better!
-        """)
-        
-        st.markdown("---")
-        
-        # Question 3
-        st.markdown(f"""
-### Question 3 🎯
-**Why is {topic} important to learn?**
-
-- A) It's not that important
-- B) Only for tests
-- C) It helps in daily life
-- D) It builds foundation for advanced topics ✅ **(Correct!)**
-
-> 💡 **Explanation:** Learning {topic} creates a strong foundation that helps you understand more complex ideas later. Keep building those skills!
-        """)
-        
-        st.markdown("---")
-        
-        # Question 4
-        st.markdown(f"""
-### Question 4 🌟
-**What's a common mistake when learning {topic}?**
-
-- A) Practicing too much
-- B) Rushing through without understanding ✅ **(Correct!)**
-- C) Asking too many questions
-- D) Taking notes
-
-> 💡 **Explanation:** Taking your time to truly understand {topic} is key! It's better to go slow and learn well than to rush and forget.
-        """)
-        
-        st.markdown("---")
-        
-        # Question 5
-        st.markdown(f"""
-### Question 5 🏆
-**How can you master {topic}?**
-
-- A) Just read about it once
-- B) Practice regularly and ask questions ✅ **(Correct!)**
-- C) Only study before tests
-- D) Skip the hard parts
-
-> 💡 **Explanation:** Regular practice and curiosity are the keys to mastering any topic! You're already on the right track by using Study Buddy Quest!
-        """)
-        
-        # Final encouragement
-        st.markdown("---")
-        st.markdown("""
-        ## 🎊 Quiz Complete! 🎊
-        
-        **You did amazing!** 🌟
-        
-        Remember: Every question you answer makes you smarter! 
-        Keep questing, Study Buddy! 💪🧠
-        """)
+        # Show a loading message while Gemini generates the quiz
+        with st.spinner(f"🧠 Creating your {difficulty} quiz about {topic}... This is gonna be awesome!"):
+            try:
+                # Call our function to generate the quiz with Gemini
+                quiz_content = generate_quiz_with_gemini(topic, difficulty)
+                
+                # Show a success message
+                st.success(f"🎉 Your quiz is ready! Let's see how much you know about **{topic}**!")
+                
+                # Display the quiz
+                st.markdown("---")
+                st.markdown(quiz_content)
+                
+            except Exception as e:
+                # If something goes wrong, show a friendly error message
+                st.error(f"😅 Oops! Something went wrong while creating your quiz. Please try again!")
+                st.error(f"Error details: {str(e)}")
 
 # ============================================================
 # FOOTER
@@ -236,6 +261,6 @@ st.markdown("---")
 st.markdown("""
 <div style='text-align: center; color: #888; padding: 20px;'>
     Made with 💜 for the Presidential AI Challenge<br>
-    <small>Study Buddy Quest v1.0 | Day 1</small>
+    <small>Study Buddy Quest v1.0 | Day 1 | Powered by Google Gemini AI ✨</small>
 </div>
 """, unsafe_allow_html=True)
