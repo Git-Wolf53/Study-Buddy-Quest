@@ -60,6 +60,86 @@ if "total_score" not in st.session_state:
     st.session_state.total_score = 0
 if "quizzes_completed" not in st.session_state:
     st.session_state.quizzes_completed = 0
+if "perfect_scores" not in st.session_state:
+    st.session_state.perfect_scores = 0
+
+# ============================================================
+# BADGE SYSTEM
+# Track and display achievement badges!
+# ============================================================
+if "badges" not in st.session_state:
+    st.session_state.badges = set()
+
+# Available badges with their emoji and description
+BADGES = {
+    "first_quiz": {"emoji": "🎯", "name": "First Quiz!", "desc": "Complete your first quiz"},
+    "five_quizzes": {"emoji": "📚", "name": "Quiz Explorer", "desc": "Complete 5 quizzes"},
+    "ten_quizzes": {"emoji": "🏅", "name": "Quiz Master", "desc": "Complete 10 quizzes"},
+    "points_50": {"emoji": "⭐", "name": "50 Points!", "desc": "Earn 50 total points"},
+    "points_100": {"emoji": "🌟", "name": "100 Points!", "desc": "Earn 100 total points"},
+    "points_200": {"emoji": "💫", "name": "200 Points!", "desc": "Earn 200 total points"},
+    "points_500": {"emoji": "🔥", "name": "500 Points!", "desc": "Earn 500 total points"},
+    "perfect_score": {"emoji": "💯", "name": "Perfect Score!", "desc": "Get 5/5 on a quiz"},
+    "three_perfects": {"emoji": "🏆", "name": "Perfectionist", "desc": "Get 3 perfect scores"},
+    "level_5": {"emoji": "👑", "name": "Level 5 Hero", "desc": "Reach Level 5"},
+}
+
+
+def check_and_award_badges():
+    """
+    Check if the player has earned any new badges based on their stats.
+    Returns list of newly earned badges.
+    """
+    new_badges = []
+    
+    # First quiz badge
+    if st.session_state.quizzes_completed >= 1 and "first_quiz" not in st.session_state.badges:
+        st.session_state.badges.add("first_quiz")
+        new_badges.append("first_quiz")
+    
+    # 5 quizzes badge
+    if st.session_state.quizzes_completed >= 5 and "five_quizzes" not in st.session_state.badges:
+        st.session_state.badges.add("five_quizzes")
+        new_badges.append("five_quizzes")
+    
+    # 10 quizzes badge
+    if st.session_state.quizzes_completed >= 10 and "ten_quizzes" not in st.session_state.badges:
+        st.session_state.badges.add("ten_quizzes")
+        new_badges.append("ten_quizzes")
+    
+    # Points badges
+    if st.session_state.total_score >= 50 and "points_50" not in st.session_state.badges:
+        st.session_state.badges.add("points_50")
+        new_badges.append("points_50")
+    
+    if st.session_state.total_score >= 100 and "points_100" not in st.session_state.badges:
+        st.session_state.badges.add("points_100")
+        new_badges.append("points_100")
+    
+    if st.session_state.total_score >= 200 and "points_200" not in st.session_state.badges:
+        st.session_state.badges.add("points_200")
+        new_badges.append("points_200")
+    
+    if st.session_state.total_score >= 500 and "points_500" not in st.session_state.badges:
+        st.session_state.badges.add("points_500")
+        new_badges.append("points_500")
+    
+    # Perfect score badges
+    if st.session_state.perfect_scores >= 1 and "perfect_score" not in st.session_state.badges:
+        st.session_state.badges.add("perfect_score")
+        new_badges.append("perfect_score")
+    
+    if st.session_state.perfect_scores >= 3 and "three_perfects" not in st.session_state.badges:
+        st.session_state.badges.add("three_perfects")
+        new_badges.append("three_perfects")
+    
+    # Level 5 badge
+    current_level = calculate_level(st.session_state.total_score)
+    if current_level >= 5 and "level_5" not in st.session_state.badges:
+        st.session_state.badges.add("level_5")
+        new_badges.append("level_5")
+    
+    return new_badges
 
 
 def calculate_level(total_points: int) -> int:
@@ -189,6 +269,43 @@ st.markdown("""
         font-size: 1.1rem;
         margin-top: 10px;
     }
+    
+    /* Badge display styling */
+    .badge-container {
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+        padding: 15px;
+        border-radius: 15px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    
+    .badge-title {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+    }
+    
+    .badges {
+        font-size: 2rem;
+        letter-spacing: 5px;
+    }
+    
+    .new-badge {
+        background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+        color: white;
+        padding: 15px;
+        border-radius: 15px;
+        text-align: center;
+        margin: 10px 0;
+        animation: pulse 1s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+        100% { transform: scale(1); }
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -202,6 +319,26 @@ st.markdown('<h1 class="big-title">🎮 Study Buddy Quest 🧠</h1>', unsafe_all
 
 # Show an encouraging message to motivate students
 st.markdown('<p class="encourage-msg">Level up your knowledge, one quiz at a time! 🚀✨</p>', unsafe_allow_html=True)
+
+# ============================================================
+# BADGE DISPLAY
+# Show all unlocked badges at the top!
+# ============================================================
+if st.session_state.badges:
+    badge_emojis = " ".join([BADGES[b]["emoji"] for b in st.session_state.badges if b in BADGES])
+    st.markdown(f"""
+    <div class="badge-container">
+        <div class="badge-title">🏅 Your Badges ({len(st.session_state.badges)}/{len(BADGES)})</div>
+        <div class="badges">{badge_emojis}</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Show badge names on hover/expand
+    with st.expander("📋 View Badge Details"):
+        for badge_id in st.session_state.badges:
+            if badge_id in BADGES:
+                badge = BADGES[badge_id]
+                st.markdown(f"{badge['emoji']} **{badge['name']}** - {badge['desc']}")
 
 # ============================================================
 # GAMIFICATION DISPLAY
@@ -219,7 +356,7 @@ st.markdown(f"""
 <div class="level-display">
     <p class="level-number">⭐ Level {current_level} ⭐</p>
     <p class="level-title">{level_title}</p>
-    <p class="points-display">🏆 Total Points: {st.session_state.total_score} | 📚 Quizzes: {st.session_state.quizzes_completed}</p>
+    <p class="points-display">🏆 Total Points: {st.session_state.total_score} | 📚 Quizzes: {st.session_state.quizzes_completed} | 💯 Perfect Scores: {st.session_state.perfect_scores}</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -582,9 +719,16 @@ if st.session_state.quiz_generated and st.session_state.quiz_content:
                 quiz_score = correct_count * 10
                 st.session_state.score = quiz_score
                 
+                # Check for perfect score
+                if correct_count == 5:
+                    st.session_state.perfect_scores += 1
+                
                 # Add to total score and increment quiz count
                 st.session_state.total_score += quiz_score
                 st.session_state.quizzes_completed += 1
+                
+                # Check for new badges
+                check_and_award_badges()
                 
                 # Set the flag that answers were submitted
                 st.session_state.answers_submitted = True
@@ -610,8 +754,11 @@ if st.session_state.quiz_generated and st.session_state.quiz_content:
         # Count correct answers
         correct_count = sum(1 for u, c in zip(user_answers, correct_answers) if u.upper() == c.upper())
         
-        # Celebrate with balloons if 4+ correct!
-        if correct_count >= 4:
+        # Celebrate with balloons or snow!
+        if correct_count == 5:
+            st.balloons()
+            st.snow()
+        elif correct_count >= 4:
             st.balloons()
         
         # Display score prominently
@@ -627,6 +774,21 @@ if st.session_state.quiz_generated and st.session_state.quiz_content:
         # Show updated total
         new_level = calculate_level(st.session_state.total_score)
         st.markdown(f"### 📈 New Total: **{st.session_state.total_score} points** | Level **{new_level}**")
+        
+        # Check and display any new badges earned
+        new_badges = check_and_award_badges()
+        if new_badges:
+            for badge_id in new_badges:
+                if badge_id in BADGES:
+                    badge = BADGES[badge_id]
+                    st.markdown(f"""
+                    <div class="new-badge">
+                        <strong>🎊 NEW BADGE UNLOCKED! 🎊</strong><br>
+                        <span style="font-size: 2rem;">{badge['emoji']}</span><br>
+                        <strong>{badge['name']}</strong><br>
+                        {badge['desc']}
+                    </div>
+                    """, unsafe_allow_html=True)
         
         st.markdown("---")
         st.markdown("### 📝 Detailed Results:")
