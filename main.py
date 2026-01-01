@@ -873,12 +873,15 @@ example_topics = [
     "e.g., rainforests, electricity, art history...",
 ]
 
+if 'topic_placeholder' not in st.session_state:
+    st.session_state.topic_placeholder = random.choice(example_topics)
+
 col1, col2 = st.columns(2)
 
 with col1:
     topic = st.text_input(
         "📚 What do you want to study?",
-        placeholder=random.choice(example_topics),
+        placeholder=st.session_state.topic_placeholder,
         help="Type any topic you want to learn about!",
         max_chars=100
     )
