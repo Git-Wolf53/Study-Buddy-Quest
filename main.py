@@ -51,6 +51,8 @@ if "user_answers" not in st.session_state:
     st.session_state.user_answers = []
 if "score" not in st.session_state:
     st.session_state.score = 0
+if "current_topic" not in st.session_state:
+    st.session_state.current_topic = ""
 
 # ============================================================
 # GAMIFICATION: TOTAL SCORE AND LEVEL TRACKING
@@ -62,6 +64,15 @@ if "quizzes_completed" not in st.session_state:
     st.session_state.quizzes_completed = 0
 if "perfect_scores" not in st.session_state:
     st.session_state.perfect_scores = 0
+
+# ============================================================
+# WEAK TOPICS TRACKING
+# Track topics where user needs more practice
+# ============================================================
+if "weak_topics" not in st.session_state:
+    st.session_state.weak_topics = []
+if "wrong_questions" not in st.session_state:
+    st.session_state.wrong_questions = []
 
 # ============================================================
 # BADGE SYSTEM
@@ -306,6 +317,26 @@ st.markdown("""
         50% { transform: scale(1.02); }
         100% { transform: scale(1); }
     }
+    
+    /* Weak topics styling */
+    .weak-topics {
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeeba 100%);
+        border-left: 4px solid #ffc107;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .weak-topics-title {
+        font-weight: bold;
+        color: #856404;
+        margin-bottom: 10px;
+    }
+    
+    .weak-topic-item {
+        color: #856404;
+        padding: 3px 0;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -363,6 +394,22 @@ st.markdown(f"""
 # Progress bar toward next level
 st.markdown(f"**Progress to Level {current_level + 1}:** {points_into_level}/{points_needed} points")
 st.progress(progress_percentage)
+
+# ============================================================
+# WEAK TOPICS DISPLAY
+# Show areas where the user needs more practice
+# ============================================================
+if st.session_state.weak_topics:
+    # Remove duplicates while preserving order
+    unique_weak_topics = list(dict.fromkeys(st.session_state.weak_topics))
+    topics_list = "".join([f'<div class="weak-topic-item">📌 {topic}</div>' for topic in unique_weak_topics[-5:]])
+    st.markdown(f"""
+    <div class="weak-topics">
+        <div class="weak-topics-title">📖 Areas to Practice</div>
+        {topics_list}
+        <small style="color: #856404;">Try these topics again to improve!</small>
+    </div>
+    """, unsafe_allow_html=True)
 
 # Add some space
 st.markdown("---")
@@ -595,6 +642,8 @@ if st.button("🎲 Generate Quiz! 🎲", use_container_width=True):
         st.session_state.explanations = []
         st.session_state.user_answers = []
         st.session_state.score = 0
+        st.session_state.current_topic = topic
+        st.session_state.wrong_questions = []
         
         # Show a loading message while Gemini generates the quiz
         with st.spinner(f"🧠 Creating your {difficulty} quiz about {topic}... This is gonna be awesome!"):
@@ -706,14 +755,20 @@ if st.session_state.quiz_generated and st.session_state.quiz_content:
                 user_answers = [q1_answer, q2_answer, q3_answer, q4_answer, q5_answer]
                 st.session_state.user_answers = user_answers
                 
-                # Grade the quiz
+                # Grade the quiz and track wrong questions
                 correct_count = 0
+                wrong_questions = []
                 correct_answers = st.session_state.correct_answers
                 
                 # Compare each answer
                 for i, (user_ans, correct_ans) in enumerate(zip(user_answers, correct_answers)):
                     if user_ans.upper() == correct_ans.upper():
                         correct_count += 1
+                    else:
+                        wrong_questions.append(i + 1)
+                
+                # Store wrong questions
+                st.session_state.wrong_questions = wrong_questions
                 
                 # Calculate score (10 points per correct answer)
                 quiz_score = correct_count * 10
@@ -722,6 +777,12 @@ if st.session_state.quiz_generated and st.session_state.quiz_content:
                 # Check for perfect score
                 if correct_count == 5:
                     st.session_state.perfect_scores += 1
+                
+                # Track weak topics (less than 3 correct)
+                if correct_count < 3 and st.session_state.current_topic:
+                    # Add to weak topics if not already there
+                    if st.session_state.current_topic not in st.session_state.weak_topics:
+                        st.session_state.weak_topics.append(st.session_state.current_topic)
                 
                 # Add to total score and increment quiz count
                 st.session_state.total_score += quiz_score
@@ -750,6 +811,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_content:
         correct_answers = st.session_state.correct_answers
         explanations = st.session_state.explanations
         score = st.session_state.score
+        wrong_questions = st.session_state.wrong_questions
         
         # Count correct answers
         correct_count = sum(1 for u, c in zip(user_answers, correct_answers) if u.upper() == c.upper())
@@ -770,6 +832,8 @@ if st.session_state.quiz_generated and st.session_state.quiz_content:
             st.info(f"## 👍 Good Work!\n### You got **{correct_count}/5** correct!\n### **+{score} points** earned!")
         else:
             st.warning(f"## 💪 Keep Practicing!\n### You got **{correct_count}/5** correct.\n### **+{score} points** earned.\n### You'll do better next time!")
+            if st.session_state.current_topic:
+                st.info(f"📖 **{st.session_state.current_topic}** has been added to your practice list!")
         
         # Show updated total
         new_level = calculate_level(st.session_state.total_score)
@@ -841,6 +905,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_content:
             st.session_state.explanations = []
             st.session_state.user_answers = []
             st.session_state.score = 0
+            st.session_state.wrong_questions = []
             st.rerun()
 
 # ============================================================
