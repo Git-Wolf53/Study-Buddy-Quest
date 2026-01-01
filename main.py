@@ -862,12 +862,23 @@ st.markdown("---")
 # ============================================================
 st.markdown("### 🎯 Choose Your Quest!")
 
+example_topics = [
+    "e.g., dinosaurs, volcanoes, the moon...",
+    "e.g., ancient Egypt, the ocean, math...",
+    "e.g., space exploration, animals, weather...",
+    "e.g., the human body, planets, geography...",
+    "e.g., world history, chemistry, coding...",
+    "e.g., famous scientists, ecosystems, music...",
+    "e.g., inventions, mythology, sports...",
+    "e.g., rainforests, electricity, art history...",
+]
+
 col1, col2 = st.columns(2)
 
 with col1:
     topic = st.text_input(
         "📚 What do you want to study?",
-        placeholder="e.g., space, fractions, history...",
+        placeholder=random.choice(example_topics),
         help="Type any topic you want to learn about!",
         max_chars=100
     )
