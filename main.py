@@ -968,12 +968,15 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
 </div>
                     """, unsafe_allow_html=True)
                     
-                    options_list = [f"{letter}) {q['options'][letter]}" for letter in ['A', 'B', 'C', 'D']]
+                    def format_option(x, opts=q['options']):
+                        if x == "—":
+                            return "👆 Choose your answer"
+                        return f"{x}) {opts[x]}"
                     
                     answer = st.radio(
                         f"Your answer for Q{q['number']}:",
-                        options=['A', 'B', 'C', 'D'],
-                        format_func=lambda x, opts=q['options']: f"{x}) {opts[x]}",
+                        options=["—", "A", "B", "C", "D"],
+                        format_func=format_option,
                         horizontal=True,
                         key=f"q{idx+1}",
                         label_visibility="collapsed"
@@ -989,40 +992,45 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 submitted = st.form_submit_button("📨 SUBMIT ALL ANSWERS!", use_container_width=True)
                 
                 if submitted:
-                    st.session_state.user_answers = user_answers
+                    unanswered = [i+1 for i, ans in enumerate(user_answers) if ans == "—"]
                     
-                    correct_count = 0
-                    wrong_questions = []
-                    correct_answers = st.session_state.correct_answers
-                    
-                    num_questions = min(len(user_answers), len(correct_answers))
-                    
-                    for i in range(num_questions):
-                        if user_answers[i].upper() == correct_answers[i].upper():
-                            correct_count += 1
-                        else:
-                            wrong_questions.append(i + 1)
-                    
-                    st.session_state.wrong_questions = wrong_questions
-                    
-                    quiz_score = correct_count * 10
-                    st.session_state.score = quiz_score
-                    
-                    if correct_count == 5:
-                        st.session_state.perfect_scores += 1
-                    
-                    if correct_count < 3 and st.session_state.current_topic:
-                        if st.session_state.current_topic not in st.session_state.weak_topics:
-                            st.session_state.weak_topics.append(st.session_state.current_topic)
-                    
-                    st.session_state.total_score += quiz_score
-                    st.session_state.quizzes_completed += 1
-                    
-                    check_and_award_badges()
-                    
-                    st.session_state.answers_submitted = True
-                    
-                    st.rerun()
+                    if unanswered:
+                        st.error(f"⚠️ Please answer all questions! You haven't picked an answer for: Question {', '.join(map(str, unanswered))}")
+                    else:
+                        st.session_state.user_answers = user_answers
+                        
+                        correct_count = 0
+                        wrong_questions = []
+                        correct_answers = st.session_state.correct_answers
+                        
+                        num_questions = min(len(user_answers), len(correct_answers))
+                        
+                        for i in range(num_questions):
+                            if user_answers[i].upper() == correct_answers[i].upper():
+                                correct_count += 1
+                            else:
+                                wrong_questions.append(i + 1)
+                        
+                        st.session_state.wrong_questions = wrong_questions
+                        
+                        quiz_score = correct_count * 10
+                        st.session_state.score = quiz_score
+                        
+                        if correct_count == 5:
+                            st.session_state.perfect_scores += 1
+                        
+                        if correct_count < 3 and st.session_state.current_topic:
+                            if st.session_state.current_topic not in st.session_state.weak_topics:
+                                st.session_state.weak_topics.append(st.session_state.current_topic)
+                        
+                        st.session_state.total_score += quiz_score
+                        st.session_state.quizzes_completed += 1
+                        
+                        check_and_award_badges()
+                        
+                        st.session_state.answers_submitted = True
+                        
+                        st.rerun()
         else:
             st.markdown(st.session_state.quiz_questions_only)
             
