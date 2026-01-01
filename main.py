@@ -39,6 +39,8 @@ st.set_page_config(
 # ============================================================
 if "quiz_content" not in st.session_state:
     st.session_state.quiz_content = None
+if "quiz_questions_only" not in st.session_state:
+    st.session_state.quiz_questions_only = None
 if "quiz_generated" not in st.session_state:
     st.session_state.quiz_generated = False
 if "answers_submitted" not in st.session_state:
@@ -192,6 +194,26 @@ def get_level_title(level: int) -> str:
     if level >= 10:
         return titles[10]
     return titles.get(level, f"Level {level} Hero 🦸")
+
+
+def strip_answers_from_quiz(quiz_text: str) -> str:
+    """
+    Remove correct answers and explanations from quiz text.
+    This way students can't see the answers before submitting!
+    """
+    # Remove the correct answer lines
+    quiz_text = re.sub(r'✅\s*\*\*Correct Answer:.*?\*\*\s*\n?', '', quiz_text)
+    
+    # Remove the explanation lines
+    quiz_text = re.sub(r'>\s*💡\s*\*\*Explanation:\*\*.*?(?=\n\n|---|\n###|$)', '', quiz_text, flags=re.DOTALL)
+    
+    # Remove the "Quiz Complete" section at the end
+    quiz_text = re.sub(r'##\s*🎊\s*Quiz Complete!.*$', '', quiz_text, flags=re.DOTALL)
+    
+    # Clean up extra blank lines
+    quiz_text = re.sub(r'\n{3,}', '\n\n', quiz_text)
+    
+    return quiz_text.strip()
 
 
 # ============================================================
@@ -654,8 +676,12 @@ if st.button("🎲 Generate Quiz! 🎲", use_container_width=True):
                 # Parse the correct answers and explanations
                 correct_answers, explanations = parse_quiz_answers(quiz_content)
                 
+                # Create a version without answers for display
+                quiz_questions_only = strip_answers_from_quiz(quiz_content)
+                
                 # Store everything in session state
                 st.session_state.quiz_content = quiz_content
+                st.session_state.quiz_questions_only = quiz_questions_only
                 st.session_state.quiz_generated = True
                 st.session_state.correct_answers = correct_answers
                 st.session_state.explanations = explanations
@@ -674,14 +700,14 @@ if st.button("🎲 Generate Quiz! 🎲", use_container_width=True):
 # ============================================================
 
 # Check if we have a quiz to display
-if st.session_state.quiz_generated and st.session_state.quiz_content:
-    
-    # Display the quiz content
-    st.markdown("---")
-    st.markdown(st.session_state.quiz_content)
+if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
     
     # Only show the answer form if answers haven't been submitted yet
     if not st.session_state.answers_submitted:
+        # Display the quiz content WITHOUT answers
+        st.markdown("---")
+        st.markdown(st.session_state.quiz_questions_only)
+        
         # ============================================================
         # ANSWER SUBMISSION FORM
         # Let students select their answers and submit!
@@ -854,36 +880,32 @@ if st.session_state.quiz_generated and st.session_state.quiz_content:
                     </div>
                     """, unsafe_allow_html=True)
         
-        st.markdown("---")
-        st.markdown("### 📝 Detailed Results:")
-        
-        # Question labels
-        question_labels = ["Question 1 🔢", "Question 2 🧮", "Question 3 🎯", "Question 4 🌟", "Question 5 🏆"]
-        
-        # Show each question's result
-        for i in range(5):
-            user_ans = user_answers[i] if i < len(user_answers) else "?"
-            correct_ans = correct_answers[i] if i < len(correct_answers) else "?"
-            explanation = explanations[i] if i < len(explanations) else "No explanation available."
+        # Only show detailed results for WRONG answers
+        if wrong_questions:
+            st.markdown("---")
+            st.markdown("### 📝 Questions You Missed:")
+            st.markdown("*Here are the correct answers and explanations for the questions you got wrong:*")
             
-            is_correct = user_ans.upper() == correct_ans.upper()
+            # Question labels
+            question_labels = ["Question 1 🔢", "Question 2 🧮", "Question 3 🎯", "Question 4 🌟", "Question 5 🏆"]
             
-            if is_correct:
-                st.markdown(f"""
-<div class="correct-answer">
-<strong>{question_labels[i]}</strong><br>
-✅ <strong>Correct!</strong> You answered: <strong>{user_ans}</strong><br>
-<em>💡 {explanation}</em>
-</div>
-                """, unsafe_allow_html=True)
-            else:
-                st.markdown(f"""
+            # Show only wrong questions with correct answer and explanation
+            for i in range(5):
+                if (i + 1) in wrong_questions:
+                    user_ans = user_answers[i] if i < len(user_answers) else "?"
+                    correct_ans = correct_answers[i] if i < len(correct_answers) else "?"
+                    explanation = explanations[i] if i < len(explanations) else "No explanation available."
+                    
+                    st.markdown(f"""
 <div class="wrong-answer">
 <strong>{question_labels[i]}</strong><br>
-❌ You answered: <strong>{user_ans}</strong> | Correct answer: <strong>{correct_ans}</strong><br>
+❌ You answered: <strong>{user_ans}</strong> | ✅ Correct answer: <strong>{correct_ans}</strong><br>
 <em>💡 {explanation}</em>
 </div>
-                """, unsafe_allow_html=True)
+                    """, unsafe_allow_html=True)
+        else:
+            st.markdown("---")
+            st.markdown("### 🌟 You got everything right! No corrections needed!")
         
         # Final encouragement
         st.markdown("---")
@@ -900,6 +922,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_content:
             # Reset for new quiz (keep total score!)
             st.session_state.quiz_generated = False
             st.session_state.quiz_content = None
+            st.session_state.quiz_questions_only = None
             st.session_state.answers_submitted = False
             st.session_state.correct_answers = []
             st.session_state.explanations = []
