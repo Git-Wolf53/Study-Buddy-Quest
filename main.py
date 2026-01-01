@@ -4,38 +4,27 @@
 # Built for the Presidential AI Challenge
 # ============================================================
 
-# Import the Streamlit library - this is what makes our web app work!
 import streamlit as st
-
-# Import os to access our secret API key
 import os
-
-# Import re for parsing the quiz answers
 import re
-
-# Import Google's Generative AI library for Gemini
-# Blueprint: python_gemini - using direct API key integration
 from google import genai
 
 # ============================================================
 # GEMINI CONFIGURATION
-# Set up the Gemini AI client with our API key from Replit Secrets
 # ============================================================
 client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
 # ============================================================
 # PAGE CONFIGURATION
-# This sets up how our page looks in the browser tab
 # ============================================================
 st.set_page_config(
-    page_title="Study Buddy Quest 🧠",  # Shows in browser tab
-    page_icon="🧠",                      # Favicon in browser tab
-    layout="centered"                    # Centers our content nicely
+    page_title="Study Buddy Quest 🧠",
+    page_icon="🧠",
+    layout="centered"
 )
 
 # ============================================================
 # SESSION STATE INITIALIZATION
-# We use session state to remember the quiz between interactions
 # ============================================================
 if "quiz_content" not in st.session_state:
     st.session_state.quiz_content = None
@@ -55,35 +44,22 @@ if "score" not in st.session_state:
     st.session_state.score = 0
 if "current_topic" not in st.session_state:
     st.session_state.current_topic = ""
-
-# ============================================================
-# GAMIFICATION: TOTAL SCORE AND LEVEL TRACKING
-# Keep track of points across all quizzes!
-# ============================================================
 if "total_score" not in st.session_state:
     st.session_state.total_score = 0
 if "quizzes_completed" not in st.session_state:
     st.session_state.quizzes_completed = 0
 if "perfect_scores" not in st.session_state:
     st.session_state.perfect_scores = 0
-
-# ============================================================
-# WEAK TOPICS TRACKING
-# Track topics where user needs more practice
-# ============================================================
 if "weak_topics" not in st.session_state:
     st.session_state.weak_topics = []
 if "wrong_questions" not in st.session_state:
     st.session_state.wrong_questions = []
-
-# ============================================================
-# BADGE SYSTEM
-# Track and display achievement badges!
-# ============================================================
 if "badges" not in st.session_state:
     st.session_state.badges = set()
 
-# Available badges with their emoji and description
+# ============================================================
+# BADGE SYSTEM
+# ============================================================
 BADGES = {
     "first_quiz": {"emoji": "🎯", "name": "First Quiz!", "desc": "Complete your first quiz"},
     "five_quizzes": {"emoji": "📚", "name": "Quiz Explorer", "desc": "Complete 5 quizzes"},
@@ -97,30 +73,32 @@ BADGES = {
     "level_5": {"emoji": "👑", "name": "Level 5 Hero", "desc": "Reach Level 5"},
 }
 
+# Encouraging messages that rotate
+ENCOURAGEMENTS = [
+    "You're leveling up your brain! 🧠✨",
+    "Every question makes you smarter! 💪",
+    "Knowledge is your superpower! ⚡",
+    "You've got this! 🚀",
+    "Learning looks good on you! 😎",
+    "Future genius in the making! 🌟",
+]
+
 
 def check_and_award_badges():
-    """
-    Check if the player has earned any new badges based on their stats.
-    Returns list of newly earned badges.
-    """
     new_badges = []
     
-    # First quiz badge
     if st.session_state.quizzes_completed >= 1 and "first_quiz" not in st.session_state.badges:
         st.session_state.badges.add("first_quiz")
         new_badges.append("first_quiz")
     
-    # 5 quizzes badge
     if st.session_state.quizzes_completed >= 5 and "five_quizzes" not in st.session_state.badges:
         st.session_state.badges.add("five_quizzes")
         new_badges.append("five_quizzes")
     
-    # 10 quizzes badge
     if st.session_state.quizzes_completed >= 10 and "ten_quizzes" not in st.session_state.badges:
         st.session_state.badges.add("ten_quizzes")
         new_badges.append("ten_quizzes")
     
-    # Points badges
     if st.session_state.total_score >= 50 and "points_50" not in st.session_state.badges:
         st.session_state.badges.add("points_50")
         new_badges.append("points_50")
@@ -137,7 +115,6 @@ def check_and_award_badges():
         st.session_state.badges.add("points_500")
         new_badges.append("points_500")
     
-    # Perfect score badges
     if st.session_state.perfect_scores >= 1 and "perfect_score" not in st.session_state.badges:
         st.session_state.badges.add("perfect_score")
         new_badges.append("perfect_score")
@@ -146,7 +123,6 @@ def check_and_award_badges():
         st.session_state.badges.add("three_perfects")
         new_badges.append("three_perfects")
     
-    # Level 5 badge
     current_level = calculate_level(st.session_state.total_score)
     if current_level >= 5 and "level_5" not in st.session_state.badges:
         st.session_state.badges.add("level_5")
@@ -156,29 +132,18 @@ def check_and_award_badges():
 
 
 def calculate_level(total_points: int) -> int:
-    """
-    Calculate the player's level based on total points.
-    Level 1 starts at 0 points, +1 level every 50 points.
-    """
     return 1 + (total_points // 50)
 
 
 def get_points_for_next_level(total_points: int) -> tuple:
-    """
-    Calculate progress toward the next level.
-    Returns (points_into_current_level, points_needed_for_next_level)
-    """
     current_level = calculate_level(total_points)
     points_at_current_level_start = (current_level - 1) * 50
     points_into_level = total_points - points_at_current_level_start
-    points_needed = 50  # Always 50 points per level
+    points_needed = 50
     return points_into_level, points_needed
 
 
 def get_level_title(level: int) -> str:
-    """
-    Get a fun title based on the player's level!
-    """
     titles = {
         1: "Curious Beginner 🌱",
         2: "Knowledge Seeker 📖",
@@ -197,315 +162,497 @@ def get_level_title(level: int) -> str:
 
 
 def strip_answers_from_quiz(quiz_text: str) -> str:
-    """
-    Remove correct answers and explanations from quiz text.
-    This way students can't see the answers before submitting!
-    """
-    # Remove the correct answer lines
     quiz_text = re.sub(r'✅\s*\*\*Correct Answer:.*?\*\*\s*\n?', '', quiz_text)
-    
-    # Remove the explanation lines
     quiz_text = re.sub(r'>\s*💡\s*\*\*Explanation:\*\*.*?(?=\n\n|---|\n###|$)', '', quiz_text, flags=re.DOTALL)
-    
-    # Remove the "Quiz Complete" section at the end
     quiz_text = re.sub(r'##\s*🎊\s*Quiz Complete!.*$', '', quiz_text, flags=re.DOTALL)
-    
-    # Clean up extra blank lines
     quiz_text = re.sub(r'\n{3,}', '\n\n', quiz_text)
-    
     return quiz_text.strip()
 
 
+def get_random_encouragement():
+    import random
+    return random.choice(ENCOURAGEMENTS)
+
+
 # ============================================================
-# CUSTOM STYLING
-# Adding some colorful CSS to make our app look awesome!
+# AWESOME CUSTOM STYLING - Teen-Friendly & Mobile-First! 🎨
 # ============================================================
 st.markdown("""
 <style>
-    /* Make the main title colorful and fun */
-    .big-title {
-        font-size: 3rem;
+    /* Import fun Google Font */
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+    
+    /* Apply font globally */
+    html, body, [class*="css"] {
+        font-family: 'Nunito', sans-serif;
+    }
+    
+    /* Hide Streamlit branding for cleaner look */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    
+    /* Main container padding for mobile */
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+        max-width: 800px;
+    }
+    
+    /* Epic gradient title */
+    .mega-title {
+        font-size: 2.8rem;
         text-align: center;
-        background: linear-gradient(90deg, #FF6B6B, #4ECDC4, #45B7D1, #96CEB4);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+        background-size: 300% 300%;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        font-weight: bold;
+        background-clip: text;
+        font-weight: 800;
         margin-bottom: 0;
+        animation: gradient-shift 5s ease infinite;
+        text-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
     }
     
-    /* Style for the encouraging message */
-    .encourage-msg {
+    @keyframes gradient-shift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    
+    /* Subtitle styling */
+    .subtitle {
         text-align: center;
-        font-size: 1.3rem;
-        color: #666;
+        font-size: 1.4rem;
+        color: #6c5ce7;
         margin-top: 10px;
+        font-weight: 600;
     }
     
-    /* Make buttons look cooler */
-    .stButton > button {
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        font-size: 1.2rem;
-        padding: 15px 30px;
-        border-radius: 25px;
-        border: none;
-        width: 100%;
-        transition: transform 0.3s;
-    }
-    
-    .stButton > button:hover {
-        transform: scale(1.05);
-    }
-    
-    /* Style for correct answers */
-    .correct-answer {
-        background-color: #d4edda;
-        border-left: 4px solid #28a745;
-        padding: 10px;
-        margin: 10px 0;
-        border-radius: 5px;
-    }
-    
-    /* Style for wrong answers */
-    .wrong-answer {
-        background-color: #f8d7da;
-        border-left: 4px solid #dc3545;
-        padding: 10px;
-        margin: 10px 0;
-        border-radius: 5px;
-    }
-    
-    /* Level display styling */
-    .level-display {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 20px;
-        border-radius: 15px;
+    /* Encouragement message - animated */
+    .encourage-box {
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        padding: 15px 25px;
+        border-radius: 50px;
         text-align: center;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #2d3436;
+        margin: 20px auto;
+        max-width: 500px;
+        box-shadow: 0 4px 15px rgba(168, 237, 234, 0.4);
+        animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-5px); }
+    }
+    
+    /* Level card - super cool gradient */
+    .level-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        color: white;
+        padding: 25px;
+        border-radius: 20px;
+        text-align: center;
+        margin: 20px 0;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .level-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+        transform: rotate(45deg);
+        animation: shine 3s infinite;
+    }
+    
+    @keyframes shine {
+        0% { transform: translateX(-100%) rotate(45deg); }
+        100% { transform: translateX(100%) rotate(45deg); }
     }
     
     .level-number {
-        font-size: 2.5rem;
-        font-weight: bold;
+        font-size: 3rem;
+        font-weight: 800;
         margin: 0;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
     
     .level-title {
-        font-size: 1.2rem;
-        opacity: 0.9;
+        font-size: 1.3rem;
+        opacity: 0.95;
         margin: 5px 0;
+        font-weight: 600;
     }
     
-    .points-display {
+    .stats-row {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-top: 15px;
         font-size: 1.1rem;
-        margin-top: 10px;
     }
     
-    /* Badge display styling */
-    .badge-container {
-        background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
-        padding: 15px;
-        border-radius: 15px;
-        margin-bottom: 20px;
+    .stat-item {
+        background: rgba(255,255,255,0.2);
+        padding: 8px 16px;
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+    }
+    
+    /* Badge display - glowing effect */
+    .badge-showcase {
+        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        padding: 20px;
+        border-radius: 20px;
+        margin: 20px 0;
         text-align: center;
+        box-shadow: 0 8px 30px rgba(252, 182, 159, 0.3);
     }
     
     .badge-title {
-        font-size: 1.2rem;
-        font-weight: bold;
-        color: #333;
-        margin-bottom: 10px;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #d63031;
+        margin-bottom: 15px;
     }
     
-    .badges {
-        font-size: 2rem;
-        letter-spacing: 5px;
+    .badge-icons {
+        font-size: 2.5rem;
+        letter-spacing: 10px;
+        filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
     }
     
-    .new-badge {
-        background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    /* New badge animation */
+    .new-badge-alert {
+        background: linear-gradient(135deg, #f5af19 0%, #f12711 100%);
         color: white;
-        padding: 15px;
-        border-radius: 15px;
+        padding: 20px;
+        border-radius: 20px;
         text-align: center;
+        margin: 15px 0;
+        animation: celebrate 0.5s ease-out;
+        box-shadow: 0 10px 40px rgba(241, 39, 17, 0.4);
+    }
+    
+    @keyframes celebrate {
+        0% { transform: scale(0.8); opacity: 0; }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    
+    .new-badge-emoji {
+        font-size: 3rem;
+        display: block;
         margin: 10px 0;
-        animation: pulse 1s infinite;
     }
     
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.02); }
-        100% { transform: scale(1); }
+    /* Weak topics - friendly warning style */
+    .practice-areas {
+        background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+        border-left: 5px solid #f39c12;
+        padding: 20px;
+        border-radius: 15px;
+        margin: 20px 0;
     }
     
-    /* Weak topics styling */
-    .weak-topics {
-        background: linear-gradient(135deg, #fff3cd 0%, #ffeeba 100%);
-        border-left: 4px solid #ffc107;
-        padding: 15px;
-        border-radius: 10px;
-        margin-bottom: 20px;
-    }
-    
-    .weak-topics-title {
-        font-weight: bold;
-        color: #856404;
+    .practice-title {
+        font-weight: 700;
+        color: #d35400;
+        font-size: 1.2rem;
         margin-bottom: 10px;
     }
     
-    .weak-topic-item {
-        color: #856404;
-        padding: 3px 0;
+    .practice-item {
+        color: #7f5539;
+        padding: 5px 0;
+        font-size: 1.1rem;
+    }
+    
+    /* Big beautiful buttons */
+    .stButton > button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        font-size: 1.4rem !important;
+        font-weight: 700 !important;
+        padding: 20px 40px !important;
+        border-radius: 50px !important;
+        border: none !important;
+        width: 100% !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4) !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-3px) scale(1.02) !important;
+        box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5) !important;
+    }
+    
+    .stButton > button:active {
+        transform: translateY(0) scale(0.98) !important;
+    }
+    
+    /* Form submit button special styling */
+    .stFormSubmitButton > button {
+        background: linear-gradient(135deg, #00b894 0%, #00cec9 100%) !important;
+        box-shadow: 0 8px 25px rgba(0, 184, 148, 0.4) !important;
+    }
+    
+    .stFormSubmitButton > button:hover {
+        box-shadow: 0 12px 35px rgba(0, 184, 148, 0.5) !important;
+    }
+    
+    /* Input fields - modern look */
+    .stTextInput > div > div > input {
+        border-radius: 15px !important;
+        border: 2px solid #dfe6e9 !important;
+        padding: 15px 20px !important;
+        font-size: 1.1rem !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .stTextInput > div > div > input:focus {
+        border-color: #667eea !important;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2) !important;
+    }
+    
+    /* Selectbox styling */
+    .stSelectbox > div > div {
+        border-radius: 15px !important;
+    }
+    
+    /* Result cards */
+    .result-correct {
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        border-left: 5px solid #28a745;
+        padding: 20px;
+        margin: 15px 0;
+        border-radius: 15px;
+        font-size: 1.1rem;
+    }
+    
+    .result-wrong {
+        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        border-left: 5px solid #dc3545;
+        padding: 20px;
+        margin: 15px 0;
+        border-radius: 15px;
+        font-size: 1.1rem;
+    }
+    
+    /* Progress bar custom styling */
+    .stProgress > div > div > div {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%) !important;
+        border-radius: 10px !important;
+    }
+    
+    /* Radio buttons - bigger touch targets for mobile */
+    .stRadio > div {
+        gap: 10px !important;
+    }
+    
+    .stRadio > div > label {
+        padding: 12px 20px !important;
+        border-radius: 12px !important;
+        border: 2px solid #dfe6e9 !important;
+        transition: all 0.2s ease !important;
+        font-size: 1.1rem !important;
+        font-weight: 600 !important;
+    }
+    
+    .stRadio > div > label:hover {
+        border-color: #667eea !important;
+        background: rgba(102, 126, 234, 0.1) !important;
+    }
+    
+    /* Success/Info/Warning boxes */
+    .stSuccess, .stInfo, .stWarning {
+        border-radius: 15px !important;
+        font-size: 1.1rem !important;
+    }
+    
+    /* Divider styling */
+    hr {
+        border: none;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, #667eea, transparent);
+        margin: 30px 0;
+    }
+    
+    /* Footer styling */
+    .cool-footer {
+        text-align: center;
+        padding: 30px;
+        color: #636e72;
+        font-size: 1rem;
+    }
+    
+    .cool-footer a {
+        color: #667eea;
+        text-decoration: none;
+    }
+    
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        .mega-title {
+            font-size: 2rem;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+        }
+        
+        .level-number {
+            font-size: 2.5rem;
+        }
+        
+        .stats-row {
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .stat-item {
+            display: block;
+        }
+        
+        .stButton > button {
+            font-size: 1.2rem !important;
+            padding: 18px 30px !important;
+        }
+        
+        .badge-icons {
+            font-size: 2rem;
+            letter-spacing: 5px;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
 
 # ============================================================
-# MAIN TITLE AND WELCOME MESSAGE
-# Let's greet our users with enthusiasm!
+# MAIN TITLE AND WELCOME
 # ============================================================
 
-# Display the big colorful title using our custom CSS class
-st.markdown('<h1 class="big-title">🎮 Study Buddy Quest 🧠</h1>', unsafe_allow_html=True)
+st.markdown('<h1 class="mega-title">🎮 Study Buddy Quest 🧠</h1>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">Level up your knowledge, one quiz at a time! 🚀</p>', unsafe_allow_html=True)
 
-# Show an encouraging message to motivate students
-st.markdown('<p class="encourage-msg">Level up your knowledge, one quiz at a time! 🚀✨</p>', unsafe_allow_html=True)
+# Encouraging message box
+st.markdown(f'<div class="encourage-box">{get_random_encouragement()}</div>', unsafe_allow_html=True)
 
 # ============================================================
 # BADGE DISPLAY
-# Show all unlocked badges at the top!
 # ============================================================
 if st.session_state.badges:
     badge_emojis = " ".join([BADGES[b]["emoji"] for b in st.session_state.badges if b in BADGES])
     st.markdown(f"""
-    <div class="badge-container">
-        <div class="badge-title">🏅 Your Badges ({len(st.session_state.badges)}/{len(BADGES)})</div>
-        <div class="badges">{badge_emojis}</div>
+    <div class="badge-showcase">
+        <div class="badge-title">🏅 Your Trophy Case ({len(st.session_state.badges)}/{len(BADGES)})</div>
+        <div class="badge-icons">{badge_emojis}</div>
     </div>
     """, unsafe_allow_html=True)
     
-    # Show badge names on hover/expand
-    with st.expander("📋 View Badge Details"):
+    with st.expander("📋 View All Your Badges"):
         for badge_id in st.session_state.badges:
             if badge_id in BADGES:
                 badge = BADGES[badge_id]
-                st.markdown(f"{badge['emoji']} **{badge['name']}** - {badge['desc']}")
+                st.markdown(f"### {badge['emoji']} {badge['name']}")
+                st.markdown(f"*{badge['desc']}*")
 
 # ============================================================
-# GAMIFICATION DISPLAY
-# Show current level, total points, and progress to next level
+# LEVEL & STATS DISPLAY
 # ============================================================
-
-# Calculate current level and progress
 current_level = calculate_level(st.session_state.total_score)
 level_title = get_level_title(current_level)
 points_into_level, points_needed = get_points_for_next_level(st.session_state.total_score)
 progress_percentage = points_into_level / points_needed
 
-# Display the level card
 st.markdown(f"""
-<div class="level-display">
+<div class="level-card">
     <p class="level-number">⭐ Level {current_level} ⭐</p>
     <p class="level-title">{level_title}</p>
-    <p class="points-display">🏆 Total Points: {st.session_state.total_score} | 📚 Quizzes: {st.session_state.quizzes_completed} | 💯 Perfect Scores: {st.session_state.perfect_scores}</p>
+    <div class="stats-row">
+        <span class="stat-item">🏆 {st.session_state.total_score} pts</span>
+        <span class="stat-item">📚 {st.session_state.quizzes_completed} quizzes</span>
+        <span class="stat-item">💯 {st.session_state.perfect_scores} perfect</span>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
-# Progress bar toward next level
-st.markdown(f"**Progress to Level {current_level + 1}:** {points_into_level}/{points_needed} points")
+st.markdown(f"##### ⬆️ Progress to Level {current_level + 1}")
 st.progress(progress_percentage)
+st.markdown(f"<center><small>{points_into_level}/{points_needed} XP</small></center>", unsafe_allow_html=True)
 
 # ============================================================
 # WEAK TOPICS DISPLAY
-# Show areas where the user needs more practice
 # ============================================================
 if st.session_state.weak_topics:
-    # Remove duplicates while preserving order
     unique_weak_topics = list(dict.fromkeys(st.session_state.weak_topics))
-    topics_list = "".join([f'<div class="weak-topic-item">📌 {topic}</div>' for topic in unique_weak_topics[-5:]])
+    topics_list = "".join([f'<div class="practice-item">📌 {topic}</div>' for topic in unique_weak_topics[-5:]])
     st.markdown(f"""
-    <div class="weak-topics">
-        <div class="weak-topics-title">📖 Areas to Practice</div>
+    <div class="practice-areas">
+        <div class="practice-title">📖 Areas to Level Up</div>
         {topics_list}
-        <small style="color: #856404;">Try these topics again to improve!</small>
+        <small style="color: #7f5539;">Pro tip: Try these topics again! 💪</small>
     </div>
     """, unsafe_allow_html=True)
 
-# Add some space
 st.markdown("---")
 
 # ============================================================
 # USER INPUT SECTION
-# This is where students enter what they want to learn about
 # ============================================================
+st.markdown("### 🎯 Choose Your Quest!")
 
-# Create two columns for a nicer layout
 col1, col2 = st.columns(2)
 
-# Column 1: Topic input
 with col1:
-    # Text input where students type their study topic
-    # The placeholder shows an example to help them understand
     topic = st.text_input(
         "📚 What do you want to study?",
-        placeholder="e.g., fractions",
+        placeholder="e.g., space, fractions, history...",
         help="Type any topic you want to learn about!"
     )
 
-# Column 2: Difficulty selector
 with col2:
-    # Selectbox lets students pick how hard they want the quiz
     difficulty = st.selectbox(
-        "🎯 Choose your difficulty level:",
+        "🎮 Difficulty Level",
         options=["Easy 🌱", "Medium 🌿", "Hard 🌳"],
         help="Pick based on how confident you feel!"
     )
 
-# Add some encouraging text based on difficulty
+# Difficulty encouragement
 if difficulty == "Easy 🌱":
-    st.info("💪 Great choice! Perfect for learning the basics!")
+    st.success("💪 Perfect for building your foundation! Let's go!")
 elif difficulty == "Medium 🌿":
-    st.info("🔥 Nice! You're ready for a challenge!")
+    st.info("🔥 Ready for a challenge! You've got this!")
 else:
-    st.info("🏆 Wow! You're going for the tough stuff! Respect!")
+    st.warning("🏆 Brave choice! Time to show what you're made of!")
 
 
 # ============================================================
 # QUIZ PARSING FUNCTION
-# Extract correct answers and explanations from Gemini's response
 # ============================================================
 def parse_quiz_answers(quiz_text: str) -> tuple:
-    """
-    Parses the quiz text to extract correct answers and explanations.
-    
-    Args:
-        quiz_text: The markdown quiz generated by Gemini
-        
-    Returns:
-        A tuple of (correct_answers_list, explanations_list)
-    """
     correct_answers = []
     explanations = []
     
-    # Regex pattern to find correct answers
-    # Matches: ✅ **Correct Answer: A** (with variations in spacing/formatting)
     answer_pattern = r"✅\s*\*\*Correct Answer:\s*([A-Da-d])\s*\*\*"
-    
-    # Regex pattern to find explanations
-    # Matches: > 💡 **Explanation:** [text until end of line or next section]
     explanation_pattern = r">\s*💡\s*\*\*Explanation:\*\*\s*(.+?)(?=\n\n|---|\n###|$)"
     
-    # Find all correct answers
     answer_matches = re.findall(answer_pattern, quiz_text, re.IGNORECASE)
     for match in answer_matches:
         correct_answers.append(match.upper())
     
-    # Find all explanations
     explanation_matches = re.findall(explanation_pattern, quiz_text, re.DOTALL)
     for match in explanation_matches:
-        # Clean up the explanation text
         clean_explanation = match.strip()
         explanations.append(clean_explanation)
     
@@ -513,37 +660,20 @@ def parse_quiz_answers(quiz_text: str) -> tuple:
 
 
 # ============================================================
-# QUIZ GENERATION FUNCTION
-# This function calls Gemini AI to create a fun quiz!
+# QUIZ GENERATION FUNCTION WITH ADAPTIVE LEARNING
 # ============================================================
 def generate_quiz_with_gemini(topic: str, difficulty: str, weak_topics: list = None) -> str:
-    """
-    Uses Google Gemini AI to generate a fun, educational quiz.
+    clean_difficulty = difficulty.split()[0]
     
-    Args:
-        topic: The subject the student wants to learn about
-        difficulty: Easy, Medium, or Hard
-        weak_topics: List of topics the student has struggled with
-        
-    Returns:
-        A string containing the quiz in markdown format
-    """
-    
-    # Clean the difficulty level (remove emoji)
-    clean_difficulty = difficulty.split()[0]  # Gets just "Easy", "Medium", or "Hard"
-    
-    # Build adaptive learning section if there are weak topics
     adaptive_section = ""
     if weak_topics and len(weak_topics) > 0:
-        weak_topics_str = ", ".join(weak_topics[-5:])  # Use last 5 weak topics
+        weak_topics_str = ", ".join(weak_topics[-5:])
         adaptive_section = f"""
 ADAPTIVE LEARNING NOTE:
 The student has struggled with these topics recently: {weak_topics_str}
 If any of these topics relate to {topic}, please include 1-2 gentle review questions to help reinforce their understanding. Make these questions encouraging and supportive!
 """
     
-    # Create a detailed prompt for Gemini
-    # This tells the AI exactly what kind of quiz we want!
     prompt = f"""You are a fun and encouraging teacher creating a quiz for a 14-year-old student.
 
 Create a 5-question multiple-choice quiz about: {topic}
@@ -636,40 +766,27 @@ IMPORTANT: You MUST follow this EXACT format for each question. Do not deviate!
 **Great job working through this quiz!** Keep learning and growing! 🌟
 """
     
-    # Call the Gemini API to generate the quiz
     response = client.models.generate_content(
-        model="gemini-2.5-flash",  # Using the fast, efficient model
+        model="gemini-2.5-flash",
         contents=prompt
     )
     
-    # Return the generated quiz text
     return response.text if response.text else "Sorry, couldn't generate a quiz. Please try again!"
 
 
 # ============================================================
 # GENERATE QUIZ BUTTON
-# The main action button that creates the quiz
 # ============================================================
-
-# Add some space before the button
 st.markdown("")
 st.markdown("")
 
-# Create the big "Generate Quiz!" button
-# When clicked, this will call Gemini to generate a real quiz!
-if st.button("🎲 Generate Quiz! 🎲", use_container_width=True):
+if st.button("🎲 START QUIZ! 🎲", use_container_width=True):
     
-    # Check if the user entered a topic
     if not topic:
-        # If no topic, show a friendly warning
-        st.warning("⚠️ Oops! Please enter a topic first! What do you want to learn about?")
+        st.warning("⚠️ Oops! Enter a topic first! What do you want to learn about today? 🤔")
     else:
-        # Topic was entered - let's generate the quiz!
-        
-        # 🎈 BALLOONS! Because learning should be fun!
         st.balloons()
         
-        # Reset quiz-specific state for new quiz (but keep total score!)
         st.session_state.answers_submitted = False
         st.session_state.correct_answers = []
         st.session_state.explanations = []
@@ -678,230 +795,166 @@ if st.button("🎲 Generate Quiz! 🎲", use_container_width=True):
         st.session_state.current_topic = topic
         st.session_state.wrong_questions = []
         
-        # Show a loading message while Gemini generates the quiz
-        with st.spinner(f"🧠 Creating your {difficulty} quiz about {topic}... This is gonna be awesome!"):
+        with st.spinner(f"🧠 Creating your epic quiz about **{topic}**... Get ready to learn! ✨"):
             try:
-                # Call our function to generate the quiz with Gemini
-                # Pass weak_topics for adaptive learning
                 quiz_content = generate_quiz_with_gemini(topic, difficulty, st.session_state.weak_topics)
-                
-                # Parse the correct answers and explanations
                 correct_answers, explanations = parse_quiz_answers(quiz_content)
-                
-                # Create a version without answers for display
                 quiz_questions_only = strip_answers_from_quiz(quiz_content)
                 
-                # Store everything in session state
                 st.session_state.quiz_content = quiz_content
                 st.session_state.quiz_questions_only = quiz_questions_only
                 st.session_state.quiz_generated = True
                 st.session_state.correct_answers = correct_answers
                 st.session_state.explanations = explanations
                 
-                # Show a success message
-                st.success(f"🎉 Your quiz is ready! Let's see how much you know about **{topic}**!")
+                st.success(f"🎉 Your quiz is ready! Let's see what you know about **{topic}**! Good luck! 🍀")
                 
             except Exception as e:
-                # If something goes wrong, show a friendly error message
-                st.error(f"😅 Oops! Something went wrong while creating your quiz. Please try again!")
-                st.error(f"Error details: {str(e)}")
+                st.error(f"😅 Oops! Something went wrong. Please try again!")
+                st.error(f"Error: {str(e)}")
 
 # ============================================================
 # DISPLAY QUIZ AND ANSWER FORM
-# Show the quiz and let students submit their answers
 # ============================================================
-
-# Check if we have a quiz to display
 if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
     
-    # Only show the answer form if answers haven't been submitted yet
     if not st.session_state.answers_submitted:
-        # Display the quiz content WITHOUT answers
         st.markdown("---")
         st.markdown(st.session_state.quiz_questions_only)
         
-        # ============================================================
-        # ANSWER SUBMISSION FORM
-        # Let students select their answers and submit!
-        # ============================================================
-        
         st.markdown("---")
-        st.markdown("## ✏️ Submit Your Answers!")
-        st.markdown("Select your answer for each question below:")
+        st.markdown("## ✏️ Lock In Your Answers!")
+        st.markdown("*Choose wisely... or guess boldly! 😄*")
         
-        # Create a form for submitting answers
-        # Using a form prevents the page from reloading on each selection
         with st.form(key="quiz_answers_form"):
-            
-            # Create 5 radio button groups, one for each question
-            # Each group has options A, B, C, D
             
             st.markdown("### Your Answers:")
             
-            # Question 1
-            q1_answer = st.radio(
-                "Question 1 🔢",
-                options=["A", "B", "C", "D"],
-                horizontal=True,
-                key="q1"
-            )
+            q1_answer = st.radio("Question 1 🔢", options=["A", "B", "C", "D"], horizontal=True, key="q1")
+            q2_answer = st.radio("Question 2 🧮", options=["A", "B", "C", "D"], horizontal=True, key="q2")
+            q3_answer = st.radio("Question 3 🎯", options=["A", "B", "C", "D"], horizontal=True, key="q3")
+            q4_answer = st.radio("Question 4 🌟", options=["A", "B", "C", "D"], horizontal=True, key="q4")
+            q5_answer = st.radio("Question 5 🏆", options=["A", "B", "C", "D"], horizontal=True, key="q5")
             
-            # Question 2
-            q2_answer = st.radio(
-                "Question 2 🧮",
-                options=["A", "B", "C", "D"],
-                horizontal=True,
-                key="q2"
-            )
-            
-            # Question 3
-            q3_answer = st.radio(
-                "Question 3 🎯",
-                options=["A", "B", "C", "D"],
-                horizontal=True,
-                key="q3"
-            )
-            
-            # Question 4
-            q4_answer = st.radio(
-                "Question 4 🌟",
-                options=["A", "B", "C", "D"],
-                horizontal=True,
-                key="q4"
-            )
-            
-            # Question 5
-            q5_answer = st.radio(
-                "Question 5 🏆",
-                options=["A", "B", "C", "D"],
-                horizontal=True,
-                key="q5"
-            )
-            
-            # Add some space
             st.markdown("")
             
-            # Submit button for the form
-            submitted = st.form_submit_button(
-                "📨 Submit Answers!",
-                use_container_width=True
-            )
+            submitted = st.form_submit_button("📨 SUBMIT ANSWERS!", use_container_width=True)
             
-            # Handle form submission
             if submitted:
-                # Collect all user answers
                 user_answers = [q1_answer, q2_answer, q3_answer, q4_answer, q5_answer]
                 st.session_state.user_answers = user_answers
                 
-                # Grade the quiz and track wrong questions
                 correct_count = 0
                 wrong_questions = []
                 correct_answers = st.session_state.correct_answers
                 
-                # Compare each answer
                 for i, (user_ans, correct_ans) in enumerate(zip(user_answers, correct_answers)):
                     if user_ans.upper() == correct_ans.upper():
                         correct_count += 1
                     else:
                         wrong_questions.append(i + 1)
                 
-                # Store wrong questions
                 st.session_state.wrong_questions = wrong_questions
                 
-                # Calculate score (10 points per correct answer)
                 quiz_score = correct_count * 10
                 st.session_state.score = quiz_score
                 
-                # Check for perfect score
                 if correct_count == 5:
                     st.session_state.perfect_scores += 1
                 
-                # Track weak topics (less than 3 correct)
                 if correct_count < 3 and st.session_state.current_topic:
-                    # Add to weak topics if not already there
                     if st.session_state.current_topic not in st.session_state.weak_topics:
                         st.session_state.weak_topics.append(st.session_state.current_topic)
                 
-                # Add to total score and increment quiz count
                 st.session_state.total_score += quiz_score
                 st.session_state.quizzes_completed += 1
                 
-                # Check for new badges
                 check_and_award_badges()
                 
-                # Set the flag that answers were submitted
                 st.session_state.answers_submitted = True
                 
-                # Trigger rerun to show results
                 st.rerun()
     
     # ============================================================
     # SHOW RESULTS AFTER SUBMISSION
-    # Display which answers were right/wrong with explanations
     # ============================================================
-    
     if st.session_state.answers_submitted:
         st.markdown("---")
-        st.markdown("## 📊 Your Results!")
+        st.markdown("## 📊 Your Results Are In!")
         
-        # Get the stored data
         user_answers = st.session_state.user_answers
         correct_answers = st.session_state.correct_answers
         explanations = st.session_state.explanations
         score = st.session_state.score
         wrong_questions = st.session_state.wrong_questions
         
-        # Count correct answers
         correct_count = sum(1 for u, c in zip(user_answers, correct_answers) if u.upper() == c.upper())
         
-        # Celebrate with balloons or snow!
         if correct_count == 5:
             st.balloons()
             st.snow()
         elif correct_count >= 4:
             st.balloons()
         
-        # Display score prominently
         if correct_count == 5:
-            st.success(f"## 🏆 PERFECT SCORE! 🏆\n### You got **{correct_count}/5** correct!\n### **+{score} points** earned! 🌟")
+            st.success(f"""
+            ## 🏆 PERFECT SCORE! 🏆
+            ### You got **{correct_count}/5** correct!
+            ### **+{score} XP** earned! 
+            
+            🌟 You're absolutely CRUSHING it! Your brain is on fire! 🔥
+            """)
         elif correct_count >= 4:
-            st.success(f"## 🎉 Amazing Job! 🎉\n### You got **{correct_count}/5** correct!\n### **+{score} points** earned! 🌟")
+            st.success(f"""
+            ## 🎉 Amazing Job! 🎉
+            ### You got **{correct_count}/5** correct!
+            ### **+{score} XP** earned!
+            
+            💪 So close to perfect! You're a knowledge machine!
+            """)
         elif correct_count >= 3:
-            st.info(f"## 👍 Good Work!\n### You got **{correct_count}/5** correct!\n### **+{score} points** earned!")
+            st.info(f"""
+            ## 👍 Nice Work!
+            ### You got **{correct_count}/5** correct!
+            ### **+{score} XP** earned!
+            
+            📈 You're learning and growing! Keep going!
+            """)
         else:
-            st.warning(f"## 💪 Keep Practicing!\n### You got **{correct_count}/5** correct.\n### **+{score} points** earned.\n### You'll do better next time!")
+            st.warning(f"""
+            ## 💪 Keep Practicing!
+            ### You got **{correct_count}/5** correct.
+            ### **+{score} XP** earned.
+            
+            🌱 Every quiz makes you smarter! Try again!
+            """)
             if st.session_state.current_topic:
-                st.info(f"📖 **{st.session_state.current_topic}** has been added to your practice list!")
+                st.info(f"📖 **{st.session_state.current_topic}** added to your practice list!")
         
-        # Show updated total
         new_level = calculate_level(st.session_state.total_score)
-        st.markdown(f"### 📈 New Total: **{st.session_state.total_score} points** | Level **{new_level}**")
+        st.markdown(f"### 📈 Total: **{st.session_state.total_score} XP** | Level **{new_level}**")
         
-        # Check and display any new badges earned
         new_badges = check_and_award_badges()
         if new_badges:
             for badge_id in new_badges:
                 if badge_id in BADGES:
                     badge = BADGES[badge_id]
                     st.markdown(f"""
-                    <div class="new-badge">
-                        <strong>🎊 NEW BADGE UNLOCKED! 🎊</strong><br>
-                        <span style="font-size: 2rem;">{badge['emoji']}</span><br>
-                        <strong>{badge['name']}</strong><br>
+                    <div class="new-badge-alert">
+                        <strong>🎊 NEW BADGE UNLOCKED! 🎊</strong>
+                        <span class="new-badge-emoji">{badge['emoji']}</span>
+                        <strong style="font-size: 1.3rem;">{badge['name']}</strong><br>
                         {badge['desc']}
                     </div>
                     """, unsafe_allow_html=True)
         
-        # Only show detailed results for WRONG answers
         if wrong_questions:
             st.markdown("---")
-            st.markdown("### 📝 Questions You Missed:")
-            st.markdown("*Here are the correct answers and explanations for the questions you got wrong:*")
+            st.markdown("### 📝 Let's Learn From These!")
+            st.markdown("*Here's what you missed and why:*")
             
-            # Question labels
             question_labels = ["Question 1 🔢", "Question 2 🧮", "Question 3 🎯", "Question 4 🌟", "Question 5 🏆"]
             
-            # Show only wrong questions with correct answer and explanation
             for i in range(5):
                 if (i + 1) in wrong_questions:
                     user_ans = user_answers[i] if i < len(user_answers) else "?"
@@ -909,29 +962,28 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     explanation = explanations[i] if i < len(explanations) else "No explanation available."
                     
                     st.markdown(f"""
-<div class="wrong-answer">
-<strong>{question_labels[i]}</strong><br>
-❌ You answered: <strong>{user_ans}</strong> | ✅ Correct answer: <strong>{correct_ans}</strong><br>
-<em>💡 {explanation}</em>
+<div class="result-wrong">
+<strong>{question_labels[i]}</strong><br><br>
+❌ You answered: <strong>{user_ans}</strong><br>
+✅ Correct answer: <strong>{correct_ans}</strong><br><br>
+💡 <em>{explanation}</em>
 </div>
                     """, unsafe_allow_html=True)
         else:
             st.markdown("---")
-            st.markdown("### 🌟 You got everything right! No corrections needed!")
+            st.markdown("### 🌟 FLAWLESS! You got everything right! 🌟")
+            st.markdown("*No corrections needed - you're already a pro at this! 😎*")
         
-        # Final encouragement
         st.markdown("---")
         if correct_count >= 4:
             st.markdown("## 🌟 You're a Study Buddy Superstar! 🌟")
-            st.markdown("Keep up the amazing work! You're crushing it! 💪🧠")
+            st.markdown("*Keep crushing it! Your brain is getting stronger every day!* 💪🧠")
         else:
-            st.markdown("## 💪 Don't Give Up!")
-            st.markdown("Every quiz makes you smarter! Try another topic or difficulty level! 🚀")
+            st.markdown("## 💪 Champions Never Give Up!")
+            st.markdown("*Every quiz is a step forward! Ready for another round?* 🚀")
         
-        # Button to try again
         st.markdown("")
-        if st.button("🔄 Try Another Quiz!", use_container_width=True):
-            # Reset for new quiz (keep total score!)
+        if st.button("🔄 TAKE ANOTHER QUIZ!", use_container_width=True):
             st.session_state.quiz_generated = False
             st.session_state.quiz_content = None
             st.session_state.quiz_questions_only = None
@@ -945,12 +997,12 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
 
 # ============================================================
 # FOOTER
-# A nice footer to end the page
 # ============================================================
 st.markdown("---")
 st.markdown("""
-<div style='text-align: center; color: #888; padding: 20px;'>
+<div class="cool-footer">
     Made with 💜 for the Presidential AI Challenge<br>
-    <small>Study Buddy Quest v1.0 | Day 1 | Powered by Google Gemini AI ✨</small>
+    <small>Study Buddy Quest v2.0 | Powered by Google Gemini AI ✨</small><br>
+    <small>🧠 Learn. Level Up. Repeat! 🚀</small>
 </div>
 """, unsafe_allow_html=True)
