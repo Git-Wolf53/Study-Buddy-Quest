@@ -365,6 +365,13 @@ Guidelines:
 - Use friendly, encouraging language with emojis
 - Make it fun and engaging!
 
+CRITICAL QUESTION FORMAT RULES:
+- Each question MUST be a real question that ends with a question mark (?)
+- Questions should start with words like: What, Which, Who, When, Where, Why, How, Is, Are, Do, Does, Can, etc.
+- DO NOT write definitions, statements, or descriptions as questions
+- BAD example: "The Libertarian Party believes in limited government" (this is a statement, NOT a question)
+- GOOD example: "What is a core belief of the Libertarian Party?" (this IS a proper question)
+
 IMPORTANT: You MUST follow this EXACT format for each question. Do not deviate!
 
 ## 📝 Your {clean_difficulty} Quiz on {topic}!
