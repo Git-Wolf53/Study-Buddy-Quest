@@ -285,12 +285,30 @@ def parse_individual_questions(quiz_text: str) -> list:
             q_num = first_line_match.group(1)
             emoji = first_line_match.group(2).strip()
             
-            q_text_match = re.search(r'\*\*(.+?)\*\*', block, re.DOTALL)
-            if q_text_match:
-                q_text = q_text_match.group(1).strip()
-            else:
+            q_text = ""
+            bold_matches = re.findall(r'\*\*([^*]+)\*\*', block)
+            for match in bold_matches:
+                match_lower = match.lower().strip()
+                if 'correct answer' in match_lower or 'explanation' in match_lower:
+                    continue
+                if len(match) > 10 and '?' in match:
+                    q_text = match.strip()
+                    break
+                elif len(match) > 15:
+                    q_text = match.strip()
+                    break
+            
+            if not q_text:
                 lines = block.split('\n')
-                q_text = lines[1].strip() if len(lines) > 1 else "Question"
+                for line in lines[1:6]:
+                    line = line.strip()
+                    if line and not line.startswith('-') and not line.startswith('*') and '✅' not in line and '💡' not in line:
+                        if len(line) > 10:
+                            q_text = line.replace('**', '').strip()
+                            break
+            
+            if not q_text:
+                q_text = f"Question {q_num}"
             
             options = {}
             option_patterns = [
