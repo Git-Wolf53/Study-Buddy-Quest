@@ -1032,7 +1032,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 if current_val in ["A", "B", "C", "D"]:
                     current_idx = ["A", "B", "C", "D"].index(current_val)
                 else:
-                    current_idx = 0
+                    current_idx = None
                 
                 st.radio(
                     f"Your answer for Q{q['number']}:",
