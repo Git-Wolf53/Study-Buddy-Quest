@@ -286,15 +286,18 @@ def parse_individual_questions(quiz_text: str) -> list:
             emoji = first_line_match.group(2).strip()
             
             q_text = ""
+            skip_phrases = ['correct answer', 'explanation', 'great job', 'quiz complete', 
+                           'good job', 'well done', 'keep learning', 'keep going', 
+                           'congratulations', 'awesome work', 'nice work']
             bold_matches = re.findall(r'\*\*([^*]+)\*\*', block)
             for match in bold_matches:
                 match_lower = match.lower().strip()
-                if 'correct answer' in match_lower or 'explanation' in match_lower:
+                if any(phrase in match_lower for phrase in skip_phrases):
                     continue
                 if len(match) > 10 and '?' in match:
                     q_text = match.strip()
                     break
-                elif len(match) > 15:
+                elif len(match) > 15 and '?' in match:
                     q_text = match.strip()
                     break
             
