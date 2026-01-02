@@ -939,7 +939,17 @@ if st.button("🎲 START QUIZ! 🎲", use_container_width=True):
     elif len(clean_topic) < 2:
         st.warning("⚠️ That topic is too short! Try something like 'volcanoes' or 'ancient Egypt' 🤔")
     else:
-        st.balloons()
+        st.markdown("""
+        <div style="text-align: center; padding: 20px;">
+            <div style="font-size: 3rem; animation: spin 2s linear infinite;">⚙️</div>
+            <style>
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            </style>
+        </div>
+        """, unsafe_allow_html=True)
         
         st.session_state.answers_submitted = False
         st.session_state.correct_answers = []
@@ -1161,7 +1171,6 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         
         if correct_count == 5:
             st.balloons()
-            st.snow()
         elif correct_count >= 4:
             st.balloons()
         
