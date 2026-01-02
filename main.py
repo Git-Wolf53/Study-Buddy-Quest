@@ -1169,10 +1169,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         num_questions = min(len(user_answers), len(correct_answers))
         correct_count = sum(1 for i in range(num_questions) if user_answers[i].upper() == correct_answers[i].upper())
         
-        if correct_count == 5:
-            st.balloons()
-        elif correct_count >= 4:
-            st.balloons()
+        st.balloons()
         
         if correct_count == 5:
             st.success(f"""
