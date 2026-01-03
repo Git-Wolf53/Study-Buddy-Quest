@@ -342,7 +342,7 @@ def parse_individual_questions(quiz_text: str) -> list:
     return questions
 
 
-def generate_quiz_with_gemini(topic: str, difficulty: str, weak_topics: list = None) -> str:
+def generate_quiz_with_gemini(topic: str, difficulty: str, weak_topics: list = None, grade_level: str = None) -> str:
     """Generate a quiz using Gemini AI."""
     clean_difficulty = difficulty.split()[0]
     
@@ -355,13 +355,46 @@ The student has struggled with these topics recently: {weak_topics_str}
 If any of these topics relate to {topic}, please include 1-2 gentle review questions to help reinforce their understanding. Make these questions encouraging and supportive!
 """
     
-    prompt = f"""You are a fun and encouraging teacher creating a quiz for a 14-year-old student.
+    grade_section = ""
+    age_description = "a 14-year-old student"
+    if grade_level and grade_level != "None (Skip)":
+        grade_section = f"\nGrade Level: {grade_level}"
+        if grade_level == "Pre-K":
+            age_description = "a Pre-K student (ages 3-5)"
+        elif grade_level == "Kindergarten":
+            age_description = "a Kindergarten student (ages 5-6)"
+        elif "1st" in grade_level:
+            age_description = "a 1st grade student (ages 6-7)"
+        elif "2nd" in grade_level:
+            age_description = "a 2nd grade student (ages 7-8)"
+        elif "3rd" in grade_level:
+            age_description = "a 3rd grade student (ages 8-9)"
+        elif "4th" in grade_level:
+            age_description = "a 4th grade student (ages 9-10)"
+        elif "5th" in grade_level:
+            age_description = "a 5th grade student (ages 10-11)"
+        elif "6th" in grade_level:
+            age_description = "a 6th grade student (ages 11-12)"
+        elif "7th" in grade_level:
+            age_description = "a 7th grade student (ages 12-13)"
+        elif "8th" in grade_level:
+            age_description = "an 8th grade student (ages 13-14)"
+        elif "9th" in grade_level:
+            age_description = "a 9th grade student (ages 14-15)"
+        elif "10th" in grade_level:
+            age_description = "a 10th grade student (ages 15-16)"
+        elif "11th" in grade_level:
+            age_description = "an 11th grade student (ages 16-17)"
+        elif "12th" in grade_level:
+            age_description = "a 12th grade student (ages 17-18)"
+    
+    prompt = f"""You are a fun and encouraging teacher creating a quiz for {age_description}.
 
 Create a 5-question multiple-choice quiz about: {topic}
-Difficulty level: {clean_difficulty}
+Difficulty level: {clean_difficulty}{grade_section}
 {adaptive_section}
 Guidelines:
-- Make questions appropriate for a 14-year-old student
+- Make questions appropriate for {age_description}
 - For Easy: Basic concepts, straightforward questions
 - For Medium: Requires some thinking, applies concepts
 - For Hard: Challenging questions that require deeper understanding
@@ -921,6 +954,17 @@ with col2:
         help="Pick based on how confident you feel!"
     )
 
+grade_levels = ["None (Skip)", "Pre-K", "Kindergarten", "1st Grade", "2nd Grade", "3rd Grade", 
+                "4th Grade", "5th Grade", "6th Grade", "7th Grade", "8th Grade", 
+                "9th Grade", "10th Grade", "11th Grade", "12th Grade"]
+
+grade_level = st.selectbox(
+    "🎓 Grade Level (Optional)",
+    options=grade_levels,
+    index=0,
+    help="Select your grade to get age-appropriate questions. Skip if not for school!"
+)
+
 if difficulty == "Easy 🌱":
     st.success("💪 Perfect for building your foundation! Let's go!")
 elif difficulty == "Medium 🌿":
@@ -972,7 +1016,7 @@ if st.button("🎲 START QUIZ! 🎲", use_container_width=True):
                 progress_bar.progress((i + 1) * 20)
                 time.sleep(0.3)
             
-            quiz_content = generate_quiz_with_gemini(clean_topic, difficulty, st.session_state.weak_topics)
+            quiz_content = generate_quiz_with_gemini(clean_topic, difficulty, st.session_state.weak_topics, grade_level)
             correct_answers, explanations = parse_quiz_answers(quiz_content)
             
             if not validate_quiz_data(correct_answers, explanations):
