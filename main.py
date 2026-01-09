@@ -1284,15 +1284,20 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             is_correct = user_ans.upper() == correct_ans.upper()
             
             question_text = ""
+            user_ans_text = ""
+            correct_ans_text = ""
             if parsed_questions and i < len(parsed_questions):
                 question_text = parsed_questions[i].get('text', '')
+                options = parsed_questions[i].get('options', {})
+                user_ans_text = options.get(user_ans.upper(), "")
+                correct_ans_text = options.get(correct_ans.upper(), "")
             
             if is_correct:
                 st.markdown(f"""
 <div class="result-correct">
 <strong>{question_labels[i]}</strong><br>
 <em style="color: #555;">{question_text}</em><br><br>
-✅ You answered: <strong>{user_ans}</strong> - Correct!<br><br>
+✅ You answered: <strong>{user_ans}) {user_ans_text}</strong> - Correct!<br><br>
 💡 <em>{explanation}</em>
 </div>
                 """, unsafe_allow_html=True)
@@ -1301,8 +1306,8 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
 <div class="result-wrong">
 <strong>{question_labels[i]}</strong><br>
 <em style="color: #555;">{question_text}</em><br><br>
-❌ You answered: <strong>{user_ans}</strong><br>
-✅ Correct answer: <strong>{correct_ans}</strong><br><br>
+❌ You answered: <strong>{user_ans}) {user_ans_text}</strong><br>
+✅ Correct answer: <strong>{correct_ans}) {correct_ans_text}</strong><br><br>
 💡 <em>{explanation}</em>
 </div>
                 """, unsafe_allow_html=True)
