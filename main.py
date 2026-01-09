@@ -498,6 +498,61 @@ IMPORTANT: You MUST follow this EXACT format for each question. Do not deviate!
     return response.text
 
 
+def generate_quiz_summary(topic: str, correct_count: int, total_questions: int, 
+                          parsed_questions: list, user_answers: list, correct_answers: list) -> str:
+    """Generate an AI-powered summary of quiz performance."""
+    
+    wrong_details = []
+    correct_details = []
+    
+    for i in range(min(len(user_answers), len(correct_answers), len(parsed_questions))):
+        q = parsed_questions[i]
+        user_ans = user_answers[i].upper()
+        correct_ans = correct_answers[i].upper()
+        question_text = q.get('text', f'Question {i+1}')
+        options = q.get('options', {})
+        
+        if user_ans == correct_ans:
+            correct_details.append(f"- Q{i+1}: {question_text}")
+        else:
+            user_choice = options.get(user_ans, "Unknown")
+            correct_choice = options.get(correct_ans, "Unknown")
+            wrong_details.append(f"- Q{i+1}: {question_text}\n  Student answered: {user_ans}) {user_choice}\n  Correct answer: {correct_ans}) {correct_choice}")
+    
+    wrong_section = "\n".join(wrong_details) if wrong_details else "None - Perfect score!"
+    correct_section = "\n".join(correct_details) if correct_details else "None"
+    
+    prompt = f"""You are an encouraging study buddy for a student who just completed a quiz.
+
+Topic: {topic}
+Score: {correct_count}/{total_questions}
+
+Questions answered correctly:
+{correct_section}
+
+Questions answered incorrectly:
+{wrong_section}
+
+Write a SHORT, personalized summary (3-5 sentences max) that:
+1. Congratulates them on what they got right (be specific about topics they understood)
+2. If they got any wrong, gently explain what concepts they should review (without being discouraging)
+3. End with an encouraging tip or next step for studying this topic
+
+Keep it friendly, supportive, and age-appropriate for a student. Use 1-2 emojis max. Be concise!"""
+
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt
+        )
+        
+        if response.text:
+            return response.text
+        return "Great effort on this quiz! Keep practicing and you'll keep improving! 🌟"
+    except Exception:
+        return "Great effort on this quiz! Keep practicing and you'll keep improving! 🌟"
+
+
 # ============================================================
 # CUSTOM STYLING - Teen-Friendly & Mobile-First! 🎨
 # ============================================================
@@ -1314,6 +1369,28 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         
         if not wrong_questions:
             st.markdown("### 🌟 FLAWLESS! You got everything right! 🌟")
+        
+        st.markdown("---")
+        st.markdown("### 🤖 AI Study Summary")
+        with st.spinner("Generating your personalized summary..."):
+            summary = generate_quiz_summary(
+                st.session_state.current_topic,
+                correct_count,
+                5,
+                parsed_questions,
+                user_answers,
+                correct_answers
+            )
+        st.markdown(f"""
+<div style="background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%); 
+            color: white; 
+            padding: 20px; 
+            border-radius: 15px; 
+            margin: 10px 0;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);">
+    {summary}
+</div>
+        """, unsafe_allow_html=True)
         
         st.markdown("---")
         if correct_count >= 4:
