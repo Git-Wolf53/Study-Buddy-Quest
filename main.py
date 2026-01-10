@@ -1523,23 +1523,55 @@ st.markdown("""
 # ============================================================
 # PERSISTENT BOTTOM BAR WITH DARK/LIGHT MODE TOGGLE
 # ============================================================
-st.markdown('<div class="page-padding"></div>', unsafe_allow_html=True)
-
-bar_class = "bottom-bar bottom-bar-dark" if st.session_state.dark_mode else "bottom-bar"
 mode_icon = "🌙" if not st.session_state.dark_mode else "☀️"
 mode_text = "Dark Mode" if not st.session_state.dark_mode else "Light Mode"
+bar_bg = "linear-gradient(135deg, #2d3436 0%, #636e72 100%)" if st.session_state.dark_mode else "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
 
 st.markdown(f"""
-<div class="{bar_class}">
-    <span class="bottom-bar-label">🎨 Theme:</span>
+<style>
+    .fixed-bottom-bar {{
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: {bar_bg};
+        padding: 10px 20px;
+        z-index: 9999;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }}
+    .fixed-bottom-bar button {{
+        background: rgba(255,255,255,0.2) !important;
+        color: white !important;
+        border: 2px solid rgba(255,255,255,0.4) !important;
+        border-radius: 25px !important;
+        padding: 8px 20px !important;
+        font-weight: 600 !important;
+        cursor: pointer !important;
+        transition: all 0.3s ease !important;
+    }}
+    .fixed-bottom-bar button:hover {{
+        background: rgba(255,255,255,0.3) !important;
+        transform: scale(1.05) !important;
+    }}
+    .stApp > div:first-child {{
+        padding-bottom: 70px !important;
+    }}
+</style>
+<div class="fixed-bottom-bar">
+    <form action="" method="get" style="margin: 0;">
+        <button type="submit" name="toggle_theme" value="1">{mode_icon} {mode_text}</button>
+    </form>
 </div>
 """, unsafe_allow_html=True)
 
-col_spacer1, col_toggle, col_spacer2 = st.columns([3, 2, 3])
-with col_toggle:
-    if st.button(f"{mode_icon} {mode_text}", key="theme_toggle", use_container_width=True):
-        st.session_state.dark_mode = not st.session_state.dark_mode
-        st.rerun()
+query_params = st.query_params
+if "toggle_theme" in query_params:
+    st.session_state.dark_mode = not st.session_state.dark_mode
+    st.query_params.clear()
+    st.rerun()
 
 if st.session_state.dark_mode:
     st.markdown("""
