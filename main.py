@@ -842,105 +842,122 @@ Remember: You're helping them LEARN, not just giving answers. Explain the "why" 
 # ============================================================
 # SOUND EFFECTS HELPER
 # ============================================================
+def get_sound_init_script() -> str:
+    """Return JavaScript to initialize global audio context on user interaction."""
+    return """
+    <script>
+    (function() {
+        if (window.studyBuddyAudioInit) return;
+        window.studyBuddyAudioInit = true;
+        
+        window.studyBuddyCtx = null;
+        
+        function initAudio() {
+            if (!window.studyBuddyCtx) {
+                window.studyBuddyCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (window.studyBuddyCtx.state === 'suspended') {
+                window.studyBuddyCtx.resume();
+            }
+        }
+        
+        document.addEventListener('click', initAudio, {once: false});
+        document.addEventListener('keydown', initAudio, {once: false});
+        document.addEventListener('touchstart', initAudio, {once: false});
+        
+        window.playStudySound = function(type) {
+            initAudio();
+            const ctx = window.studyBuddyCtx;
+            if (!ctx) return;
+            
+            try {
+                if (type === 'correct') {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+                    osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1);
+                    osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2);
+                    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+                    osc.start(ctx.currentTime);
+                    osc.stop(ctx.currentTime + 0.4);
+                } else if (type === 'wrong') {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(200, ctx.currentTime);
+                    osc.frequency.setValueAtTime(150, ctx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                    osc.start(ctx.currentTime);
+                    osc.stop(ctx.currentTime + 0.3);
+                } else if (type === 'complete') {
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, i) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.15);
+                        gain.gain.setValueAtTime(0.25, ctx.currentTime + i * 0.15);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.15 + 0.3);
+                        osc.start(ctx.currentTime + i * 0.15);
+                        osc.stop(ctx.currentTime + i * 0.15 + 0.3);
+                    });
+                } else if (type === 'levelup') {
+                    const notes = [392, 523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, i) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.12);
+                        gain.gain.setValueAtTime(0.3, ctx.currentTime + i * 0.12);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.12 + 0.25);
+                        osc.start(ctx.currentTime + i * 0.12);
+                        osc.stop(ctx.currentTime + i * 0.12 + 0.25);
+                    });
+                } else if (type === 'badge') {
+                    const notes = [440, 554.37, 659.25, 880];
+                    notes.forEach((freq, i) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.1);
+                        gain.gain.setValueAtTime(0.25, ctx.currentTime + i * 0.1);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.1 + 0.3);
+                        osc.start(ctx.currentTime + i * 0.1);
+                        osc.stop(ctx.currentTime + i * 0.1 + 0.3);
+                    });
+                } else if (type === 'click') {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.frequency.setValueAtTime(800, ctx.currentTime);
+                    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+                    osc.start(ctx.currentTime);
+                    osc.stop(ctx.currentTime + 0.05);
+                }
+            } catch(e) {}
+        };
+    })();
+    </script>
+    """
+
 def play_sound(sound_type: str) -> str:
     """Generate JavaScript to play a sound effect using Web Audio API."""
     if not st.session_state.get('sound_enabled', True):
         return ""
-    
-    sounds = {
-        'correct': """
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.frequency.setValueAtTime(523.25, ctx.currentTime);
-            osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1);
-            osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2);
-            gain.gain.setValueAtTime(0.3, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
-            osc.start(ctx.currentTime);
-            osc.stop(ctx.currentTime + 0.4);
-        """,
-        'wrong': """
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(200, ctx.currentTime);
-            osc.frequency.setValueAtTime(150, ctx.currentTime + 0.15);
-            gain.gain.setValueAtTime(0.2, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-            osc.start(ctx.currentTime);
-            osc.stop(ctx.currentTime + 0.3);
-        """,
-        'complete': """
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const notes = [523.25, 659.25, 783.99, 1046.50];
-            notes.forEach((freq, i) => {
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.15);
-                gain.gain.setValueAtTime(0.25, ctx.currentTime + i * 0.15);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.15 + 0.3);
-                osc.start(ctx.currentTime + i * 0.15);
-                osc.stop(ctx.currentTime + i * 0.15 + 0.3);
-            });
-        """,
-        'levelup': """
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const notes = [392, 523.25, 659.25, 783.99, 1046.50];
-            notes.forEach((freq, i) => {
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.12);
-                gain.gain.setValueAtTime(0.3, ctx.currentTime + i * 0.12);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.12 + 0.25);
-                osc.start(ctx.currentTime + i * 0.12);
-                osc.stop(ctx.currentTime + i * 0.12 + 0.25);
-            });
-        """,
-        'badge': """
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const notes = [440, 554.37, 659.25, 880];
-            notes.forEach((freq, i) => {
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.1);
-                gain.gain.setValueAtTime(0.25, ctx.currentTime + i * 0.1);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.1 + 0.3);
-                osc.start(ctx.currentTime + i * 0.1);
-                osc.stop(ctx.currentTime + i * 0.1 + 0.3);
-            });
-        """,
-        'click': """
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.frequency.setValueAtTime(800, ctx.currentTime);
-            gain.gain.setValueAtTime(0.15, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
-            osc.start(ctx.currentTime);
-            osc.stop(ctx.currentTime + 0.05);
-        """
-    }
-    
-    js_code = sounds.get(sound_type, '')
-    if js_code:
-        return f'<script>try {{ {js_code} }} catch(e) {{}}</script>'
-    return ""
+    return f'<script>if(window.playStudySound) window.playStudySound("{sound_type}");</script>'
 
 
 # ============================================================
@@ -1279,6 +1296,8 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
+
+st.markdown(get_sound_init_script(), unsafe_allow_html=True)
 
 # ============================================================
 # TOP RIGHT BUTTONS - HELP, SOUND & THEME TOGGLE
@@ -1677,6 +1696,9 @@ if timed_mode:
 st.markdown("")
 
 if st.button("🎲 START QUIZ! 🎲", use_container_width=True):
+    click_sound = play_sound('click')
+    if click_sound:
+        st.markdown(click_sound, unsafe_allow_html=True)
     
     # Combine category with topic if a category is selected
     if selected_category and selected_category != "Any Topic":
@@ -1907,6 +1929,9 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             
             st.markdown("")
             if st.button("📨 SUBMIT ALL ANSWERS!", use_container_width=True):
+                submit_sound = play_sound('click')
+                if submit_sound:
+                    st.markdown(submit_sound, unsafe_allow_html=True)
                 user_answers = [st.session_state.get(f"q{i+1}") for i in range(num_questions)]
                 unanswered = [i+1 for i, ans in enumerate(user_answers) if ans is None]
                 
@@ -2411,6 +2436,9 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         
         st.markdown("")
         if st.button("🔄 TAKE ANOTHER QUIZ!", use_container_width=True):
+            another_sound = play_sound('click')
+            if another_sound:
+                st.markdown(another_sound, unsafe_allow_html=True)
             st.session_state.quiz_generated = False
             st.session_state.quiz_content = None
             st.session_state.quiz_questions_only = None
