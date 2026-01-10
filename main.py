@@ -5,6 +5,7 @@
 # ============================================================
 
 import streamlit as st
+import streamlit.components.v1 as components
 import os
 import re
 import random
@@ -1525,100 +1526,63 @@ st.markdown("""
 # ============================================================
 bar_bg = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" if st.session_state.dark_mode else "linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%)"
 
-st.markdown(f"""
-<style>
-    .main .block-container {{
-        padding-bottom: 100px !important;
-    }}
-    
-    .fixed-bottom-bar-wrapper {{
-        position: fixed !important;
-        bottom: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        background: {bar_bg} !important;
-        padding: 12px 20px !important;
-        z-index: 999999 !important;
-        box-shadow: 0 -4px 20px rgba(0,0,0,0.2) !important;
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important;
-        gap: 15px !important;
-    }}
-    
-    .theme-icon {{
-        font-size: 1.5rem;
-        cursor: pointer;
-    }}
-</style>
+is_checked = "true" if not st.session_state.dark_mode else "false"
 
-<div class="fixed-bottom-bar-wrapper" id="theme-bar">
-    <span class="theme-icon" id="dark-icon">🌙</span>
-    <label class="theme-switch">
-        <input type="checkbox" id="theme-checkbox" {'checked' if not st.session_state.dark_mode else ''}>
-        <span class="slider"></span>
-    </label>
-    <span class="theme-icon" id="light-icon">☀️</span>
-</div>
-
-<style>
-    .theme-switch {{
-        position: relative;
-        display: inline-block;
-        width: 50px;
-        height: 26px;
-    }}
+components.html(f"""
+<script>
+(function() {{
+    // Remove existing bar if present
+    const existingBar = window.parent.document.getElementById('theme-bottom-bar');
+    if (existingBar) existingBar.remove();
     
-    .theme-switch input {{
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }}
-    
-    .slider {{
-        position: absolute;
-        cursor: pointer;
-        top: 0;
+    // Create the bar in the parent document
+    const bar = document.createElement('div');
+    bar.id = 'theme-bottom-bar';
+    bar.innerHTML = `
+        <span style="font-size: 1.5rem;">🌙</span>
+        <label style="position: relative; display: inline-block; width: 50px; height: 26px;">
+            <input type="checkbox" id="theme-toggle-input" style="opacity: 0; width: 0; height: 0;" ${{({is_checked}) ? 'checked' : ''}}>
+            <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.3); transition: 0.4s; border-radius: 26px;">
+                <span style="position: absolute; content: ''; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: 0.4s; border-radius: 50%; transform: ${{({is_checked}) ? 'translateX(24px)' : 'translateX(0)'}}"></span>
+            </span>
+        </label>
+        <span style="font-size: 1.5rem;">☀️</span>
+    `;
+    bar.style.cssText = `
+        position: fixed;
+        bottom: 0;
         left: 0;
         right: 0;
-        bottom: 0;
-        background-color: rgba(255,255,255,0.3);
-        transition: 0.4s;
-        border-radius: 26px;
+        background: {bar_bg};
+        padding: 12px 20px;
+        z-index: 999999;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+    `;
+    
+    window.parent.document.body.appendChild(bar);
+    
+    // Add padding to main content
+    const mainBlock = window.parent.document.querySelector('.main .block-container');
+    if (mainBlock) {{
+        mainBlock.style.paddingBottom = '100px';
     }}
     
-    .slider:before {{
-        position: absolute;
-        content: "";
-        height: 20px;
-        width: 20px;
-        left: 3px;
-        bottom: 3px;
-        background-color: white;
-        transition: 0.4s;
-        border-radius: 50%;
-    }}
-    
-    input:checked + .slider {{
-        background-color: rgba(102, 126, 234, 0.6);
-    }}
-    
-    input:checked + .slider:before {{
-        transform: translateX(24px);
-    }}
-</style>
-
-<script>
-    const checkbox = document.getElementById('theme-checkbox');
+    // Add click handler
+    const checkbox = window.parent.document.getElementById('theme-toggle-input');
     if (checkbox) {{
         checkbox.addEventListener('change', function() {{
-            const params = new URLSearchParams(window.location.search);
-            params.set('theme_toggle', '1');
-            window.location.search = params.toString();
+            const url = new URL(window.parent.location.href);
+            url.searchParams.set('theme_toggle', '1');
+            window.parent.location.href = url.toString();
         }});
     }}
+}})();
 </script>
-""", unsafe_allow_html=True)
+""", height=0)
 
 if "theme_toggle" in st.query_params:
     st.session_state.dark_mode = not st.session_state.dark_mode
