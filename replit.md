@@ -2,9 +2,21 @@
 
 ## Overview
 
-Study Buddy Quest is an educational web application built for the Presidential AI Challenge. It's a quiz generation app that helps students learn any topic through engaging, AI-generated quizzes. Users can enter any subject they want to study, select a difficulty level (Easy, Medium, or Hard), and receive a 5-question multiple choice quiz with instant feedback and explanations.
+Study Buddy Quest is an educational web application built for the Presidential AI Challenge. It's a gamified quiz generation app that helps students learn any topic through engaging, AI-generated quizzes with comprehensive learning features.
 
-The application uses Google's Gemini AI to dynamically generate quiz questions and includes features like text-to-speech support, celebratory animations, and a teen-friendly design with emojis and colorful UI elements.
+### Key Features
+- **Customizable Quizzes**: 5, 10, or 15 questions with Easy/Medium/Hard difficulty
+- **Progressive Leveling System**: 10 levels with increasing XP requirements and rewards
+- **Badges & Achievements**: Unlock badges for milestones like perfect scores and quiz streaks
+- **AI Tutor Chat**: Ask follow-up questions about topics you got wrong
+- **Achievement Certificate**: Generate and download a PNG certificate to show your progress
+- **Study Notes**: AI-generated notes summarizing key concepts from each quiz
+- **Timed Challenge Mode**: Race against the clock for bonus Experience Points
+- **Weak Topic Tracking**: Adaptive learning that identifies areas to practice
+- **Quiz History**: Review and retake past quizzes
+- **Accessibility**: Text-to-speech, font size controls, high contrast mode
+- **Sound Effects**: Audio feedback with toggle control
+- **Teen-Friendly Design**: Mobile-responsive with colorful UI and emojis
 
 ## User Preferences
 
@@ -38,6 +50,7 @@ Preferred communication style: Simple, everyday language.
 - `streamlit`: Web application framework
 - `google-genai`: Google Gemini AI client library
 - `gtts`: Google Text-to-Speech for audio generation
+- `pillow`: Image generation for downloadable certificates
 
 ### Environment Variables
 - `GEMINI_API_KEY`: Required. The Google Gemini API key for AI-powered quiz generation.
