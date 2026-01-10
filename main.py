@@ -1146,7 +1146,26 @@ if st.session_state.get('show_tutorial', False):
 st.markdown('<h1 class="mega-title">🎮 Study Buddy Quest 🧠</h1>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">Level up your knowledge, one quiz at a time! 🚀</p>', unsafe_allow_html=True)
 
-st.markdown(f'<div class="encourage-box">{get_random_encouragement()}</div>', unsafe_allow_html=True)
+with st.expander("💡 Why Use Study Buddy Quest?"):
+    st.markdown("""
+    **Study Buddy Quest makes learning fun and effective!**
+    
+    🎮 **Gamified Learning** - Earn XP, level up, and collect badges as you learn. It's like playing a game while studying!
+    
+    🧠 **AI-Powered Quizzes** - Get personalized questions on ANY topic you want to learn about, at your difficulty level.
+    
+    📊 **Track Your Progress** - See your weak areas and focus on what needs more practice. The app remembers what you struggle with!
+    
+    ⏱️ **Timed Challenges** - Test yourself under pressure and earn bonus points for quick thinking.
+    
+    📝 **Study Notes** - Get AI-generated study notes after each quiz to reinforce what you learned.
+    
+    🎓 **Grade-Appropriate** - Questions are tailored to your grade level, from Pre-K to 12th grade.
+    
+    🔊 **Accessibility** - Listen to questions read aloud, adjust font sizes, and customize your experience.
+    
+    *Start your learning quest today and watch your knowledge grow!*
+    """)
 
 # ============================================================
 # BADGE DISPLAY
