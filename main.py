@@ -71,6 +71,7 @@ defaults = {
     "quiz_length": 5,
     "font_size": "medium",
     "selected_category": None,
+    "sound_enabled": True,
 }
 
 # ============================================================
@@ -883,15 +884,21 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ============================================================
-# TOP RIGHT BUTTONS - HELP & THEME TOGGLE
+# TOP RIGHT BUTTONS - HELP, SOUND & THEME TOGGLE
 # ============================================================
 theme_icon = "☀️" if st.session_state.dark_mode else "🌙"
 theme_text = "Light" if st.session_state.dark_mode else "Dark"
+sound_icon = "🔊" if st.session_state.sound_enabled else "🔇"
+sound_text = "Off" if st.session_state.sound_enabled else "On"
 
-col_spacer, col_help, col_theme = st.columns([10, 1, 1])
+col_spacer, col_help, col_sound, col_theme = st.columns([10, 1, 1, 1])
 with col_help:
     if st.button("❓", key="help_btn", help="How to use Study Buddy"):
         st.session_state.show_tutorial = not st.session_state.get('show_tutorial', False)
+        st.rerun()
+with col_sound:
+    if st.button(f"{sound_icon}", key="sound_btn", help=f"Turn Sound {sound_text}"):
+        st.session_state.sound_enabled = not st.session_state.sound_enabled
         st.rerun()
 with col_theme:
     if st.button(f"{theme_icon}", key="theme_btn", help=f"Switch to {theme_text} Mode"):
