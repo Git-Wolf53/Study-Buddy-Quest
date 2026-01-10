@@ -1721,7 +1721,9 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     num_questions = min(len(user_answers), len(correct_answers))
                     
                     for i in range(num_questions):
-                        if user_answers[i].upper() == correct_answers[i].upper():
+                        user_ans = user_answers[i] if user_answers[i] else ""
+                        correct_ans = correct_answers[i] if correct_answers[i] else ""
+                        if user_ans.upper() == correct_ans.upper():
                             correct_count += 1
                         else:
                             wrong_questions.append(i + 1)
