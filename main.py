@@ -1524,50 +1524,66 @@ st.markdown("""
 # PERSISTENT BOTTOM BAR WITH DARK/LIGHT MODE TOGGLE
 # ============================================================
 bar_bg = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" if st.session_state.dark_mode else "linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%)"
+label_color = "white" if st.session_state.dark_mode else "#333"
 
 st.markdown(f"""
 <style>
-    .fixed-bottom-bar {{
+    [data-testid="stVerticalBlock"]:has(> [data-testid="stVerticalBlock"] > [data-testid="stMarkdown"] > .bottom-bar-anchor) {{
         position: fixed;
         bottom: 0;
         left: 0;
         right: 0;
         background: {bar_bg};
-        padding: 12px 20px;
+        padding: 10px 20px;
         z-index: 9999;
         box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
     }}
-    .stApp > div:first-child {{
-        padding-bottom: 80px !important;
+    
+    .main .block-container {{
+        padding-bottom: 100px !important;
     }}
-    .theme-toggle-container {{
+    
+    .bottom-bar-anchor {{
+        display: none;
+    }}
+    
+    .theme-row {{
         display: flex;
         justify-content: center;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
     }}
-    .theme-label {{
-        color: {'white' if st.session_state.dark_mode else '#333'};
+    
+    .theme-icon {{
+        font-size: 1.3rem;
+    }}
+    
+    .theme-text {{
+        color: {label_color};
         font-weight: 600;
-        font-size: 1rem;
+        font-size: 0.95rem;
     }}
 </style>
-<div class="fixed-bottom-bar">
-    <div class="theme-toggle-container">
-        <span class="theme-label">🌙 Dark</span>
-    </div>
-</div>
 """, unsafe_allow_html=True)
 
-col1, col2, col3 = st.columns([2, 1, 2])
-with col2:
-    theme_toggle = st.toggle(
-        "Theme",
-        value=not st.session_state.dark_mode,
-        key="theme_switch",
-        label_visibility="collapsed"
-    )
-    if theme_toggle != (not st.session_state.dark_mode):
+bottom_bar = st.container()
+with bottom_bar:
+    st.markdown('<div class="bottom-bar-anchor">anchor</div>', unsafe_allow_html=True)
+    
+    col1, col2, col3, col4, col5 = st.columns([2, 1, 1, 1, 2])
+    with col2:
+        st.markdown(f'<span class="theme-icon">🌙</span>', unsafe_allow_html=True)
+    with col3:
+        theme_toggle = st.toggle(
+            "Theme",
+            value=not st.session_state.dark_mode,
+            key="theme_switch",
+            label_visibility="collapsed"
+        )
+    with col4:
+        st.markdown(f'<span class="theme-icon">☀️</span>', unsafe_allow_html=True)
+    
+    if theme_toggle == st.session_state.dark_mode:
         st.session_state.dark_mode = not theme_toggle
         st.rerun()
 
