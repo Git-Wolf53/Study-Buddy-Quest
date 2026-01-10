@@ -216,6 +216,26 @@ def get_level_title(level: int) -> str:
         return titles[10]
     return titles.get(level, f"Level {level} Hero 🦸")
 
+# Level perks - what each level unlocks
+LEVEL_PERKS = {
+    1: "Start your learning journey!",
+    2: "Unlock Quiz History tracking",
+    3: "Unlock Timed Challenge Mode",
+    4: "Unlock AI Study Notes",
+    5: "Earn the Study Champion badge!",
+    6: "Get +5% bonus XP on all quizzes",
+    7: "Get +10% bonus XP on all quizzes",
+    8: "Get +15% bonus XP on all quizzes",
+    9: "Get +20% bonus XP on all quizzes",
+    10: "Maximum +25% bonus XP + all features unlocked!"
+}
+
+def get_level_perk(level: int) -> str:
+    """Get the perk for a specific level."""
+    if level >= 10:
+        return LEVEL_PERKS[10]
+    return LEVEL_PERKS.get(level, "Keep learning!")
+
 
 def strip_answers_from_quiz(quiz_text: str) -> str:
     """Remove answers and explanations from quiz text."""
@@ -1104,21 +1124,21 @@ with st.expander("📖 How to Use Study Buddy Quest"):
     ### Step 4: Take the Quiz!
     Click **'START QUIZ!'** to generate your quiz. Answer all the questions, then submit to see your score and earn XP points!
     
-    ### Step 5: Level Up & Earn Badges!
-    Every correct answer earns you **XP points** (10 XP each, plus bonuses!). Every **50 XP** moves you up to the next level:
+    ### Step 5: Level Up & Earn Rewards!
+    Every correct answer earns you **XP points** (10 XP each, plus bonuses!). Every **50 XP** moves you up to the next level and unlocks new rewards:
     
-    | Level | Title | XP Needed |
-    |-------|-------|-----------|
-    | 1 | Curious Beginner 🌱 | 0 XP |
-    | 2 | Knowledge Seeker 📖 | 50 XP |
-    | 3 | Quiz Explorer 🗺️ | 100 XP |
-    | 4 | Brain Builder 🧱 | 150 XP |
-    | 5 | Study Champion 🏅 | 200 XP |
-    | 6 | Wisdom Warrior ⚔️ | 250 XP |
-    | 7 | Master Learner 🎓 | 300 XP |
-    | 8 | Knowledge Knight 🛡️ | 350 XP |
-    | 9 | Quiz Legend 🌟 | 400 XP |
-    | 10 | Ultimate Genius 👑 | 450 XP |
+    | Level | Title | XP Needed | Reward |
+    |-------|-------|-----------|--------|
+    | 1 | Curious Beginner 🌱 | 0 XP | Start your learning journey! |
+    | 2 | Knowledge Seeker 📖 | 50 XP | Unlock Quiz History tracking |
+    | 3 | Quiz Explorer 🗺️ | 100 XP | Unlock Timed Challenge Mode |
+    | 4 | Brain Builder 🧱 | 150 XP | Unlock AI Study Notes |
+    | 5 | Study Champion 🏅 | 200 XP | Earn the Study Champion badge! |
+    | 6 | Wisdom Warrior ⚔️ | 250 XP | Get +5% bonus XP on all quizzes |
+    | 7 | Master Learner 🎓 | 300 XP | Get +10% bonus XP on all quizzes |
+    | 8 | Knowledge Knight 🛡️ | 350 XP | Get +15% bonus XP on all quizzes |
+    | 9 | Quiz Legend 🌟 | 400 XP | Get +20% bonus XP on all quizzes |
+    | 10 | Ultimate Genius 👑 | 450 XP | Maximum +25% bonus XP! |
     
     **Bonus XP:** Get extra points for perfect scores and fast answers in timed mode!
     """)
@@ -1482,6 +1502,7 @@ if st.button("🎲 START QUIZ! 🎲", use_container_width=True):
         st.session_state.study_notes = None
         st.session_state.time_bonus = 0
         st.session_state.base_score = 0
+        st.session_state.level_bonus = 0
         
         progress_bar = st.progress(0)
         status_text = st.empty()
@@ -1704,7 +1725,15 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                             time_bonus = int((remaining / total_time) * quiz_score * 0.5)
                             st.session_state.time_bonus = time_bonus
                     
-                    total_quiz_score = quiz_score + time_bonus
+                    # Calculate level bonus (levels 6+ get bonus XP) - use level BEFORE adding score
+                    pre_quiz_level = calculate_level(st.session_state.total_score)
+                    level_bonus_percent = max(0, (pre_quiz_level - 5) * 5) if pre_quiz_level >= 6 else 0
+                    level_bonus_percent = min(level_bonus_percent, 25)  # Cap at 25%
+                    level_bonus = int(quiz_score * level_bonus_percent / 100)
+                    st.session_state.level_bonus = level_bonus
+                    st.session_state.bonus_level = pre_quiz_level  # Store the level used for bonus calculation
+                    
+                    total_quiz_score = quiz_score + time_bonus + level_bonus
                     st.session_state.score = total_quiz_score
                     st.session_state.base_score = quiz_score
                     
@@ -1763,7 +1792,20 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                             wrong_questions.append(i + 1)
                     
                     st.session_state.wrong_questions = wrong_questions
-                    st.session_state.score = correct_count * 10
+                    
+                    quiz_score = correct_count * 10
+                    
+                    # Calculate level bonus (levels 6+ get bonus XP) - fallback path
+                    pre_quiz_level = calculate_level(st.session_state.total_score)
+                    level_bonus_percent = max(0, (pre_quiz_level - 5) * 5) if pre_quiz_level >= 6 else 0
+                    level_bonus_percent = min(level_bonus_percent, 25)  # Cap at 25%
+                    level_bonus = int(quiz_score * level_bonus_percent / 100)
+                    st.session_state.level_bonus = level_bonus
+                    st.session_state.bonus_level = pre_quiz_level
+                    
+                    total_quiz_score = quiz_score + level_bonus
+                    st.session_state.score = total_quiz_score
+                    st.session_state.base_score = quiz_score
                     
                     fallback_total = min(len(user_answers), len(correct_answers))
                     if correct_count == fallback_total:
@@ -1773,7 +1815,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                         if st.session_state.current_topic not in st.session_state.weak_topics:
                             st.session_state.weak_topics.append(st.session_state.current_topic)
                     
-                    st.session_state.total_score += st.session_state.score
+                    st.session_state.total_score += total_quiz_score
                     st.session_state.quizzes_completed += 1
                     
                     # Save to quiz history (fallback form)
@@ -1817,6 +1859,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         total_questions = st.session_state.get('quiz_length', 5)
         base_score = st.session_state.get('base_score', score)
         time_bonus = st.session_state.get('time_bonus', 0)
+        level_bonus = st.session_state.get('level_bonus', 0)
         
         # Show time bonus if earned
         if time_bonus > 0:
@@ -1826,6 +1869,18 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 <div style="font-size: 1.2rem;">⚡ SPEED BONUS! ⚡</div>
                 <div style="font-size: 1.5rem; font-weight: bold;">+{time_bonus} XP</div>
                 <div style="font-size: 0.9rem;">You finished with time to spare!</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        # Show level bonus if earned
+        if level_bonus > 0:
+            bonus_lvl = st.session_state.get('bonus_level', calculate_level(st.session_state.total_score))
+            st.markdown(f"""
+            <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
+                        color: white; padding: 15px; border-radius: 12px; text-align: center; margin: 10px 0;">
+                <div style="font-size: 1.2rem;">🌟 LEVEL BONUS! 🌟</div>
+                <div style="font-size: 1.5rem; font-weight: bold;">+{level_bonus} XP</div>
+                <div style="font-size: 0.9rem;">Level {bonus_lvl} perk active!</div>
             </div>
             """, unsafe_allow_html=True)
         
@@ -1872,11 +1927,15 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             levelup_sound = play_sound('levelup')
             if levelup_sound:
                 st.markdown(levelup_sound, unsafe_allow_html=True)
+            new_perk = get_level_perk(new_level)
+            new_title = get_level_title(new_level)
             st.markdown(f"""
             <div style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); 
                         color: white; padding: 20px; border-radius: 12px; text-align: center; margin: 15px 0;">
                 <div style="font-size: 2rem;">🎉 LEVEL UP! 🎉</div>
                 <div style="font-size: 1.5rem; font-weight: bold;">Level {old_level} → Level {new_level}</div>
+                <div style="font-size: 1.2rem; margin-top: 8px;">{new_title}</div>
+                <div style="font-size: 1rem; margin-top: 8px; background: rgba(255,255,255,0.2); padding: 8px; border-radius: 8px;">🎁 Unlocked: {new_perk}</div>
             </div>
             """, unsafe_allow_html=True)
         
