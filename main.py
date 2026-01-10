@@ -567,6 +567,9 @@ st.markdown("""
     
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
+    header {visibility: hidden;}
+    [data-testid="stHeader"] {display: none;}
+    .stDeployButton {display: none;}
     
     .block-container {
         padding-top: 2rem;
