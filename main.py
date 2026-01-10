@@ -1972,14 +1972,8 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         
         # Current stats summary
         st.markdown(f"""
-        <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; 
-                    padding: 15px; text-align: center; margin: 15px 0;">
-            <span style="font-size: 1.1rem; color: #475569;">
-                📈 <strong>Total: {st.session_state.total_score} Experience Points</strong> | 
-                <strong>Level {new_level}</strong> ({get_level_title(new_level)})
-            </span>
-        </div>
-        """, unsafe_allow_html=True)
+        📈 **Total: {st.session_state.total_score} Experience Points** | **Level {new_level}** ({get_level_title(new_level)})
+        """)
         
         new_badges = check_and_award_badges()
         if new_badges:
