@@ -76,6 +76,11 @@ defaults = {
     "quiz_start_time": None,
     "time_per_question": 30,
     "study_notes": None,
+    "high_contrast": False,
+    "reduce_animations": False,
+    "default_timed_mode": False,
+    "default_quiz_length": 5,
+    "compact_mode": False,
 }
 
 # ============================================================
@@ -115,6 +120,11 @@ GRADE_CATEGORIES = {
 for key, value in defaults.items():
     if key not in st.session_state:
         st.session_state[key] = value
+
+# Ensure timed_mode respects default_timed_mode preference on fresh sessions
+if 'timed_mode_initialized' not in st.session_state:
+    st.session_state.timed_mode = st.session_state.get('default_timed_mode', False)
+    st.session_state.timed_mode_initialized = True
 
 # ============================================================
 # BADGE SYSTEM
@@ -1230,6 +1240,82 @@ st.markdown(f"""
 </style>
 """, unsafe_allow_html=True)
 
+# High Contrast Mode CSS
+if st.session_state.get('high_contrast', False):
+    st.markdown("""
+    <style>
+        /* High Contrast Mode */
+        .stApp {
+            background-color: #000000 !important;
+        }
+        .stMarkdown, .stMarkdown p, .stMarkdown span, .stMarkdown div,
+        .stTextInput label, .stSelectbox label, h1, h2, h3, h4, h5, h6 {
+            color: #FFFFFF !important;
+        }
+        .stRadio label, .stCheckbox label {
+            color: #FFFFFF !important;
+        }
+        .stButton button {
+            background-color: #FFFF00 !important;
+            color: #000000 !important;
+            border: 3px solid #FFFFFF !important;
+            font-weight: bold !important;
+        }
+        .stButton button:hover {
+            background-color: #00FF00 !important;
+        }
+        a, .stMarkdown a {
+            color: #00FFFF !important;
+            text-decoration: underline !important;
+        }
+        .stProgress > div > div {
+            background-color: #00FF00 !important;
+        }
+        .stExpander {
+            border: 2px solid #FFFFFF !important;
+        }
+        .quiz-question, .explanation {
+            color: #FFFFFF !important;
+            border: 2px solid #FFFF00 !important;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
+# Compact Mode CSS
+if st.session_state.get('compact_mode', False):
+    st.markdown("""
+    <style>
+        /* Compact Mode */
+        .block-container {
+            padding-top: 1rem !important;
+            padding-bottom: 1rem !important;
+        }
+        .stMarkdown {
+            margin-bottom: 0.25rem !important;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            margin-top: 0.5rem !important;
+            margin-bottom: 0.25rem !important;
+        }
+        .stButton {
+            margin-top: 0.25rem !important;
+            margin-bottom: 0.25rem !important;
+        }
+        .stRadio > div {
+            gap: 0.25rem !important;
+        }
+        .stExpander {
+            margin-bottom: 0.5rem !important;
+        }
+        hr {
+            margin: 0.5rem 0 !important;
+        }
+        .element-container {
+            margin-bottom: 0.25rem !important;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
 # ============================================================
 # QUIZ HISTORY
 # ============================================================
@@ -1302,10 +1388,12 @@ with col2:
 col3, col4 = st.columns(2)
 
 with col3:
+    default_length = st.session_state.get('default_quiz_length', 5)
+    retake_len = st.session_state.get('retake_length', default_length)
     quiz_length = st.selectbox(
         "📝 Number of Questions",
         options=[5, 10, 15],
-        index=[5, 10, 15].index(st.session_state.get('retake_length', 5)) if st.session_state.get('retake_length', 5) in [5, 10, 15] else 0,
+        index=[5, 10, 15].index(retake_len) if retake_len in [5, 10, 15] else 0,
         help="Choose how many questions you want!"
     )
     if 'retake_length' in st.session_state:
@@ -1357,7 +1445,8 @@ with timed_col1:
     st.markdown("**⏱️ Timed Challenge Mode**")
     st.caption("Race against the clock for bonus XP! 30 seconds per question.")
 with timed_col2:
-    timed_mode = st.toggle("Enable Timer", value=st.session_state.get('timed_mode', False), key="timed_toggle")
+    default_timed = st.session_state.get('default_timed_mode', False)
+    timed_mode = st.toggle("Enable Timer", value=st.session_state.get('timed_mode', default_timed), key="timed_toggle")
 
 if timed_mode:
     st.markdown("""
@@ -1742,7 +1831,8 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         num_questions = min(len(user_answers), len(correct_answers))
         correct_count = sum(1 for i in range(num_questions) if user_answers[i].upper() == correct_answers[i].upper())
         
-        st.balloons()
+        if not st.session_state.get('reduce_animations', False):
+            st.balloons()
         
         # Play quiz complete sound
         complete_sound = play_sound('complete')
@@ -2009,7 +2099,10 @@ with st.expander("💡 Why Real Understanding Matters"):
 # ============================================================
 # ACCESSIBILITY SETTINGS (at bottom of page)
 # ============================================================
-with st.expander("⚙️ Accessibility Settings"):
+with st.expander("⚙️ Settings"):
+    st.markdown("### Display Settings")
+    
+    # Font Size
     st.markdown("**Font Size**")
     font_col1, font_col2, font_col3 = st.columns(3)
     with font_col1:
@@ -2025,6 +2118,61 @@ with st.expander("⚙️ Accessibility Settings"):
             st.session_state.font_size = "large"
             st.rerun()
     st.caption(f"Current: {st.session_state.font_size.title()}")
+    
+    st.markdown("---")
+    
+    # High Contrast Mode
+    high_contrast = st.toggle(
+        "🔲 High Contrast Mode",
+        value=st.session_state.get('high_contrast', False),
+        help="Stronger colors for better visibility"
+    )
+    if high_contrast != st.session_state.high_contrast:
+        st.session_state.high_contrast = high_contrast
+        st.rerun()
+    
+    # Compact Mode
+    compact_mode = st.toggle(
+        "📐 Compact Mode",
+        value=st.session_state.get('compact_mode', False),
+        help="Reduce spacing for more content on screen"
+    )
+    if compact_mode != st.session_state.compact_mode:
+        st.session_state.compact_mode = compact_mode
+        st.rerun()
+    
+    # Reduce Animations
+    reduce_animations = st.toggle(
+        "🎯 Reduce Animations",
+        value=st.session_state.get('reduce_animations', False),
+        help="Turn off balloons and celebration effects"
+    )
+    if reduce_animations != st.session_state.reduce_animations:
+        st.session_state.reduce_animations = reduce_animations
+        st.rerun()
+    
+    st.markdown("---")
+    st.markdown("### Quiz Preferences")
+    
+    # Default Quiz Length
+    default_quiz_length = st.selectbox(
+        "📝 Default Quiz Length",
+        options=[5, 10, 15],
+        index=[5, 10, 15].index(st.session_state.get('default_quiz_length', 5)),
+        help="This will be your default when starting new quizzes"
+    )
+    if default_quiz_length != st.session_state.default_quiz_length:
+        st.session_state.default_quiz_length = default_quiz_length
+    
+    # Default Timer Setting
+    default_timed_mode = st.toggle(
+        "⏱️ Enable Timer by Default",
+        value=st.session_state.get('default_timed_mode', False),
+        help="Automatically enable timed mode for new quizzes"
+    )
+    if default_timed_mode != st.session_state.default_timed_mode:
+        st.session_state.default_timed_mode = default_timed_mode
+        st.session_state.timed_mode = default_timed_mode
 
 # ============================================================
 # FOOTER
