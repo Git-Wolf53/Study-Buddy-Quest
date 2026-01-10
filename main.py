@@ -1858,7 +1858,6 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
     # ============================================================
     if st.session_state.answers_submitted:
         st.markdown("---")
-        st.markdown("## 📊 Your Results Are In!")
         
         user_answers = st.session_state.user_answers
         correct_answers = st.session_state.correct_answers
@@ -1882,69 +1881,70 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         time_bonus = st.session_state.get('time_bonus', 0)
         level_bonus = st.session_state.get('level_bonus', 0)
         
-        # Show time bonus if earned
-        if time_bonus > 0:
-            st.markdown(f"""
-            <div style="background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); 
-                        color: white; padding: 15px; border-radius: 12px; text-align: center; margin: 10px 0;">
-                <div style="font-size: 1.2rem;">⚡ SPEED BONUS! ⚡</div>
-                <div style="font-size: 1.5rem; font-weight: bold;">+{time_bonus} Experience Points</div>
-                <div style="font-size: 0.9rem;">You finished with time to spare!</div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        # Show level bonus if earned
-        if level_bonus > 0:
-            bonus_lvl = st.session_state.get('bonus_level', calculate_level(st.session_state.total_score))
-            st.markdown(f"""
-            <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
-                        color: white; padding: 15px; border-radius: 12px; text-align: center; margin: 10px 0;">
-                <div style="font-size: 1.2rem;">🌟 LEVEL BONUS! 🌟</div>
-                <div style="font-size: 1.5rem; font-weight: bold;">+{level_bonus} Experience Points</div>
-                <div style="font-size: 0.9rem;">Level {bonus_lvl} perk active!</div>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        if correct_count == total_questions:
-            st.success(f"""
-            ## 🏆 PERFECT SCORE! 🏆
-            ### You got **{correct_count}/{total_questions}** correct!
-            ### **+{score} Experience Points** earned! 
-            
-            🌟 You're absolutely CRUSHING it! Your brain is on fire! 🔥
-            """)
-        elif correct_count >= total_questions * 0.8:
-            st.success(f"""
-            ## 🎉 Amazing Job! 🎉
-            ### You got **{correct_count}/{total_questions}** correct!
-            ### **+{score} Experience Points** earned!
-            
-            💪 So close to perfect! You're a knowledge machine!
-            """)
-        elif correct_count >= total_questions * 0.6:
-            st.info(f"""
-            ## 👍 Nice Work!
-            ### You got **{correct_count}/{total_questions}** correct!
-            ### **+{score} Experience Points** earned!
-            
-            📈 You're learning and growing! Keep going!
-            """)
-        else:
-            st.warning(f"""
-            ## 💪 Keep Practicing!
-            ### You got **{correct_count}/{total_questions}** correct.
-            ### **+{score} Experience Points** earned.
-            
-            🌱 Every quiz makes you smarter! Try again!
-            """)
-            if st.session_state.current_topic:
-                st.info(f"📖 **{st.session_state.current_topic}** added to your practice list!")
-        
         new_level = calculate_level(st.session_state.total_score)
         old_level = calculate_level(st.session_state.total_score - score)
+        leveled_up = new_level > old_level
         
-        # Check for level up
-        if new_level > old_level:
+        # Determine celebration style based on performance
+        if correct_count == total_questions:
+            card_gradient = "linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)"
+            card_emoji = "🏆"
+            card_title = "PERFECT SCORE!"
+            card_message = "You're absolutely CRUSHING it! Your brain is on fire! 🔥"
+        elif correct_count >= total_questions * 0.8:
+            card_gradient = "linear-gradient(135deg, #34d399 0%, #10b981 50%, #059669 100%)"
+            card_emoji = "🎉"
+            card_title = "Amazing Job!"
+            card_message = "So close to perfect! You're a knowledge machine! 💪"
+        elif correct_count >= total_questions * 0.6:
+            card_gradient = "linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%)"
+            card_emoji = "👍"
+            card_title = "Nice Work!"
+            card_message = "You're learning and growing! Keep going! 📈"
+        else:
+            card_gradient = "linear-gradient(135deg, #a78bfa 0%, #8b5cf6 50%, #7c3aed 100%)"
+            card_emoji = "💪"
+            card_title = "Keep Practicing!"
+            card_message = "Every quiz makes you smarter! Try again! 🌱"
+        
+        # Build bonus breakdown text
+        bonus_parts = []
+        if base_score > 0:
+            bonus_parts.append(f"Base: {base_score}")
+        if time_bonus > 0:
+            bonus_parts.append(f"⚡ Speed: +{time_bonus}")
+        if level_bonus > 0:
+            bonus_parts.append(f"🌟 Level: +{level_bonus}")
+        bonus_text = " | ".join(bonus_parts) if len(bonus_parts) > 1 else ""
+        
+        # Main celebration card
+        st.markdown(f"""
+        <div style="background: {card_gradient}; 
+                    color: white; 
+                    padding: 30px; 
+                    border-radius: 20px; 
+                    text-align: center; 
+                    margin: 20px 0;
+                    box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+            <div style="font-size: 4rem; margin-bottom: 10px;">{card_emoji}</div>
+            <div style="font-size: 2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">{card_title}</div>
+            <div style="font-size: 3rem; font-weight: 700; margin: 15px 0;">
+                {correct_count} / {total_questions}
+            </div>
+            <div style="font-size: 1.1rem; opacity: 0.9; margin-bottom: 15px;">{card_message}</div>
+            <div style="background: rgba(255,255,255,0.2); 
+                        padding: 15px 25px; 
+                        border-radius: 12px; 
+                        display: inline-block;
+                        margin-top: 10px;">
+                <div style="font-size: 1.8rem; font-weight: 700;">+{score} Experience Points</div>
+                {"<div style='font-size: 0.9rem; opacity: 0.8; margin-top: 5px;'>" + bonus_text + "</div>" if bonus_text else ""}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Level up notification (if applicable)
+        if leveled_up:
             levelup_sound = play_sound('levelup')
             if levelup_sound:
                 st.markdown(levelup_sound, unsafe_allow_html=True)
@@ -1952,7 +1952,8 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             new_title = get_level_title(new_level)
             st.markdown(f"""
             <div style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); 
-                        color: white; padding: 20px; border-radius: 12px; text-align: center; margin: 15px 0;">
+                        color: white; padding: 20px; border-radius: 12px; text-align: center; margin: 15px 0;
+                        box-shadow: 0 5px 20px rgba(99,102,241,0.3);">
                 <div style="font-size: 2rem;">🎉 LEVEL UP! 🎉</div>
                 <div style="font-size: 1.5rem; font-weight: bold;">Level {old_level} → Level {new_level}</div>
                 <div style="font-size: 1.2rem; margin-top: 8px;">{new_title}</div>
@@ -1960,7 +1961,20 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             </div>
             """, unsafe_allow_html=True)
         
-        st.markdown(f"### 📈 Total: **{st.session_state.total_score} Experience Points** | Level **{new_level}**")
+        # Topic added to practice list (for low scores)
+        if correct_count < total_questions * 0.5 and st.session_state.current_topic:
+            st.info(f"📖 **{st.session_state.current_topic}** added to your practice list!")
+        
+        # Current stats summary
+        st.markdown(f"""
+        <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; 
+                    padding: 15px; text-align: center; margin: 15px 0;">
+            <span style="font-size: 1.1rem; color: #475569;">
+                📈 <strong>Total: {st.session_state.total_score} Experience Points</strong> | 
+                <strong>Level {new_level}</strong> ({get_level_title(new_level)})
+            </span>
+        </div>
+        """, unsafe_allow_html=True)
         
         new_badges = check_and_award_badges()
         if new_badges:
