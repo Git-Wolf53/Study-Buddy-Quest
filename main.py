@@ -71,6 +71,12 @@ for key, value in defaults.items():
     if key not in st.session_state:
         st.session_state[key] = value
 
+# Handle theme toggle from query params (must be early in the code)
+if "toggle_theme" in st.query_params:
+    st.session_state.dark_mode = not st.session_state.dark_mode
+    st.query_params.clear()
+    st.rerun()
+
 # ============================================================
 # BADGE SYSTEM
 # ============================================================
@@ -1568,122 +1574,16 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-query_params = st.query_params
-if "toggle_theme" in query_params:
-    st.session_state.dark_mode = not st.session_state.dark_mode
-    st.query_params.clear()
-    st.rerun()
-
 if not st.session_state.dark_mode:
     st.markdown("""
     <style>
         .stApp {
             background-color: #ffffff !important;
+        }
+        
+        .stMarkdown, .stMarkdown p, .stMarkdown span, .stMarkdown div,
+        .stTextInput label, .stSelectbox label {
             color: #333333 !important;
-        }
-        
-        .stMarkdown, .stMarkdown p, .stMarkdown span, .stMarkdown div {
-            color: #333333 !important;
-        }
-        
-        .mega-title {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            background-size: 300% 300%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .subtitle {
-            color: #667eea !important;
-        }
-        
-        .encourage-box {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
-            color: #333333 !important;
-            border: 2px solid #667eea !important;
-        }
-        
-        .level-card {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
-            color: #333333 !important;
-            border: 3px solid #667eea !important;
-        }
-        
-        .level-card .level-number, .level-card .level-title, .level-card .stat-item {
-            color: #333333 !important;
-        }
-        
-        .badge-showcase {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
-            color: #333333 !important;
-            border: 2px solid #667eea !important;
-        }
-        
-        .badge-title {
-            color: #667eea !important;
-        }
-        
-        .practice-card {
-            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%) !important;
-            color: #333333 !important;
-            border: 2px solid #ff9800 !important;
-        }
-        
-        .practice-title {
-            color: #e65100 !important;
-        }
-        
-        .question-card {
-            background: #ffffff !important;
-            color: #333333 !important;
-            border: 2px solid #667eea !important;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15) !important;
-        }
-        
-        .result-correct {
-            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%) !important;
-            color: #1b5e20 !important;
-            border: 2px solid #4caf50 !important;
-        }
-        
-        .result-wrong {
-            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%) !important;
-            color: #b71c1c !important;
-            border: 2px solid #f44336 !important;
-        }
-        
-        .stTextInput > div > div > input {
-            background-color: #ffffff !important;
-            color: #333333 !important;
-            border-color: #667eea !important;
-        }
-        
-        .stSelectbox > div > div {
-            background-color: #ffffff !important;
-            color: #333333 !important;
-        }
-        
-        [data-testid="stExpander"] {
-            background-color: #f8f9fa !important;
-            border-color: #667eea !important;
-        }
-        
-        .cool-footer {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
-            color: #333333 !important;
-            border: 2px solid #667eea !important;
-        }
-        
-        .loading-box {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-            color: white !important;
-        }
-        
-        .new-badge-alert {
-            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%) !important;
-            color: #333333 !important;
-            border: 3px solid #ff9800 !important;
         }
     </style>
     """, unsafe_allow_html=True)
