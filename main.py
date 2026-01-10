@@ -1124,7 +1124,7 @@ with st.expander("💡 Why Use Study Buddy Quest?"):
     *Start your learning quest today and watch your knowledge grow!*
     """)
 
-with st.expander("📖 How to Use Study Buddy Quest"):
+with st.expander("📖 How to Use Study Buddy Quest & Level Up!"):
     st.markdown("""
     ### Step 1: Choose Your Topic
     Type any subject you want to learn about in the **'What do you want to study?'** box. It can be anything - dinosaurs, math, history, space, coding, and more!
