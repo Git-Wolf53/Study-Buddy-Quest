@@ -1580,5 +1580,16 @@ if not st.session_state.dark_mode:
         .stRadio > div > label > div:first-child {
             background-color: #f8f9fa !important;
         }
+        
+        /* Text input boxes */
+        .stTextInput > div > div > input {
+            background-color: #f8f9fa !important;
+            border-color: #e9ecef !important;
+            color: #333333 !important;
+        }
+        
+        .stTextInput > div > div {
+            background-color: #f8f9fa !important;
+        }
     </style>
     """, unsafe_allow_html=True)
