@@ -240,11 +240,11 @@ LEVEL_PERKS = {
     3: "Unlock Timed Challenge Mode",
     4: "Unlock AI Study Notes",
     5: "Earn the Study Champion badge!",
-    6: "Get +5% bonus XP on all quizzes",
-    7: "Get +10% bonus XP on all quizzes",
-    8: "Get +15% bonus XP on all quizzes",
-    9: "Get +20% bonus XP on all quizzes",
-    10: "Maximum +25% bonus XP + all features unlocked!"
+    6: "Get +5% bonus Experience Points on all quizzes",
+    7: "Get +10% bonus Experience Points on all quizzes",
+    8: "Get +15% bonus Experience Points on all quizzes",
+    9: "Get +20% bonus Experience Points on all quizzes",
+    10: "Maximum +25% bonus Experience Points + all features unlocked!"
 }
 
 def get_level_perk(level: int) -> str:
@@ -1107,7 +1107,7 @@ with st.expander("💡 Why Use Study Buddy Quest? Boost Your Grades!"):
     st.markdown("""
     **Study Buddy Quest makes learning fun and effective!**
     
-    🎮 **Gamified Learning** - Earn XP, level up, and collect badges as you learn. It's like playing a game while studying!
+    🎮 **Gamified Learning** - Earn Experience Points, level up, and collect badges as you learn. It's like playing a game while studying!
     
     🧠 **AI-Powered Quizzes** - Get personalized questions on ANY topic you want to learn about, at your difficulty level.
     
@@ -1139,25 +1139,25 @@ with st.expander("📖 How to Use Study Buddy Quest & Level Up!"):
     You can optionally select your grade level to get questions written at the right level for you. Skip it if you prefer!
     
     ### Step 4: Take the Quiz!
-    Click **'START QUIZ!'** to generate your quiz. Answer all the questions, then submit to see your score and earn XP points!
+    Click **'START QUIZ!'** to generate your quiz. Answer all the questions, then submit to see your score and earn Experience Points!
     
     ### Step 5: Level Up & Earn Rewards!
-    Every correct answer earns you **XP points** (10 XP each, plus bonuses!). Each level takes more XP to reach, but unlocks better rewards:
+    Every correct answer earns you **Experience Points** (10 points each, plus bonuses!). Each level takes more points to reach, but unlocks better rewards:
     
-    | Level | Title | Total XP | Reward |
-    |-------|-------|----------|--------|
-    | 1 | Curious Beginner 🌱 | 0 XP | Start your learning journey! |
-    | 2 | Knowledge Seeker 📖 | 50 XP | Unlock Quiz History tracking |
-    | 3 | Quiz Explorer 🗺️ | 125 XP | Unlock Timed Challenge Mode |
-    | 4 | Brain Builder 🧱 | 225 XP | Unlock AI Study Notes |
-    | 5 | Study Champion 🏅 | 350 XP | Earn the Study Champion badge! |
-    | 6 | Wisdom Warrior ⚔️ | 500 XP | Get +5% bonus XP on all quizzes |
-    | 7 | Master Learner 🎓 | 675 XP | Get +10% bonus XP on all quizzes |
-    | 8 | Knowledge Knight 🛡️ | 875 XP | Get +15% bonus XP on all quizzes |
-    | 9 | Quiz Legend 🌟 | 1100 XP | Get +20% bonus XP on all quizzes |
-    | 10 | Ultimate Genius 👑 | 1350 XP | Maximum +25% bonus XP! |
+    | Level | Title | Total Points | Reward |
+    |-------|-------|--------------|--------|
+    | 1 | Curious Beginner 🌱 | 0 | Start your learning journey! |
+    | 2 | Knowledge Seeker 📖 | 50 | Unlock Quiz History tracking |
+    | 3 | Quiz Explorer 🗺️ | 125 | Unlock Timed Challenge Mode |
+    | 4 | Brain Builder 🧱 | 225 | Unlock AI Study Notes |
+    | 5 | Study Champion 🏅 | 350 | Earn the Study Champion badge! |
+    | 6 | Wisdom Warrior ⚔️ | 500 | Get +5% bonus Experience Points on all quizzes |
+    | 7 | Master Learner 🎓 | 675 | Get +10% bonus Experience Points on all quizzes |
+    | 8 | Knowledge Knight 🛡️ | 875 | Get +15% bonus Experience Points on all quizzes |
+    | 9 | Quiz Legend 🌟 | 1100 | Get +20% bonus Experience Points on all quizzes |
+    | 10 | Ultimate Genius 👑 | 1350 | Maximum +25% bonus Experience Points! |
     
-    **Bonus XP:** Get extra points for perfect scores and fast answers in timed mode!
+    **Bonus Experience Points:** Get extra points for perfect scores and fast answers in timed mode!
     """)
 
 # ============================================================
@@ -1201,9 +1201,9 @@ st.markdown(f"""
 
 next_level = current_level + 1
 next_perk = get_level_perk(next_level)
-st.markdown(f"##### ⬆️ Progress to Level {next_level} (Earn XP by completing quizzes!)")
+st.markdown(f"##### ⬆️ Progress to Level {next_level} (Earn Experience Points by completing quizzes!)")
 st.progress(progress_percentage)
-st.markdown(f"<center><small>{points_into_level}/{points_needed} XP — <b>Next reward:</b> {next_perk}</small></center>", unsafe_allow_html=True)
+st.markdown(f"<center><small>{points_into_level}/{points_needed} Experience Points — <b>Next reward:</b> {next_perk}</small></center>", unsafe_allow_html=True)
 
 # ============================================================
 # WEAK TOPICS DISPLAY
@@ -1457,7 +1457,7 @@ st.markdown("")
 timed_col1, timed_col2 = st.columns([3, 1])
 with timed_col1:
     st.markdown("**⏱️ Timed Challenge Mode**")
-    st.caption("Race against the clock for bonus XP! 30 seconds per question.")
+    st.caption("Race against the clock for bonus Experience Points! 30 seconds per question.")
 with timed_col2:
     default_timed = st.session_state.get('default_timed_mode', False)
     timed_mode = st.toggle("Enable Timer", value=st.session_state.get('timed_mode', default_timed), key="timed_toggle")
@@ -1594,7 +1594,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                             border-radius: 15px; padding: 15px; text-align: center; margin: 15px 0;">
                     <div style="font-size: 0.9rem; font-weight: 600;">⏱️ TIME REMAINING</div>
                     <div id="timer-display" style="font-size: 2.5rem; font-weight: 800;">--:--</div>
-                    <div style="font-size: 0.8rem; color: #666;">Bonus XP for fast completion!</div>
+                    <div style="font-size: 0.8rem; color: #666;">Bonus Experience Points for fast completion!</div>
                 </div>
                 <script>
                     (function() {{
@@ -1888,7 +1888,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             <div style="background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); 
                         color: white; padding: 15px; border-radius: 12px; text-align: center; margin: 10px 0;">
                 <div style="font-size: 1.2rem;">⚡ SPEED BONUS! ⚡</div>
-                <div style="font-size: 1.5rem; font-weight: bold;">+{time_bonus} XP</div>
+                <div style="font-size: 1.5rem; font-weight: bold;">+{time_bonus} Experience Points</div>
                 <div style="font-size: 0.9rem;">You finished with time to spare!</div>
             </div>
             """, unsafe_allow_html=True)
@@ -1900,7 +1900,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
                         color: white; padding: 15px; border-radius: 12px; text-align: center; margin: 10px 0;">
                 <div style="font-size: 1.2rem;">🌟 LEVEL BONUS! 🌟</div>
-                <div style="font-size: 1.5rem; font-weight: bold;">+{level_bonus} XP</div>
+                <div style="font-size: 1.5rem; font-weight: bold;">+{level_bonus} Experience Points</div>
                 <div style="font-size: 0.9rem;">Level {bonus_lvl} perk active!</div>
             </div>
             """, unsafe_allow_html=True)
@@ -1909,7 +1909,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             st.success(f"""
             ## 🏆 PERFECT SCORE! 🏆
             ### You got **{correct_count}/{total_questions}** correct!
-            ### **+{score} XP** earned! 
+            ### **+{score} Experience Points** earned! 
             
             🌟 You're absolutely CRUSHING it! Your brain is on fire! 🔥
             """)
@@ -1917,7 +1917,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             st.success(f"""
             ## 🎉 Amazing Job! 🎉
             ### You got **{correct_count}/{total_questions}** correct!
-            ### **+{score} XP** earned!
+            ### **+{score} Experience Points** earned!
             
             💪 So close to perfect! You're a knowledge machine!
             """)
@@ -1925,7 +1925,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             st.info(f"""
             ## 👍 Nice Work!
             ### You got **{correct_count}/{total_questions}** correct!
-            ### **+{score} XP** earned!
+            ### **+{score} Experience Points** earned!
             
             📈 You're learning and growing! Keep going!
             """)
@@ -1933,7 +1933,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             st.warning(f"""
             ## 💪 Keep Practicing!
             ### You got **{correct_count}/{total_questions}** correct.
-            ### **+{score} XP** earned.
+            ### **+{score} Experience Points** earned.
             
             🌱 Every quiz makes you smarter! Try again!
             """)
@@ -1960,7 +1960,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             </div>
             """, unsafe_allow_html=True)
         
-        st.markdown(f"### 📈 Total: **{st.session_state.total_score} XP** | Level **{new_level}**")
+        st.markdown(f"### 📈 Total: **{st.session_state.total_score} Experience Points** | Level **{new_level}**")
         
         new_badges = check_and_award_badges()
         if new_badges:
