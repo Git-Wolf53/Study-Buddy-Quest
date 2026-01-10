@@ -185,17 +185,34 @@ def check_and_award_badges():
     return new_badges
 
 
+def xp_required_for_level(level: int) -> int:
+    """Get total XP required to reach a specific level.
+    Level 1: 0 XP, Level 2: 50 XP, Level 3: 125 XP (50+75), Level 4: 225 XP (50+75+100), etc.
+    Each level requires 25 more XP than the previous."""
+    if level <= 1:
+        return 0
+    total = 0
+    for lvl in range(2, level + 1):
+        total += 50 + (lvl - 2) * 25  # Level 2 needs 50, Level 3 needs 75, etc.
+    return total
+
+
 def calculate_level(total_points: int) -> int:
-    """Calculate player level based on total points."""
-    return 1 + (total_points // 50)
+    """Calculate player level based on total points (progressive XP requirements)."""
+    level = 1
+    while xp_required_for_level(level + 1) <= total_points:
+        level += 1
+    return level
 
 
 def get_points_for_next_level(total_points: int) -> tuple:
     """Get progress toward next level."""
     current_level = calculate_level(total_points)
-    points_at_current_level_start = (current_level - 1) * 50
-    points_into_level = total_points - points_at_current_level_start
-    return points_into_level, 50
+    xp_at_current_level = xp_required_for_level(current_level)
+    xp_for_next_level = xp_required_for_level(current_level + 1)
+    points_into_level = total_points - xp_at_current_level
+    xp_needed = xp_for_next_level - xp_at_current_level
+    return points_into_level, xp_needed
 
 
 def get_level_title(level: int) -> str:
@@ -1125,20 +1142,20 @@ with st.expander("📖 How to Use Study Buddy Quest"):
     Click **'START QUIZ!'** to generate your quiz. Answer all the questions, then submit to see your score and earn XP points!
     
     ### Step 5: Level Up & Earn Rewards!
-    Every correct answer earns you **XP points** (10 XP each, plus bonuses!). Every **50 XP** moves you up to the next level and unlocks new rewards:
+    Every correct answer earns you **XP points** (10 XP each, plus bonuses!). Each level takes more XP to reach, but unlocks better rewards:
     
-    | Level | Title | XP Needed | Reward |
-    |-------|-------|-----------|--------|
+    | Level | Title | Total XP | Reward |
+    |-------|-------|----------|--------|
     | 1 | Curious Beginner 🌱 | 0 XP | Start your learning journey! |
     | 2 | Knowledge Seeker 📖 | 50 XP | Unlock Quiz History tracking |
-    | 3 | Quiz Explorer 🗺️ | 100 XP | Unlock Timed Challenge Mode |
-    | 4 | Brain Builder 🧱 | 150 XP | Unlock AI Study Notes |
-    | 5 | Study Champion 🏅 | 200 XP | Earn the Study Champion badge! |
-    | 6 | Wisdom Warrior ⚔️ | 250 XP | Get +5% bonus XP on all quizzes |
-    | 7 | Master Learner 🎓 | 300 XP | Get +10% bonus XP on all quizzes |
-    | 8 | Knowledge Knight 🛡️ | 350 XP | Get +15% bonus XP on all quizzes |
-    | 9 | Quiz Legend 🌟 | 400 XP | Get +20% bonus XP on all quizzes |
-    | 10 | Ultimate Genius 👑 | 450 XP | Maximum +25% bonus XP! |
+    | 3 | Quiz Explorer 🗺️ | 125 XP | Unlock Timed Challenge Mode |
+    | 4 | Brain Builder 🧱 | 225 XP | Unlock AI Study Notes |
+    | 5 | Study Champion 🏅 | 350 XP | Earn the Study Champion badge! |
+    | 6 | Wisdom Warrior ⚔️ | 500 XP | Get +5% bonus XP on all quizzes |
+    | 7 | Master Learner 🎓 | 675 XP | Get +10% bonus XP on all quizzes |
+    | 8 | Knowledge Knight 🛡️ | 875 XP | Get +15% bonus XP on all quizzes |
+    | 9 | Quiz Legend 🌟 | 1100 XP | Get +20% bonus XP on all quizzes |
+    | 10 | Ultimate Genius 👑 | 1350 XP | Maximum +25% bonus XP! |
     
     **Bonus XP:** Get extra points for perfect scores and fast answers in timed mode!
     """)
