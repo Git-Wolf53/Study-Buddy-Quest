@@ -1915,7 +1915,12 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             bonus_parts.append(f"⚡ Speed: +{time_bonus}")
         if level_bonus > 0:
             bonus_parts.append(f"🌟 Level: +{level_bonus}")
-        bonus_text = " | ".join(bonus_parts) if len(bonus_parts) > 1 else ""
+        
+        # Only show breakdown if there are multiple bonus sources
+        bonus_html = ""
+        if len(bonus_parts) > 1:
+            bonus_text = " | ".join(bonus_parts)
+            bonus_html = f"<div style='font-size: 0.9rem; opacity: 0.8; margin-top: 5px;'>{bonus_text}</div>"
         
         # Main celebration card
         st.markdown(f"""
@@ -1938,7 +1943,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                         display: inline-block;
                         margin-top: 10px;">
                 <div style="font-size: 1.8rem; font-weight: 700;">+{score} Experience Points</div>
-                {"<div style='font-size: 0.9rem; opacity: 0.8; margin-top: 5px;'>" + bonus_text + "</div>" if bonus_text else ""}
+                {bonus_html}
             </div>
         </div>
         """, unsafe_allow_html=True)
