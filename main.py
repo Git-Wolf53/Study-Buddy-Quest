@@ -84,6 +84,10 @@ defaults = {
     "student_name": "",
     "tutor_chat_history": [],
     "tutor_chat_active": False,
+    "image_quiz_mode": False,
+    "uploaded_image": None,
+    "xp_history": [],
+    "quiz_score_history": [],
 }
 
 # ============================================================
@@ -543,6 +547,97 @@ IMPORTANT: You MUST follow this EXACT format for each question. Do not deviate!
         raise ValueError("No response received from AI. Please try again!")
     
     return response.text
+
+
+def generate_quiz_from_image(image_bytes: bytes, difficulty: str, grade_level: str = None, num_questions: int = 5, mime_type: str = "image/jpeg") -> tuple:
+    """Generate a quiz from an uploaded image using Gemini vision."""
+    import base64
+    
+    clean_difficulty = difficulty.split()[0]
+    
+    grade_section = ""
+    age_description = "a 14-year-old student"
+    if grade_level and grade_level != "None (Skip)":
+        grade_section = f"\nGrade Level: {grade_level}"
+        grade_ages = {
+            "Pre-K": "a 4-year-old", "Kindergarten": "a 5-year-old",
+            "1st Grade": "a 6-year-old", "2nd Grade": "a 7-year-old",
+            "3rd Grade": "an 8-year-old", "4th Grade": "a 9-year-old",
+            "5th Grade": "a 10-year-old", "6th Grade": "an 11-year-old",
+            "7th Grade": "a 12-year-old", "8th Grade": "a 13-year-old",
+            "9th Grade": "a 14-year-old", "10th Grade": "a 15-year-old",
+            "11th Grade": "a 16-year-old", "12th Grade": "a 17-year-old"
+        }
+        age_description = grade_ages.get(grade_level, "a 14-year-old student")
+    
+    questions_template = ""
+    for i in range(1, num_questions + 1):
+        questions_template += f"""
+### Question {i} 🔢
+
+[Question based on the image]?
+
+- A) [Option A]
+- B) [Option B]
+- C) [Option C]
+- D) [Option D]
+
+✅ **Correct Answer: [Single Letter A, B, C, or D]**
+
+> 💡 **Explanation:** [Short, friendly explanation]
+
+---
+"""
+    
+    prompt = f"""You are analyzing an educational image to create a quiz for {age_description}.
+
+First, describe what you see in this image briefly (1-2 sentences).
+Then create a {num_questions}-question multiple-choice quiz based on what's shown in the image.
+Difficulty level: {clean_difficulty}{grade_section}
+
+Guidelines:
+- Make questions directly related to what's visible in the image
+- Questions should test understanding of the image content
+- Make questions appropriate for {age_description}
+- Use friendly, encouraging language with emojis
+- Make it fun and engaging!
+
+CRITICAL: Each question MUST end with a question mark (?) and be a real question.
+
+Start your response with:
+**📸 Image Topic: [Brief description of what the image shows]**
+
+Then format the quiz EXACTLY like this:
+
+## 📝 Your {clean_difficulty} Quiz!
+{questions_template}
+## 🎊 Quiz Complete!
+
+**Great job working through this quiz!** Keep learning and growing! 🌟
+"""
+    
+    image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+    
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=[
+            {
+                "parts": [
+                    {"text": prompt},
+                    {"inline_data": {"mime_type": mime_type, "data": image_base64}}
+                ]
+            }
+        ]
+    )
+    
+    if not response.text:
+        raise ValueError("No response received from AI. Please try again!")
+    
+    text = response.text
+    topic_match = re.search(r'\*\*📸 Image Topic:\s*(.+?)\*\*', text)
+    detected_topic = topic_match.group(1).strip() if topic_match else "Image Analysis"
+    
+    return text, detected_topic
 
 
 def generate_quiz_summary(topic: str, correct_count: int, total_questions: int, 
@@ -1568,6 +1663,107 @@ if st.session_state.quiz_history:
                     st.rerun()
 
 # ============================================================
+# PROGRESS ANALYTICS DASHBOARD
+# ============================================================
+if st.session_state.quiz_history and len(st.session_state.quiz_history) >= 2:
+    with st.expander("📊 Progress Analytics Dashboard"):
+        st.markdown("### 📈 Your Learning Journey")
+        
+        # Calculate stats
+        quiz_data = st.session_state.quiz_history
+        total_quizzes = len(quiz_data)
+        avg_score = sum(q.get('percentage', (q['score']/q['total']*100)) for q in quiz_data) / total_quizzes if total_quizzes > 0 else 0
+        total_xp = st.session_state.total_score
+        
+        # Stats row
+        stat_col1, stat_col2, stat_col3, stat_col4 = st.columns(4)
+        with stat_col1:
+            st.metric("Total Quizzes", total_quizzes)
+        with stat_col2:
+            st.metric("Avg Score", f"{avg_score:.0f}%")
+        with stat_col3:
+            st.metric("Total XP", total_xp)
+        with stat_col4:
+            st.metric("Level", calculate_level(total_xp))
+        
+        st.markdown("---")
+        
+        # Score trend chart
+        st.markdown("#### 📉 Score Trend")
+        scores = [q.get('percentage', round((q['score']/q['total'])*100)) for q in quiz_data[-15:]]
+        if len(scores) >= 2:
+            st.line_chart(scores)
+            
+            # Calculate improvement
+            first_half_avg = sum(scores[:len(scores)//2]) / (len(scores)//2) if len(scores) >= 2 else 0
+            second_half_avg = sum(scores[len(scores)//2:]) / len(scores[len(scores)//2:]) if len(scores) >= 2 else 0
+            improvement = second_half_avg - first_half_avg
+            
+            if improvement > 5:
+                st.success(f"📈 You're improving! Your recent scores are {improvement:.0f}% higher than earlier ones!")
+            elif improvement < -5:
+                st.info(f"💪 Keep practicing! Your scores dipped a bit, but you can bounce back!")
+            else:
+                st.info("📊 You're staying consistent! Keep up the good work!")
+        
+        st.markdown("---")
+        
+        # XP Progress chart
+        st.markdown("#### 💎 XP Progress")
+        xp_earned = [q.get('xp_earned', q['score'] * 10) for q in quiz_data[-15:]]
+        if len(xp_earned) >= 2:
+            st.bar_chart(xp_earned)
+        
+        st.markdown("---")
+        
+        # Topics breakdown
+        st.markdown("#### 📚 Topics Covered")
+        topic_scores = {}
+        for q in quiz_data:
+            topic = q['topic'][:30] + "..." if len(q['topic']) > 30 else q['topic']
+            pct = q.get('percentage', round((q['score']/q['total'])*100))
+            if topic not in topic_scores:
+                topic_scores[topic] = []
+            topic_scores[topic].append(pct)
+        
+        for topic, scores_list in list(topic_scores.items())[:8]:
+            avg = sum(scores_list) / len(scores_list)
+            color = "#10b981" if avg >= 70 else "#f59e0b" if avg >= 50 else "#ef4444"
+            st.markdown(f"""
+            <div style="display: flex; align-items: center; margin: 5px 0;">
+                <div style="flex: 1; font-size: 0.9rem;">{topic}</div>
+                <div style="width: 150px; background: #e5e7eb; border-radius: 10px; height: 20px; margin-left: 10px;">
+                    <div style="width: {min(avg, 100)}%; background: {color}; border-radius: 10px; height: 100%;"></div>
+                </div>
+                <div style="width: 50px; text-align: right; font-weight: 600; margin-left: 10px;">{avg:.0f}%</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        st.markdown("---")
+        
+        # Difficulty breakdown
+        st.markdown("#### 🎯 Performance by Difficulty")
+        diff_stats = {"Easy": [], "Medium": [], "Hard": []}
+        for q in quiz_data:
+            diff = q['difficulty'].split()[0]
+            pct = q.get('percentage', round((q['score']/q['total'])*100))
+            if diff in diff_stats:
+                diff_stats[diff].append(pct)
+        
+        diff_col1, diff_col2, diff_col3 = st.columns(3)
+        for col, (diff, scores_list) in zip([diff_col1, diff_col2, diff_col3], diff_stats.items()):
+            with col:
+                if scores_list:
+                    avg = sum(scores_list) / len(scores_list)
+                    emoji = "🌱" if diff == "Easy" else "🌿" if diff == "Medium" else "🌳"
+                    st.markdown(f"**{emoji} {diff}**")
+                    st.markdown(f"Avg: **{avg:.0f}%** ({len(scores_list)} quizzes)")
+                else:
+                    emoji = "🌱" if diff == "Easy" else "🌿" if diff == "Medium" else "🌳"
+                    st.markdown(f"**{emoji} {diff}**")
+                    st.markdown("No quizzes yet")
+
+# ============================================================
 # USER INPUT SECTION
 # ============================================================
 st.markdown("### 🎯 Choose Your Quest!")
@@ -1672,6 +1868,35 @@ elif difficulty == "Medium 🌿":
 else:
     st.warning("🏆 Brave choice! Time to show what you're made of!")
 
+# Image Quiz Mode
+st.markdown("")
+st.markdown("### 📸 Image Quiz Mode (Optional)")
+st.caption("Upload an image and get quizzed on what's in it! Great for diagrams, charts, photos, and more.")
+
+image_col1, image_col2 = st.columns([1, 3])
+with image_col1:
+    image_quiz_mode = st.toggle("Enable Image Quiz", value=st.session_state.get('image_quiz_mode', False), key="image_mode_toggle")
+    st.session_state.image_quiz_mode = image_quiz_mode
+
+uploaded_image = None
+if image_quiz_mode:
+    with image_col2:
+        uploaded_image = st.file_uploader(
+            "Upload an image to quiz on:",
+            type=['png', 'jpg', 'jpeg', 'gif', 'webp'],
+            help="Upload a diagram, chart, photo, or any educational image!",
+            key="image_uploader"
+        )
+    
+    if uploaded_image:
+        st.image(uploaded_image, caption="Your uploaded image", use_container_width=True)
+        st.session_state.uploaded_image = uploaded_image.getvalue()
+        st.session_state.uploaded_image_type = uploaded_image.type
+        st.info("🎯 Great! Click START QUIZ to get questions about this image!")
+    else:
+        st.session_state.uploaded_image = None
+        st.session_state.uploaded_image_type = None
+
 # Timed Mode Toggle
 st.markdown("")
 timed_col1, timed_col2 = st.columns([3, 1])
@@ -1700,6 +1925,9 @@ if st.button("🎲 START QUIZ! 🎲", use_container_width=True):
     if click_sound:
         st.markdown(click_sound, unsafe_allow_html=True)
     
+    # Check if image quiz mode with uploaded image
+    is_image_quiz = st.session_state.get('image_quiz_mode', False) and st.session_state.get('uploaded_image')
+    
     # Combine category with topic if a category is selected
     if selected_category and selected_category != "Any Topic":
         if topic:
@@ -1711,11 +1939,12 @@ if st.button("🎲 START QUIZ! 🎲", use_container_width=True):
     
     clean_topic = sanitize_topic(full_topic) if full_topic else ""
     
-    if not clean_topic:
+    # Validation - either need topic OR image
+    if not is_image_quiz and not clean_topic:
         st.warning("⚠️ Oops! Enter a topic first! What do you want to learn about today? 🤔")
-    elif len(clean_topic) < 2:
+    elif not is_image_quiz and len(clean_topic) < 2:
         st.warning("⚠️ That topic is too short! Try something like 'volcanoes' or 'ancient Egypt' 🤔")
-    else:
+    elif is_image_quiz or clean_topic:
         st.markdown("""
         <div style="text-align: center; padding: 20px;">
             <div style="font-size: 3rem; animation: spin 2s linear infinite;">⚙️</div>
@@ -1755,7 +1984,17 @@ if st.button("🎲 START QUIZ! 🎲", use_container_width=True):
                 progress_bar.progress((i + 1) * 20)
                 time.sleep(0.3)
             
-            quiz_content = generate_quiz_with_gemini(clean_topic, difficulty, st.session_state.weak_topics, grade_level, quiz_length)
+            # Generate quiz based on mode (image or text)
+            if is_image_quiz:
+                image_bytes = st.session_state.uploaded_image
+                image_mime = st.session_state.get('uploaded_image_type', 'image/jpeg')
+                quiz_content, detected_topic = generate_quiz_from_image(image_bytes, difficulty, grade_level, quiz_length, image_mime)
+                clean_topic = f"📸 {detected_topic}"
+                st.session_state.current_topic = clean_topic
+            else:
+                quiz_content = generate_quiz_with_gemini(clean_topic, difficulty, st.session_state.weak_topics, grade_level, quiz_length)
+                st.session_state.current_topic = clean_topic
+            
             correct_answers, explanations = parse_quiz_answers(quiz_content)
             
             if not validate_quiz_data(correct_answers, explanations, quiz_length):
@@ -1994,7 +2233,8 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     st.session_state.total_score += total_quiz_score
                     st.session_state.quizzes_completed += 1
                     
-                    # Save to quiz history
+                    # Save to quiz history with timestamp and XP for analytics
+                    import datetime
                     st.session_state.quiz_history.append({
                         'topic': st.session_state.current_topic,
                         'score': correct_count,
@@ -2002,6 +2242,21 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                         'difficulty': st.session_state.get('current_difficulty', 'Medium'),
                         'grade_level': st.session_state.get('current_grade_level', 'None (Skip)'),
                         'num_questions': num_questions,
+                        'xp_earned': total_quiz_score,
+                        'timestamp': datetime.datetime.now().isoformat(),
+                        'percentage': round((correct_count / num_questions) * 100) if num_questions > 0 else 0,
+                    })
+                    
+                    # Track XP and score history for analytics
+                    st.session_state.xp_history.append({
+                        'xp': total_quiz_score,
+                        'total_xp': st.session_state.total_score,
+                        'timestamp': datetime.datetime.now().isoformat()
+                    })
+                    st.session_state.quiz_score_history.append({
+                        'percentage': round((correct_count / num_questions) * 100) if num_questions > 0 else 0,
+                        'topic': st.session_state.current_topic,
+                        'timestamp': datetime.datetime.now().isoformat()
                     })
                     
                     check_and_award_badges()
@@ -2065,7 +2320,8 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     st.session_state.total_score += total_quiz_score
                     st.session_state.quizzes_completed += 1
                     
-                    # Save to quiz history (fallback form)
+                    # Save to quiz history (fallback form) with timestamp and XP
+                    import datetime
                     st.session_state.quiz_history.append({
                         'topic': st.session_state.current_topic,
                         'score': correct_count,
@@ -2073,6 +2329,21 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                         'difficulty': st.session_state.get('current_difficulty', 'Medium'),
                         'grade_level': st.session_state.get('current_grade_level', 'None (Skip)'),
                         'num_questions': fallback_total,
+                        'xp_earned': total_quiz_score,
+                        'timestamp': datetime.datetime.now().isoformat(),
+                        'percentage': round((correct_count / fallback_total) * 100) if fallback_total > 0 else 0,
+                    })
+                    
+                    # Track XP and score history for analytics
+                    st.session_state.xp_history.append({
+                        'xp': total_quiz_score,
+                        'total_xp': st.session_state.total_score,
+                        'timestamp': datetime.datetime.now().isoformat()
+                    })
+                    st.session_state.quiz_score_history.append({
+                        'percentage': round((correct_count / fallback_total) * 100) if fallback_total > 0 else 0,
+                        'topic': st.session_state.current_topic,
+                        'timestamp': datetime.datetime.now().isoformat()
                     })
                     
                     check_and_award_badges()
@@ -2425,6 +2696,60 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     st.warning("Certificate image generation unavailable. Use screenshot to save!")
                 
                 st.info("📸 **Tip:** You can also take a screenshot or use your browser's print function (Ctrl+P / Cmd+P) to save as PDF!")
+                
+                # Share Achievement Section
+                st.markdown("---")
+                st.markdown("#### 📢 Share Your Achievement!")
+                
+                import urllib.parse
+                level = calculate_level(st.session_state.total_score)
+                title = get_level_title(level)
+                title_clean = re.sub(r'[^\w\s]', '', title)
+                share_name = student_name if student_name else "I"
+                share_text = f"{share_name} just reached Level {level} ({title_clean}) on Study Buddy Quest! Completed {st.session_state.quizzes_completed} quizzes and earned {st.session_state.total_score} XP!"
+                share_text_encoded = urllib.parse.quote_plus(share_text)
+                
+                share_col1, share_col2, share_col3 = st.columns(3)
+                
+                with share_col1:
+                    twitter_url = f"https://twitter.com/intent/tweet?text={share_text_encoded}"
+                    st.markdown(f'''
+                    <a href="{twitter_url}" target="_blank" style="text-decoration: none;">
+                        <div style="background: #1DA1F2; color: white; padding: 12px; border-radius: 10px; text-align: center; font-weight: 600;">
+                            🐦 Share on X
+                        </div>
+                    </a>
+                    ''', unsafe_allow_html=True)
+                
+                with share_col2:
+                    facebook_url = f"https://www.facebook.com/sharer/sharer.php?quote={share_text_encoded}"
+                    st.markdown(f'''
+                    <a href="{facebook_url}" target="_blank" style="text-decoration: none;">
+                        <div style="background: #4267B2; color: white; padding: 12px; border-radius: 10px; text-align: center; font-weight: 600;">
+                            📘 Share on Facebook
+                        </div>
+                    </a>
+                    ''', unsafe_allow_html=True)
+                
+                with share_col3:
+                    linkedin_url = f"https://www.linkedin.com/sharing/share-offsite/?url=https://replit.com"
+                    st.markdown(f'''
+                    <a href="{linkedin_url}" target="_blank" style="text-decoration: none;">
+                        <div style="background: #0077B5; color: white; padding: 12px; border-radius: 10px; text-align: center; font-weight: 600;">
+                            💼 Share on LinkedIn
+                        </div>
+                    </a>
+                    ''', unsafe_allow_html=True)
+                
+                # Copy to clipboard
+                st.markdown("")
+                st.text_area(
+                    "📋 Copy this message to share anywhere:",
+                    value=share_text,
+                    height=80,
+                    key="share_text_area"
+                )
+                st.caption("Copy the text above and paste it anywhere you want to share!")
         
         st.markdown("---")
         if correct_count >= 4:
