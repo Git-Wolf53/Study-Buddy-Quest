@@ -1591,5 +1591,31 @@ if not st.session_state.dark_mode:
         .stTextInput > div > div {
             background-color: #f8f9fa !important;
         }
+        
+        /* Tone down colorful elements in light mode */
+        .encourage-box {
+            background: linear-gradient(135deg, #f1f3f4 0%, #e8eaed 100%) !important;
+            color: #333333 !important;
+        }
+        
+        .level-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+        }
+        
+        .badge-showcase {
+            background: linear-gradient(135deg, #f1f3f4 0%, #e8eaed 100%) !important;
+        }
+        
+        .practice-areas {
+            background: linear-gradient(135deg, #fff8f0 0%, #ffeedd 100%) !important;
+        }
+        
+        .cool-footer {
+            background: linear-gradient(135deg, #f1f3f4 0%, #e8eaed 100%) !important;
+        }
+        
+        .subtitle {
+            color: #5f6368 !important;
+        }
     </style>
     """, unsafe_allow_html=True)
