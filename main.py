@@ -1050,11 +1050,7 @@ theme_text = "Light" if st.session_state.dark_mode else "Dark"
 sound_icon = "🔊" if st.session_state.sound_enabled else "🔇"
 sound_text = "Off" if st.session_state.sound_enabled else "On"
 
-col_spacer, col_help, col_sound, col_theme = st.columns([10, 1, 1, 1])
-with col_help:
-    if st.button("❓", key="help_btn", help="How to use Study Buddy"):
-        st.session_state.show_tutorial = not st.session_state.get('show_tutorial', False)
-        st.rerun()
+col_spacer, col_sound, col_theme = st.columns([10, 1, 1])
 with col_sound:
     if st.button(f"{sound_icon}", key="sound_btn", help=f"Turn Sound {sound_text}"):
         st.session_state.sound_enabled = not st.session_state.sound_enabled
@@ -1063,102 +1059,6 @@ with col_theme:
     if st.button(f"{theme_icon}", key="theme_btn", help=f"Switch to {theme_text} Mode"):
         st.session_state.dark_mode = not st.session_state.dark_mode
         st.rerun()
-
-# ============================================================
-# INTERACTIVE TUTORIAL
-# ============================================================
-if st.session_state.get('show_tutorial', False):
-    st.markdown("""
-    <div style="background: #eff6ff; border: 2px solid #6366f1; border-radius: 16px; padding: 25px; margin-bottom: 20px;">
-        <h3 style="color: #6366f1; margin-top: 0;">Welcome to Study Buddy Quest!</h3>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    tutorial_step = st.session_state.get('tutorial_step', 1)
-    
-    if tutorial_step == 1:
-        st.markdown("### Step 1: Choose Your Topic")
-        st.info("Type any subject you want to learn about in the **'What do you want to study?'** box below. It can be anything - dinosaurs, math, history, space, coding, and more!")
-        col1, col2 = st.columns(2)
-        with col2:
-            if st.button("Next →", key="tut_next_1"):
-                st.session_state.tutorial_step = 2
-                st.rerun()
-    
-    elif tutorial_step == 2:
-        st.markdown("### Step 2: Pick Your Difficulty")
-        st.info("Select how challenging you want your quiz to be:\n- **Easy** - Great for beginners\n- **Medium** - A balanced challenge\n- **Hard** - Test your expertise!")
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("← Back", key="tut_back_2"):
-                st.session_state.tutorial_step = 1
-                st.rerun()
-        with col2:
-            if st.button("Next →", key="tut_next_2"):
-                st.session_state.tutorial_step = 3
-                st.rerun()
-    
-    elif tutorial_step == 3:
-        st.markdown("### Step 3: Optional Grade Level")
-        st.info("You can optionally select your grade level to get questions written at the right level for you. Skip it if you prefer!")
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("← Back", key="tut_back_3"):
-                st.session_state.tutorial_step = 2
-                st.rerun()
-        with col2:
-            if st.button("Next →", key="tut_next_3"):
-                st.session_state.tutorial_step = 4
-                st.rerun()
-    
-    elif tutorial_step == 4:
-        st.markdown("### Step 4: Take the Quiz!")
-        st.info("Click **'Start My Quest!'** to generate your quiz. Answer all 5 questions, then submit to see your score and earn XP points!")
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("← Back", key="tut_back_4"):
-                st.session_state.tutorial_step = 3
-                st.rerun()
-        with col2:
-            if st.button("Next →", key="tut_next_4"):
-                st.session_state.tutorial_step = 5
-                st.rerun()
-    
-    elif tutorial_step == 5:
-        st.markdown("### Step 5: Level Up & Earn Badges!")
-        st.markdown("""
-        **How Leveling Works:**
-        - Every correct answer earns you **XP points** (10 XP each, plus bonuses!)
-        - Every **50 XP** you earn moves you up to the next level
-        - Each level has a special title showing your progress:
-        
-        | Level | Title | XP Needed |
-        |-------|-------|-----------|
-        | 1 | Curious Beginner 🌱 | 0 XP |
-        | 2 | Knowledge Seeker 📖 | 50 XP |
-        | 3 | Quiz Explorer 🗺️ | 100 XP |
-        | 4 | Brain Builder 🧱 | 150 XP |
-        | 5 | Study Champion 🏅 | 200 XP |
-        | 6 | Wisdom Warrior ⚔️ | 250 XP |
-        | 7 | Master Learner 🎓 | 300 XP |
-        | 8 | Knowledge Knight 🛡️ | 350 XP |
-        | 9 | Quiz Legend 🌟 | 400 XP |
-        | 10 | Ultimate Genius 👑 | 450 XP |
-        
-        **Bonus XP:** Get extra points for perfect scores and fast answers in timed mode!
-        """)
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("← Back", key="tut_back_5"):
-                st.session_state.tutorial_step = 4
-                st.rerun()
-        with col2:
-            if st.button("Got it! ✓", key="tut_done", type="primary"):
-                st.session_state.show_tutorial = False
-                st.session_state.tutorial_step = 1
-                st.rerun()
-    
-    st.markdown("---")
 
 # ============================================================
 # MAIN TITLE AND WELCOME
@@ -1185,6 +1085,42 @@ with st.expander("💡 Why Use Study Buddy Quest?"):
     🔊 **Accessibility** - Listen to questions read aloud, adjust font sizes, and customize your experience.
     
     *Start your learning quest today and watch your knowledge grow!*
+    """)
+
+with st.expander("📖 How to Use Study Buddy Quest"):
+    st.markdown("""
+    ### Step 1: Choose Your Topic
+    Type any subject you want to learn about in the **'What do you want to study?'** box. It can be anything - dinosaurs, math, history, space, coding, and more!
+    
+    ### Step 2: Pick Your Difficulty
+    Select how challenging you want your quiz to be:
+    - **Easy 🌱** - Great for beginners
+    - **Medium 🌿** - A balanced challenge  
+    - **Hard 🌳** - Test your expertise!
+    
+    ### Step 3: Optional Grade Level
+    You can optionally select your grade level to get questions written at the right level for you. Skip it if you prefer!
+    
+    ### Step 4: Take the Quiz!
+    Click **'START QUIZ!'** to generate your quiz. Answer all the questions, then submit to see your score and earn XP points!
+    
+    ### Step 5: Level Up & Earn Badges!
+    Every correct answer earns you **XP points** (10 XP each, plus bonuses!). Every **50 XP** moves you up to the next level:
+    
+    | Level | Title | XP Needed |
+    |-------|-------|-----------|
+    | 1 | Curious Beginner 🌱 | 0 XP |
+    | 2 | Knowledge Seeker 📖 | 50 XP |
+    | 3 | Quiz Explorer 🗺️ | 100 XP |
+    | 4 | Brain Builder 🧱 | 150 XP |
+    | 5 | Study Champion 🏅 | 200 XP |
+    | 6 | Wisdom Warrior ⚔️ | 250 XP |
+    | 7 | Master Learner 🎓 | 300 XP |
+    | 8 | Knowledge Knight 🛡️ | 350 XP |
+    | 9 | Quiz Legend 🌟 | 400 XP |
+    | 10 | Ultimate Genius 👑 | 450 XP |
+    
+    **Bonus XP:** Get extra points for perfect scores and fast answers in timed mode!
     """)
 
 # ============================================================
