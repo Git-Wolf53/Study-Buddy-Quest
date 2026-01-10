@@ -1199,9 +1199,11 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown(f"##### ⬆️ Progress to Level {current_level + 1}")
+next_level = current_level + 1
+next_perk = get_level_perk(next_level)
+st.markdown(f"##### ⬆️ Progress to Level {next_level}")
 st.progress(progress_percentage)
-st.markdown(f"<center><small>{points_into_level}/{points_needed} XP</small></center>", unsafe_allow_html=True)
+st.markdown(f"<center><small>{points_into_level}/{points_needed} XP — <b>Next reward:</b> {next_perk}</small></center>", unsafe_allow_html=True)
 
 # ============================================================
 # WEAK TOPICS DISPLAY
