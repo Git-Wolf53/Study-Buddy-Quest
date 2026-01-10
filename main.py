@@ -64,7 +64,7 @@ defaults = {
     "wrong_questions": [],
     "badges": set(),
     "generation_error": None,
-    "dark_mode": False,
+    "dark_mode": True,
 }
 
 for key, value in defaults.items():
@@ -1523,9 +1523,10 @@ st.markdown("""
 # ============================================================
 # PERSISTENT BOTTOM BAR WITH DARK/LIGHT MODE TOGGLE
 # ============================================================
-mode_icon = "🌙" if not st.session_state.dark_mode else "☀️"
-mode_text = "Dark Mode" if not st.session_state.dark_mode else "Light Mode"
-bar_bg = "linear-gradient(135deg, #2d3436 0%, #636e72 100%)" if st.session_state.dark_mode else "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+mode_icon = "☀️" if st.session_state.dark_mode else "🌙"
+mode_text = "Light Mode" if st.session_state.dark_mode else "Dark Mode"
+bar_bg = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" if st.session_state.dark_mode else "linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%)"
+bar_text_color = "white" if st.session_state.dark_mode else "#333333"
 
 st.markdown(f"""
 <style>
@@ -1544,8 +1545,8 @@ st.markdown(f"""
     }}
     .fixed-bottom-bar button {{
         background: rgba(255,255,255,0.2) !important;
-        color: white !important;
-        border: 2px solid rgba(255,255,255,0.4) !important;
+        color: {bar_text_color} !important;
+        border: 2px solid rgba(102, 126, 234, 0.4) !important;
         border-radius: 25px !important;
         padding: 8px 20px !important;
         font-weight: 600 !important;
@@ -1573,20 +1574,20 @@ if "toggle_theme" in query_params:
     st.query_params.clear()
     st.rerun()
 
-if st.session_state.dark_mode:
+if not st.session_state.dark_mode:
     st.markdown("""
     <style>
         .stApp {
-            background-color: #1a1a2e !important;
-            color: #eaeaea !important;
+            background-color: #ffffff !important;
+            color: #333333 !important;
         }
         
         .stMarkdown, .stMarkdown p, .stMarkdown span, .stMarkdown div {
-            color: #eaeaea !important;
+            color: #333333 !important;
         }
         
         .mega-title {
-            background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 25%, #fd79a8 50%, #e17055 75%, #74b9ff 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             background-size: 300% 300%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -1594,63 +1595,95 @@ if st.session_state.dark_mode:
         }
         
         .subtitle {
-            color: #a29bfe !important;
+            color: #667eea !important;
         }
         
         .encourage-box {
-            background: linear-gradient(135deg, #2d3436 0%, #636e72 100%) !important;
-            color: #eaeaea !important;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+            color: #333333 !important;
+            border: 2px solid #667eea !important;
         }
         
         .level-card {
-            background: linear-gradient(135deg, #2d3436 0%, #636e72 50%, #a29bfe 100%) !important;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+            color: #333333 !important;
+            border: 3px solid #667eea !important;
+        }
+        
+        .level-card .level-number, .level-card .level-title, .level-card .stat-item {
+            color: #333333 !important;
         }
         
         .badge-showcase {
-            background: linear-gradient(135deg, #2d3436 0%, #636e72 100%) !important;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+            color: #333333 !important;
+            border: 2px solid #667eea !important;
+        }
+        
+        .badge-title {
+            color: #667eea !important;
         }
         
         .practice-card {
-            background: linear-gradient(135deg, #2d3436 0%, #636e72 100%) !important;
-            color: #eaeaea !important;
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%) !important;
+            color: #333333 !important;
+            border: 2px solid #ff9800 !important;
         }
         
         .practice-title {
-            color: #a29bfe !important;
+            color: #e65100 !important;
         }
         
         .question-card {
-            background: linear-gradient(135deg, #2d3436 0%, #636e72 100%) !important;
-            color: #eaeaea !important;
+            background: #ffffff !important;
+            color: #333333 !important;
+            border: 2px solid #667eea !important;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15) !important;
         }
         
         .result-correct {
-            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%) !important;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%) !important;
+            color: #1b5e20 !important;
+            border: 2px solid #4caf50 !important;
         }
         
         .result-wrong {
-            background: linear-gradient(135deg, #d63031 0%, #e17055 100%) !important;
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%) !important;
+            color: #b71c1c !important;
+            border: 2px solid #f44336 !important;
         }
         
         .stTextInput > div > div > input {
-            background-color: #2d3436 !important;
-            color: #eaeaea !important;
-            border-color: #636e72 !important;
+            background-color: #ffffff !important;
+            color: #333333 !important;
+            border-color: #667eea !important;
         }
         
         .stSelectbox > div > div {
-            background-color: #2d3436 !important;
-            color: #eaeaea !important;
+            background-color: #ffffff !important;
+            color: #333333 !important;
         }
         
         [data-testid="stExpander"] {
-            background-color: #2d3436 !important;
-            border-color: #636e72 !important;
+            background-color: #f8f9fa !important;
+            border-color: #667eea !important;
         }
         
         .cool-footer {
-            background: linear-gradient(135deg, #2d3436 0%, #636e72 100%) !important;
-            color: #eaeaea !important;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+            color: #333333 !important;
+            border: 2px solid #667eea !important;
+        }
+        
+        .loading-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+        }
+        
+        .new-badge-alert {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%) !important;
+            color: #333333 !important;
+            border: 3px solid #ff9800 !important;
         }
     </style>
     """, unsafe_allow_html=True)
