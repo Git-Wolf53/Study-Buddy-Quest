@@ -1126,7 +1126,27 @@ if st.session_state.get('show_tutorial', False):
     
     elif tutorial_step == 5:
         st.markdown("### Step 5: Level Up & Earn Badges!")
-        st.info("Every quiz earns you XP points. Level up by earning more points! Complete special challenges to unlock badges for your trophy case.")
+        st.markdown("""
+        **How Leveling Works:**
+        - Every correct answer earns you **XP points** (10 XP each, plus bonuses!)
+        - Every **50 XP** you earn moves you up to the next level
+        - Each level has a special title showing your progress:
+        
+        | Level | Title | XP Needed |
+        |-------|-------|-----------|
+        | 1 | Curious Beginner 🌱 | 0 XP |
+        | 2 | Knowledge Seeker 📖 | 50 XP |
+        | 3 | Quiz Explorer 🗺️ | 100 XP |
+        | 4 | Brain Builder 🧱 | 150 XP |
+        | 5 | Study Champion 🏅 | 200 XP |
+        | 6 | Wisdom Warrior ⚔️ | 250 XP |
+        | 7 | Master Learner 🎓 | 300 XP |
+        | 8 | Knowledge Knight 🛡️ | 350 XP |
+        | 9 | Quiz Legend 🌟 | 400 XP |
+        | 10 | Ultimate Genius 👑 | 450 XP |
+        
+        **Bonus XP:** Get extra points for perfect scores and fast answers in timed mode!
+        """)
         col1, col2 = st.columns(2)
         with col1:
             if st.button("← Back", key="tut_back_5"):
