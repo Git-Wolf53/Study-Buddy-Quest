@@ -71,12 +71,6 @@ for key, value in defaults.items():
     if key not in st.session_state:
         st.session_state[key] = value
 
-# Handle theme toggle from query params (must be early in the code)
-if "toggle_theme" in st.query_params:
-    st.session_state.dark_mode = not st.session_state.dark_mode
-    st.query_params.clear()
-    st.rerun()
-
 # ============================================================
 # BADGE SYSTEM
 # ============================================================
@@ -1529,10 +1523,7 @@ st.markdown("""
 # ============================================================
 # PERSISTENT BOTTOM BAR WITH DARK/LIGHT MODE TOGGLE
 # ============================================================
-mode_icon = "☀️" if st.session_state.dark_mode else "🌙"
-mode_text = "Light Mode" if st.session_state.dark_mode else "Dark Mode"
 bar_bg = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" if st.session_state.dark_mode else "linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%)"
-bar_text_color = "white" if st.session_state.dark_mode else "#333333"
 
 st.markdown(f"""
 <style>
@@ -1542,37 +1533,43 @@ st.markdown(f"""
         left: 0;
         right: 0;
         background: {bar_bg};
-        padding: 10px 20px;
+        padding: 12px 20px;
         z-index: 9999;
         box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+    }}
+    .stApp > div:first-child {{
+        padding-bottom: 80px !important;
+    }}
+    .theme-toggle-container {{
         display: flex;
         justify-content: center;
         align-items: center;
+        gap: 10px;
     }}
-    .fixed-bottom-bar button {{
-        background: rgba(255,255,255,0.2) !important;
-        color: {bar_text_color} !important;
-        border: 2px solid rgba(102, 126, 234, 0.4) !important;
-        border-radius: 25px !important;
-        padding: 8px 20px !important;
-        font-weight: 600 !important;
-        cursor: pointer !important;
-        transition: all 0.3s ease !important;
-    }}
-    .fixed-bottom-bar button:hover {{
-        background: rgba(255,255,255,0.3) !important;
-        transform: scale(1.05) !important;
-    }}
-    .stApp > div:first-child {{
-        padding-bottom: 70px !important;
+    .theme-label {{
+        color: {'white' if st.session_state.dark_mode else '#333'};
+        font-weight: 600;
+        font-size: 1rem;
     }}
 </style>
 <div class="fixed-bottom-bar">
-    <form action="" method="get" style="margin: 0;">
-        <button type="submit" name="toggle_theme" value="1">{mode_icon} {mode_text}</button>
-    </form>
+    <div class="theme-toggle-container">
+        <span class="theme-label">🌙 Dark</span>
+    </div>
 </div>
 """, unsafe_allow_html=True)
+
+col1, col2, col3 = st.columns([2, 1, 2])
+with col2:
+    theme_toggle = st.toggle(
+        "Theme",
+        value=not st.session_state.dark_mode,
+        key="theme_switch",
+        label_visibility="collapsed"
+    )
+    if theme_toggle != (not st.session_state.dark_mode):
+        st.session_state.dark_mode = not theme_toggle
+        st.rerun()
 
 if not st.session_state.dark_mode:
     st.markdown("""
