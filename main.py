@@ -64,6 +64,7 @@ defaults = {
     "wrong_questions": [],
     "badges": set(),
     "generation_error": None,
+    "dark_mode": False,
 }
 
 for key, value in defaults.items():
@@ -903,6 +904,35 @@ st.markdown("""
             letter-spacing: 5px;
         }
     }
+    
+    .bottom-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 12px 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        z-index: 9999;
+        box-shadow: 0 -4px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .bottom-bar-dark {
+        background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
+    }
+    
+    .bottom-bar-label {
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    
+    .page-padding {
+        padding-bottom: 80px !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -1489,3 +1519,106 @@ st.markdown("""
     <small>🧠 Learn. Level Up. Repeat! 🚀</small>
 </div>
 """, unsafe_allow_html=True)
+
+# ============================================================
+# PERSISTENT BOTTOM BAR WITH DARK/LIGHT MODE TOGGLE
+# ============================================================
+st.markdown('<div class="page-padding"></div>', unsafe_allow_html=True)
+
+bar_class = "bottom-bar bottom-bar-dark" if st.session_state.dark_mode else "bottom-bar"
+mode_icon = "🌙" if not st.session_state.dark_mode else "☀️"
+mode_text = "Dark Mode" if not st.session_state.dark_mode else "Light Mode"
+
+st.markdown(f"""
+<div class="{bar_class}">
+    <span class="bottom-bar-label">🎨 Theme:</span>
+</div>
+""", unsafe_allow_html=True)
+
+col_spacer1, col_toggle, col_spacer2 = st.columns([3, 2, 3])
+with col_toggle:
+    if st.button(f"{mode_icon} {mode_text}", key="theme_toggle", use_container_width=True):
+        st.session_state.dark_mode = not st.session_state.dark_mode
+        st.rerun()
+
+if st.session_state.dark_mode:
+    st.markdown("""
+    <style>
+        .stApp {
+            background-color: #1a1a2e !important;
+            color: #eaeaea !important;
+        }
+        
+        .stMarkdown, .stMarkdown p, .stMarkdown span, .stMarkdown div {
+            color: #eaeaea !important;
+        }
+        
+        .mega-title {
+            background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 25%, #fd79a8 50%, #e17055 75%, #74b9ff 100%);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            color: #a29bfe !important;
+        }
+        
+        .encourage-box {
+            background: linear-gradient(135deg, #2d3436 0%, #636e72 100%) !important;
+            color: #eaeaea !important;
+        }
+        
+        .level-card {
+            background: linear-gradient(135deg, #2d3436 0%, #636e72 50%, #a29bfe 100%) !important;
+        }
+        
+        .badge-showcase {
+            background: linear-gradient(135deg, #2d3436 0%, #636e72 100%) !important;
+        }
+        
+        .practice-card {
+            background: linear-gradient(135deg, #2d3436 0%, #636e72 100%) !important;
+            color: #eaeaea !important;
+        }
+        
+        .practice-title {
+            color: #a29bfe !important;
+        }
+        
+        .question-card {
+            background: linear-gradient(135deg, #2d3436 0%, #636e72 100%) !important;
+            color: #eaeaea !important;
+        }
+        
+        .result-correct {
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%) !important;
+        }
+        
+        .result-wrong {
+            background: linear-gradient(135deg, #d63031 0%, #e17055 100%) !important;
+        }
+        
+        .stTextInput > div > div > input {
+            background-color: #2d3436 !important;
+            color: #eaeaea !important;
+            border-color: #636e72 !important;
+        }
+        
+        .stSelectbox > div > div {
+            background-color: #2d3436 !important;
+            color: #eaeaea !important;
+        }
+        
+        [data-testid="stExpander"] {
+            background-color: #2d3436 !important;
+            border-color: #636e72 !important;
+        }
+        
+        .cool-footer {
+            background: linear-gradient(135deg, #2d3436 0%, #636e72 100%) !important;
+            color: #eaeaea !important;
+        }
+    </style>
+    """, unsafe_allow_html=True)
