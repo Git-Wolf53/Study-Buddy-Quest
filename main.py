@@ -1200,12 +1200,31 @@ st.markdown("---")
 # ============================================================
 # ACCESSIBILITY CONTROLS - Font Size
 # ============================================================
-font_sizes = {"small": "0.9rem", "medium": "1rem", "large": "1.2rem"}
+font_sizes = {"small": "0.85rem", "medium": "1rem", "large": "1.25rem"}
 current_font = font_sizes.get(st.session_state.font_size, "1rem")
 
 st.markdown(f"""
 <style>
-    .quiz-question, .stRadio label, .stMarkdown p {{
+    /* Apply font size to all main text elements */
+    html, body, .main, .block-container {{
+        font-size: {current_font} !important;
+    }}
+    .stMarkdown, .stMarkdown p, .stMarkdown li, .stMarkdown span {{
+        font-size: {current_font} !important;
+    }}
+    .stRadio label, .stSelectbox label, .stTextInput label {{
+        font-size: {current_font} !important;
+    }}
+    .stRadio div[role="radiogroup"] label {{
+        font-size: {current_font} !important;
+    }}
+    .quiz-question, .quiz-option, .explanation {{
+        font-size: {current_font} !important;
+    }}
+    .stExpander summary, .stExpander p {{
+        font-size: {current_font} !important;
+    }}
+    button, .stButton button {{
         font-size: {current_font} !important;
     }}
 </style>
