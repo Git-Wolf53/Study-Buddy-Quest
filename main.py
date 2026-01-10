@@ -1547,5 +1547,38 @@ if not st.session_state.dark_mode:
         .stTextInput label, .stSelectbox label {
             color: #333333 !important;
         }
+        
+        /* Light mode: Quest boxes and form elements */
+        .stSelectbox > div > div,
+        .stRadio > div,
+        [data-baseweb="select"] > div,
+        [data-baseweb="popover"] > div,
+        .stSelectbox [data-baseweb="select"],
+        div[data-baseweb="select"] > div:first-child {
+            background-color: #f8f9fa !important;
+            border-color: #e9ecef !important;
+        }
+        
+        /* Dropdown menu items */
+        [data-baseweb="menu"],
+        [data-baseweb="popover"],
+        ul[role="listbox"] {
+            background-color: #f8f9fa !important;
+        }
+        
+        [data-baseweb="menu"] li,
+        ul[role="listbox"] li {
+            background-color: #f8f9fa !important;
+        }
+        
+        [data-baseweb="menu"] li:hover,
+        ul[role="listbox"] li:hover {
+            background-color: #e9ecef !important;
+        }
+        
+        /* Radio buttons */
+        .stRadio > div > label > div:first-child {
+            background-color: #f8f9fa !important;
+        }
     </style>
     """, unsafe_allow_html=True)
