@@ -5,7 +5,6 @@
 # ============================================================
 
 import streamlit as st
-import streamlit.components.v1 as components
 import os
 import re
 import random
@@ -938,6 +937,33 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ============================================================
+# SIDEBAR WITH THEME TOGGLE
+# ============================================================
+with st.sidebar:
+    st.markdown("### 🎨 Theme Settings")
+    mode_label = "🌙 Dark Mode" if st.session_state.dark_mode else "☀️ Light Mode"
+    
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        if st.button("🌙 Dark", use_container_width=True, 
+                     type="primary" if st.session_state.dark_mode else "secondary"):
+            if not st.session_state.dark_mode:
+                st.session_state.dark_mode = True
+                st.rerun()
+    with col2:
+        if st.button("☀️ Light", use_container_width=True,
+                     type="primary" if not st.session_state.dark_mode else "secondary"):
+            if st.session_state.dark_mode:
+                st.session_state.dark_mode = False
+                st.rerun()
+    
+    st.markdown("---")
+    st.markdown("### 📊 Quick Stats")
+    st.markdown(f"**Level:** {calculate_level(st.session_state.total_score)}")
+    st.markdown(f"**Points:** {st.session_state.total_score} XP")
+    st.markdown(f"**Quizzes:** {st.session_state.quizzes_completed}")
+
+# ============================================================
 # MAIN TITLE AND WELCOME
 # ============================================================
 st.markdown('<h1 class="mega-title">🎮 Study Buddy Quest 🧠</h1>', unsafe_allow_html=True)
@@ -1521,73 +1547,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ============================================================
-# PERSISTENT BOTTOM BAR WITH DARK/LIGHT MODE TOGGLE
-# ============================================================
-bar_bg = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" if st.session_state.dark_mode else "linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%)"
-
-is_checked = "true" if not st.session_state.dark_mode else "false"
-
-components.html(f"""
-<script>
-(function() {{
-    // Remove existing bar if present
-    const existingBar = window.parent.document.getElementById('theme-bottom-bar');
-    if (existingBar) existingBar.remove();
-    
-    // Create the bar in the parent document
-    const bar = document.createElement('div');
-    bar.id = 'theme-bottom-bar';
-    bar.innerHTML = `
-        <span style="font-size: 1.5rem;">🌙</span>
-        <label style="position: relative; display: inline-block; width: 50px; height: 26px;">
-            <input type="checkbox" id="theme-toggle-input" style="opacity: 0; width: 0; height: 0;" ${{({is_checked}) ? 'checked' : ''}}>
-            <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.3); transition: 0.4s; border-radius: 26px;">
-                <span style="position: absolute; content: ''; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: 0.4s; border-radius: 50%; transform: ${{({is_checked}) ? 'translateX(24px)' : 'translateX(0)'}}"></span>
-            </span>
-        </label>
-        <span style="font-size: 1.5rem;">☀️</span>
-    `;
-    bar.style.cssText = `
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: {bar_bg};
-        padding: 12px 20px;
-        z-index: 999999;
-        box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 15px;
-    `;
-    
-    window.parent.document.body.appendChild(bar);
-    
-    // Add padding to main content
-    const mainBlock = window.parent.document.querySelector('.main .block-container');
-    if (mainBlock) {{
-        mainBlock.style.paddingBottom = '100px';
-    }}
-    
-    // Add click handler
-    const checkbox = window.parent.document.getElementById('theme-toggle-input');
-    if (checkbox) {{
-        checkbox.addEventListener('change', function() {{
-            const url = new URL(window.parent.location.href);
-            url.searchParams.set('theme_toggle', '1');
-            window.parent.location.href = url.toString();
-        }});
-    }}
-}})();
-</script>
-""", height=0)
-
-if "theme_toggle" in st.query_params:
-    st.session_state.dark_mode = not st.session_state.dark_mode
-    st.query_params.clear()
-    st.rerun()
 
 if not st.session_state.dark_mode:
     st.markdown("""
