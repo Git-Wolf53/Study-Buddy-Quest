@@ -580,76 +580,43 @@ st.markdown("""
     .mega-title {
         font-size: 2.8rem;
         text-align: center;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
-        background-size: 300% 300%;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
         font-weight: 800;
         margin-bottom: 0;
-        animation: gradient-shift 5s ease infinite;
-    }
-    
-    @keyframes gradient-shift {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
     }
     
     .subtitle {
         text-align: center;
         font-size: 1.4rem;
-        color: #6c5ce7;
+        color: #7c7c7c;
         margin-top: 10px;
         font-weight: 600;
     }
     
     .encourage-box {
-        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        background: #f0f4f8;
+        border-left: 4px solid #6366f1;
         padding: 15px 25px;
-        border-radius: 50px;
+        border-radius: 12px;
         text-align: center;
-        font-size: 1.2rem;
+        font-size: 1.1rem;
         font-weight: 600;
-        color: #2d3436;
+        color: #4a5568;
         margin: 20px auto;
         max-width: 500px;
-        box-shadow: 0 4px 15px rgba(168, 237, 234, 0.4);
-        animation: float 3s ease-in-out infinite;
-    }
-    
-    @keyframes float {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-5px); }
     }
     
     .level-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
         color: white;
         padding: 25px;
         border-radius: 20px;
         text-align: center;
         margin: 20px 0;
-        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .level-card::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
-        transform: rotate(45deg);
-        animation: shine 3s infinite;
-    }
-    
-    @keyframes shine {
-        0% { transform: translateX(-100%) rotate(45deg); }
-        100% { transform: translateX(100%) rotate(45deg); }
+        box-shadow: 0 4px 20px rgba(99, 102, 241, 0.25);
     }
     
     .level-number {
@@ -683,102 +650,93 @@ st.markdown("""
     }
     
     .badge-showcase {
-        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
         padding: 20px;
-        border-radius: 20px;
+        border-radius: 16px;
         margin: 20px 0;
         text-align: center;
-        box-shadow: 0 8px 30px rgba(252, 182, 159, 0.3);
     }
     
     .badge-title {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
         font-weight: 700;
-        color: #d63031;
+        color: #6366f1;
         margin-bottom: 15px;
     }
     
     .badge-icons {
-        font-size: 2.5rem;
-        letter-spacing: 10px;
-        filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
+        font-size: 2.2rem;
+        letter-spacing: 8px;
     }
     
     .new-badge-alert {
-        background: linear-gradient(135deg, #f5af19 0%, #f12711 100%);
+        background: #6366f1;
         color: white;
         padding: 20px;
-        border-radius: 20px;
+        border-radius: 16px;
         text-align: center;
         margin: 15px 0;
-        animation: celebrate 0.5s ease-out;
-        box-shadow: 0 10px 40px rgba(241, 39, 17, 0.4);
-    }
-    
-    @keyframes celebrate {
-        0% { transform: scale(0.8); opacity: 0; }
-        50% { transform: scale(1.05); }
-        100% { transform: scale(1); opacity: 1; }
     }
     
     .new-badge-emoji {
-        font-size: 3rem;
+        font-size: 2.5rem;
         display: block;
         margin: 10px 0;
     }
     
     .practice-areas {
-        background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
-        border-left: 5px solid #f39c12;
+        background: #fffbeb;
+        border-left: 4px solid #f59e0b;
         padding: 20px;
-        border-radius: 15px;
+        border-radius: 12px;
         margin: 20px 0;
     }
     
     .practice-title {
         font-weight: 700;
-        color: #d35400;
-        font-size: 1.2rem;
+        color: #b45309;
+        font-size: 1.1rem;
         margin-bottom: 10px;
     }
     
     .practice-item {
-        color: #7f5539;
+        color: #78716c;
         padding: 5px 0;
-        font-size: 1.1rem;
+        font-size: 1rem;
     }
     
     .stButton > button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        background: #6366f1 !important;
         color: white !important;
-        font-size: 1.4rem !important;
-        font-weight: 700 !important;
-        padding: 20px 40px !important;
-        border-radius: 50px !important;
+        font-size: 1.2rem !important;
+        font-weight: 600 !important;
+        padding: 16px 32px !important;
+        border-radius: 12px !important;
         border: none !important;
         width: 100% !important;
-        transition: all 0.3s ease !important;
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4) !important;
-        text-transform: uppercase !important;
-        letter-spacing: 1px !important;
+        transition: all 0.2s ease !important;
+        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25) !important;
     }
     
     .stButton > button:hover {
-        transform: translateY(-3px) scale(1.02) !important;
-        box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5) !important;
+        background: #4f46e5 !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3) !important;
     }
     
     .stButton > button:active {
-        transform: translateY(0) scale(0.98) !important;
+        transform: translateY(0) !important;
     }
     
     .stFormSubmitButton > button {
-        background: linear-gradient(135deg, #00b894 0%, #00cec9 100%) !important;
-        box-shadow: 0 8px 25px rgba(0, 184, 148, 0.4) !important;
+        background: #10b981 !important;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25) !important;
     }
     
     .stFormSubmitButton > button:hover {
-        box-shadow: 0 12px 35px rgba(0, 184, 148, 0.5) !important;
+        background: #059669 !important;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
     }
     
     .stTextInput > div > div > input {
@@ -846,33 +804,27 @@ st.markdown("""
     
     hr {
         border: none;
-        height: 3px;
-        background: linear-gradient(90deg, transparent, #667eea, transparent);
+        height: 1px;
+        background: #e2e8f0;
         margin: 30px 0;
     }
     
     .cool-footer {
         text-align: center;
         padding: 30px;
-        color: #636e72;
-        font-size: 1rem;
+        color: #64748b;
+        font-size: 0.95rem;
     }
     
     .loading-box {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #6366f1;
         color: white;
-        padding: 30px;
-        border-radius: 20px;
+        padding: 25px;
+        border-radius: 16px;
         text-align: center;
         margin: 20px 0;
-        font-size: 1.3rem;
+        font-size: 1.2rem;
         font-weight: 600;
-        animation: pulse 2s ease-in-out infinite;
-    }
-    
-    @keyframes pulse {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: 0.8; transform: scale(0.98); }
     }
     
     @media (max-width: 768px) {
@@ -1479,15 +1431,15 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
 # ============================================================
 st.markdown("---")
 st.markdown("""
-<div style="background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%); 
-            color: white; 
+<div style="background: #eff6ff; 
+            border-left: 4px solid #6366f1;
+            color: #475569; 
             padding: 15px 25px; 
-            border-radius: 15px; 
+            border-radius: 8px; 
             text-align: center; 
-            margin: 15px 0;
-            box-shadow: 0 4px 15px rgba(9, 132, 227, 0.3);">
-    <strong>🎓 Learning Pledge:</strong> This tool helps you learn and understand – always think for yourself and never use it to cheat! 
-    <br><small>Real knowledge comes from real effort! 💪</small>
+            margin: 15px 0;">
+    <strong>Learning Pledge:</strong> This tool helps you learn and understand – always think for yourself and never use it to cheat! 
+    <br><small>Real knowledge comes from real effort!</small>
 </div>
 """, unsafe_allow_html=True)
 
@@ -1514,14 +1466,15 @@ with st.expander("💡 Why Real Understanding Matters"):
 st.markdown("---")
 
 st.markdown("""
-<div style="background: linear-gradient(135deg, #dfe6e9 0%, #b2bec3 100%); 
+<div style="background: #f1f5f9; 
             padding: 20px; 
-            border-radius: 15px; 
+            border-radius: 12px; 
             text-align: center; 
-            margin-bottom: 20px;">
-    <strong>🌟 Remember:</strong> The best learning happens when you challenge yourself! 
+            margin-bottom: 20px;
+            color: #475569;">
+    <strong>Remember:</strong> The best learning happens when you challenge yourself! 
     <br>Use this tool to <em>strengthen</em> your understanding, not replace it.
-    <br><small>Think critically. Question everything. Stay curious! 🔍</small>
+    <br><small>Think critically. Question everything. Stay curious!</small>
 </div>
 """, unsafe_allow_html=True)
 
