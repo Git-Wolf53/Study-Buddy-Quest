@@ -937,31 +937,16 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ============================================================
-# SIDEBAR WITH THEME TOGGLE
+# THEME TOGGLE - TOP RIGHT
 # ============================================================
-with st.sidebar:
-    st.markdown("### 🎨 Theme Settings")
-    mode_label = "🌙 Dark Mode" if st.session_state.dark_mode else "☀️ Light Mode"
-    
-    col1, col2 = st.columns([1, 1])
-    with col1:
-        if st.button("🌙 Dark", use_container_width=True, 
-                     type="primary" if st.session_state.dark_mode else "secondary"):
-            if not st.session_state.dark_mode:
-                st.session_state.dark_mode = True
-                st.rerun()
-    with col2:
-        if st.button("☀️ Light", use_container_width=True,
-                     type="primary" if not st.session_state.dark_mode else "secondary"):
-            if st.session_state.dark_mode:
-                st.session_state.dark_mode = False
-                st.rerun()
-    
-    st.markdown("---")
-    st.markdown("### 📊 Quick Stats")
-    st.markdown(f"**Level:** {calculate_level(st.session_state.total_score)}")
-    st.markdown(f"**Points:** {st.session_state.total_score} XP")
-    st.markdown(f"**Quizzes:** {st.session_state.quizzes_completed}")
+theme_icon = "☀️" if st.session_state.dark_mode else "🌙"
+theme_text = "Light" if st.session_state.dark_mode else "Dark"
+
+col_spacer, col_btn = st.columns([5, 1])
+with col_btn:
+    if st.button(f"{theme_icon}", key="theme_btn", help=f"Switch to {theme_text} Mode"):
+        st.session_state.dark_mode = not st.session_state.dark_mode
+        st.rerun()
 
 # ============================================================
 # MAIN TITLE AND WELCOME
