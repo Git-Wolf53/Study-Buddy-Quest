@@ -9,6 +9,8 @@ import os
 import re
 import random
 import time
+from io import BytesIO
+from gtts import gTTS
 
 # ============================================================
 # PAGE CONFIGURATION - Must be first Streamlit command
@@ -65,6 +67,44 @@ defaults = {
     "badges": set(),
     "generation_error": None,
     "dark_mode": True,
+    "quiz_history": [],
+    "quiz_length": 5,
+    "font_size": "medium",
+    "selected_category": None,
+}
+
+# ============================================================
+# SUBJECT CATEGORIES (Grade-dependent for school topics)
+# ============================================================
+DEFAULT_CATEGORIES = [
+    "Any Topic",
+    "Science",
+    "History", 
+    "Math",
+    "Language Arts",
+    "Geography",
+    "Art & Music",
+    "Technology",
+    "Sports & Games",
+    "Animals & Nature",
+    "Fun Facts",
+]
+
+GRADE_CATEGORIES = {
+    "Pre-K": ["Any Topic", "Colors & Shapes", "Animals", "Numbers 1-10", "ABCs", "Nature", "My Body", "Seasons"],
+    "Kindergarten": ["Any Topic", "Phonics", "Counting", "Animals", "Weather", "Community Helpers", "Shapes", "Colors"],
+    "1st Grade": ["Any Topic", "Reading", "Addition & Subtraction", "Plants", "Animals", "Maps", "Time & Calendar"],
+    "2nd Grade": ["Any Topic", "Reading Comprehension", "Math Facts", "Life Cycles", "Geography", "Money", "Measurement"],
+    "3rd Grade": ["Any Topic", "Multiplication", "Fractions", "Earth Science", "US States", "Grammar", "Solar System"],
+    "4th Grade": ["Any Topic", "Division", "Decimals", "US History", "Ecosystems", "Writing", "Electricity"],
+    "5th Grade": ["Any Topic", "Fractions & Decimals", "American Revolution", "Human Body", "Grammar", "Ancient Civilizations"],
+    "6th Grade": ["Any Topic", "Pre-Algebra", "World History", "Earth Science", "Literature", "Geography"],
+    "7th Grade": ["Any Topic", "Algebra Basics", "Life Science", "World Geography", "Writing Skills", "Civics"],
+    "8th Grade": ["Any Topic", "Algebra", "Physical Science", "US History", "Literature Analysis", "Government"],
+    "9th Grade": ["Any Topic", "Algebra I", "Biology", "World History", "English", "Physical Science"],
+    "10th Grade": ["Any Topic", "Geometry", "Chemistry", "World Literature", "US History", "Health"],
+    "11th Grade": ["Any Topic", "Algebra II", "Physics", "American Literature", "US Government", "Psychology"],
+    "12th Grade": ["Any Topic", "Pre-Calculus", "AP Sciences", "British Literature", "Economics", "Philosophy"],
 }
 
 for key, value in defaults.items():
@@ -258,14 +298,14 @@ def parse_quiz_answers(quiz_text: str) -> tuple:
     return correct_answers, explanations
 
 
-def validate_quiz_data(correct_answers: list, explanations: list) -> bool:
+def validate_quiz_data(correct_answers: list, explanations: list, expected_count: int = 5) -> bool:
     """Validate that quiz data is complete."""
-    if len(correct_answers) != 5:
+    if len(correct_answers) < expected_count:
         return False
-    if len(explanations) < 5:
-        while len(explanations) < 5:
+    if len(explanations) < expected_count:
+        while len(explanations) < expected_count:
             explanations.append("Great effort! Keep learning and you'll master this topic.")
-    for ans in correct_answers:
+    for ans in correct_answers[:expected_count]:
         if ans not in ['A', 'B', 'C', 'D']:
             return False
     return True
@@ -343,7 +383,7 @@ def parse_individual_questions(quiz_text: str) -> list:
     return questions
 
 
-def generate_quiz_with_gemini(topic: str, difficulty: str, weak_topics: list = None, grade_level: str = None) -> str:
+def generate_quiz_with_gemini(topic: str, difficulty: str, weak_topics: list = None, grade_level: str = None, num_questions: int = 5) -> str:
     """Generate a quiz using Gemini AI."""
     clean_difficulty = difficulty.split()[0]
     
@@ -389,9 +429,30 @@ If any of these topics relate to {topic}, please include 1-2 gentle review quest
         elif "12th" in grade_level:
             age_description = "a 12th grade student (ages 17-18)"
     
+    question_emojis = ["🔢", "🧮", "🎯", "🌟", "🏆", "📚", "💡", "🔬", "🌍", "🎨", "🚀", "⭐", "🎓", "🧠", "✨"]
+    
+    questions_template = ""
+    for i in range(1, num_questions + 1):
+        emoji = question_emojis[(i - 1) % len(question_emojis)]
+        questions_template += f"""
+### Question {i} {emoji}
+**[Question text here]**
+
+- A) [Option A]
+- B) [Option B]
+- C) [Option C]
+- D) [Option D]
+
+✅ **Correct Answer: [Single Letter A, B, C, or D]**
+
+> 💡 **Explanation:** [Short, friendly explanation]
+
+---
+"""
+    
     prompt = f"""You are a fun and encouraging teacher creating a quiz for {age_description}.
 
-Create a 5-question multiple-choice quiz about: {topic}
+Create a {num_questions}-question multiple-choice quiz about: {topic}
 Difficulty level: {clean_difficulty}{grade_section}
 {adaptive_section}
 Guidelines:
@@ -412,77 +473,7 @@ CRITICAL QUESTION FORMAT RULES:
 IMPORTANT: You MUST follow this EXACT format for each question. Do not deviate!
 
 ## 📝 Your {clean_difficulty} Quiz on {topic}!
-
-### Question 1 🔢
-**[Question text here]**
-
-- A) [Option A]
-- B) [Option B]
-- C) [Option C]
-- D) [Option D]
-
-✅ **Correct Answer: [Single Letter A, B, C, or D]**
-
-> 💡 **Explanation:** [Short, friendly explanation that helps the student understand why this is correct. Keep it encouraging!]
-
----
-
-### Question 2 🧮
-**[Question text here]**
-
-- A) [Option A]
-- B) [Option B]
-- C) [Option C]
-- D) [Option D]
-
-✅ **Correct Answer: [Single Letter A, B, C, or D]**
-
-> 💡 **Explanation:** [Short, friendly explanation]
-
----
-
-### Question 3 🎯
-**[Question text here]**
-
-- A) [Option A]
-- B) [Option B]
-- C) [Option C]
-- D) [Option D]
-
-✅ **Correct Answer: [Single Letter A, B, C, or D]**
-
-> 💡 **Explanation:** [Short, friendly explanation]
-
----
-
-### Question 4 🌟
-**[Question text here]**
-
-- A) [Option A]
-- B) [Option B]
-- C) [Option C]
-- D) [Option D]
-
-✅ **Correct Answer: [Single Letter A, B, C, or D]**
-
-> 💡 **Explanation:** [Short, friendly explanation]
-
----
-
-### Question 5 🏆
-**[Question text here]**
-
-- A) [Option A]
-- B) [Option B]
-- C) [Option C]
-- D) [Option D]
-
-✅ **Correct Answer: [Single Letter A, B, C, or D]**
-
-> 💡 **Explanation:** [Short, friendly explanation]
-
----
-
+{questions_template}
 ## 🎊 Quiz Complete!
 
 **Great job working through this quiz!** Keep learning and growing! 🌟
@@ -1051,6 +1042,54 @@ if st.session_state.weak_topics:
 st.markdown("---")
 
 # ============================================================
+# ACCESSIBILITY CONTROLS - Font Size
+# ============================================================
+font_sizes = {"small": "0.9rem", "medium": "1rem", "large": "1.2rem"}
+current_font = font_sizes.get(st.session_state.font_size, "1rem")
+
+st.markdown(f"""
+<style>
+    .quiz-question, .stRadio label, .stMarkdown p {{
+        font-size: {current_font} !important;
+    }}
+</style>
+""", unsafe_allow_html=True)
+
+with st.expander("⚙️ Accessibility Settings"):
+    st.markdown("**Font Size**")
+    font_col1, font_col2, font_col3 = st.columns(3)
+    with font_col1:
+        if st.button("A", key="font_small", help="Small text"):
+            st.session_state.font_size = "small"
+            st.rerun()
+    with font_col2:
+        if st.button("A", key="font_medium", help="Medium text", type="primary" if st.session_state.font_size == "medium" else "secondary"):
+            st.session_state.font_size = "medium"
+            st.rerun()
+    with font_col3:
+        if st.button("A", key="font_large", help="Large text"):
+            st.session_state.font_size = "large"
+            st.rerun()
+    st.caption(f"Current: {st.session_state.font_size.title()}")
+
+# ============================================================
+# QUIZ HISTORY
+# ============================================================
+if st.session_state.quiz_history:
+    with st.expander(f"📜 Quiz History ({len(st.session_state.quiz_history)} quizzes)"):
+        for i, quiz in enumerate(reversed(st.session_state.quiz_history[-10:])):
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                st.markdown(f"**{quiz['topic']}** - {quiz['score']}/{quiz['total']} ({quiz['difficulty']})")
+            with col2:
+                if st.button("Retake", key=f"retake_{i}"):
+                    st.session_state.retake_topic = quiz['topic']
+                    st.session_state.retake_difficulty = quiz['difficulty']
+                    st.session_state.retake_grade = quiz.get('grade_level', 'None (Skip)')
+                    st.session_state.retake_length = quiz.get('num_questions', 5)
+                    st.rerun()
+
+# ============================================================
 # USER INPUT SECTION
 # ============================================================
 st.markdown("### 🎯 Choose Your Quest!")
@@ -1069,32 +1108,81 @@ example_topics = [
 if 'topic_placeholder' not in st.session_state:
     st.session_state.topic_placeholder = random.choice(example_topics)
 
+retake_topic = st.session_state.get('retake_topic', '')
+if retake_topic:
+    del st.session_state['retake_topic']
+
 col1, col2 = st.columns(2)
 
 with col1:
     topic = st.text_input(
         "📚 What do you want to study?",
+        value=retake_topic,
         placeholder=st.session_state.topic_placeholder,
         help="Type any topic you want to learn about!",
         max_chars=100
     )
 
 with col2:
+    difficulty_options = ["Easy 🌱", "Medium 🌿", "Hard 🌳"]
+    retake_diff = st.session_state.get('retake_difficulty', None)
+    diff_index = 0
+    if retake_diff:
+        for i, d in enumerate(difficulty_options):
+            if retake_diff in d:
+                diff_index = i
+                break
+        del st.session_state['retake_difficulty']
+    
     difficulty = st.selectbox(
         "🎮 Difficulty Level",
-        options=["Easy 🌱", "Medium 🌿", "Hard 🌳"],
+        options=difficulty_options,
+        index=diff_index,
         help="Pick based on how confident you feel!"
     )
 
-grade_levels = ["None (Skip)", "Pre-K", "Kindergarten", "1st Grade", "2nd Grade", "3rd Grade", 
-                "4th Grade", "5th Grade", "6th Grade", "7th Grade", "8th Grade", 
-                "9th Grade", "10th Grade", "11th Grade", "12th Grade"]
+col3, col4 = st.columns(2)
 
-grade_level = st.selectbox(
-    "🎓 Grade Level (Optional)",
-    options=grade_levels,
+with col3:
+    quiz_length = st.selectbox(
+        "📝 Number of Questions",
+        options=[5, 10, 15],
+        index=[5, 10, 15].index(st.session_state.get('retake_length', 5)) if st.session_state.get('retake_length', 5) in [5, 10, 15] else 0,
+        help="Choose how many questions you want!"
+    )
+    if 'retake_length' in st.session_state:
+        del st.session_state['retake_length']
+
+with col4:
+    grade_levels = ["None (Skip)", "Pre-K", "Kindergarten", "1st Grade", "2nd Grade", "3rd Grade", 
+                    "4th Grade", "5th Grade", "6th Grade", "7th Grade", "8th Grade", 
+                    "9th Grade", "10th Grade", "11th Grade", "12th Grade"]
+    
+    retake_grade = st.session_state.get('retake_grade', 'None (Skip)')
+    grade_index = 0
+    if retake_grade in grade_levels:
+        grade_index = grade_levels.index(retake_grade)
+    if 'retake_grade' in st.session_state:
+        del st.session_state['retake_grade']
+    
+    grade_level = st.selectbox(
+        "🎓 Grade Level (Optional)",
+        options=grade_levels,
+        index=grade_index,
+        help="Select your grade to get age-appropriate questions. Skip if not for school!"
+    )
+
+# Subject Category (Optional, grade-dependent)
+if grade_level and grade_level != "None (Skip)":
+    categories = GRADE_CATEGORIES.get(grade_level, DEFAULT_CATEGORIES)
+else:
+    categories = DEFAULT_CATEGORIES
+
+selected_category = st.selectbox(
+    "📂 Subject Category (Optional)",
+    options=categories,
     index=0,
-    help="Select your grade to get age-appropriate questions. Skip if not for school!"
+    help="Pick a category or choose 'Any Topic' to enter your own!"
 )
 
 if difficulty == "Easy 🌱":
@@ -1111,7 +1199,16 @@ st.markdown("")
 
 if st.button("🎲 START QUIZ! 🎲", use_container_width=True):
     
-    clean_topic = sanitize_topic(topic) if topic else ""
+    # Combine category with topic if a category is selected
+    if selected_category and selected_category != "Any Topic":
+        if topic:
+            full_topic = f"{selected_category}: {topic}"
+        else:
+            full_topic = selected_category
+    else:
+        full_topic = topic
+    
+    clean_topic = sanitize_topic(full_topic) if full_topic else ""
     
     if not clean_topic:
         st.warning("⚠️ Oops! Enter a topic first! What do you want to learn about today? 🤔")
@@ -1138,6 +1235,9 @@ if st.button("🎲 START QUIZ! 🎲", use_container_width=True):
         st.session_state.current_topic = clean_topic
         st.session_state.wrong_questions = []
         st.session_state.generation_error = None
+        st.session_state.quiz_length = quiz_length
+        st.session_state.current_grade_level = grade_level
+        st.session_state.current_difficulty = difficulty
         
         progress_bar = st.progress(0)
         status_text = st.empty()
@@ -1148,10 +1248,10 @@ if st.button("🎲 START QUIZ! 🎲", use_container_width=True):
                 progress_bar.progress((i + 1) * 20)
                 time.sleep(0.3)
             
-            quiz_content = generate_quiz_with_gemini(clean_topic, difficulty, st.session_state.weak_topics, grade_level)
+            quiz_content = generate_quiz_with_gemini(clean_topic, difficulty, st.session_state.weak_topics, grade_level, quiz_length)
             correct_answers, explanations = parse_quiz_answers(quiz_content)
             
-            if not validate_quiz_data(correct_answers, explanations):
+            if not validate_quiz_data(correct_answers, explanations, quiz_length):
                 raise ValueError("Quiz generation incomplete. Please try again!")
             
             quiz_questions_only = strip_answers_from_quiz(quiz_content)
@@ -1192,9 +1292,10 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         st.markdown("---")
         
         parsed_questions = st.session_state.parsed_questions
-        question_emojis = ["🔢", "🧮", "🎯", "🌟", "🏆"]
+        num_questions = st.session_state.get('quiz_length', 5)
+        question_emojis = ["🔢", "🧮", "🎯", "🌟", "🏆", "📚", "💡", "🔬", "🌍", "🎨", "🚀", "⭐", "🎓", "🧠", "✨"]
         
-        if parsed_questions and len(parsed_questions) == 5:
+        if parsed_questions and len(parsed_questions) >= num_questions:
             st.markdown(f"## 📝 Quiz Time!")
             st.markdown("*Select your answer for each question below, then click Submit!*")
             st.markdown("")
@@ -1205,7 +1306,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             if st.session_state.quiz_error:
                 st.error(st.session_state.quiz_error)
             
-            for idx, q in enumerate(parsed_questions):
+            for idx, q in enumerate(parsed_questions[:num_questions]):
                 emoji = question_emojis[idx] if idx < len(question_emojis) else "❓"
                 
                 st.markdown(f"""
@@ -1219,7 +1320,24 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
 </div>
                 """, unsafe_allow_html=True)
                 
-                st.markdown("**👆 Pick your answer:**")
+                # Text-to-Speech button for this question
+                tts_col1, tts_col2 = st.columns([1, 8])
+                with tts_col1:
+                    if st.button("🔊", key=f"tts_{idx}", help="Read question aloud"):
+                        try:
+                            # Build full text to read
+                            options_text = ". ".join([f"{letter}: {q['options'][letter]}" for letter in ['A', 'B', 'C', 'D']])
+                            full_text = f"Question {q['number']}. {q['text']}. The options are: {options_text}"
+                            
+                            tts = gTTS(text=full_text, lang='en')
+                            audio_bytes = BytesIO()
+                            tts.write_to_fp(audio_bytes)
+                            audio_bytes.seek(0)
+                            st.audio(audio_bytes, format='audio/mp3')
+                        except Exception as e:
+                            st.warning("Could not generate audio. Please try again.")
+                with tts_col2:
+                    st.markdown("**👆 Pick your answer:**")
                 
                 option_emojis = {letter: get_emoji_for_answer(q['options'][letter]) for letter in ['A', 'B', 'C', 'D']}
                 
@@ -1240,12 +1358,12 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     label_visibility="collapsed"
                 )
                 
-                if idx < 4:
+                if idx < num_questions - 1:
                     st.markdown("---")
             
             st.markdown("")
             if st.button("📨 SUBMIT ALL ANSWERS!", use_container_width=True):
-                user_answers = [st.session_state.get(f"q{i+1}") for i in range(5)]
+                user_answers = [st.session_state.get(f"q{i+1}") for i in range(num_questions)]
                 unanswered = [i+1 for i, ans in enumerate(user_answers) if ans is None]
                 
                 if unanswered:
@@ -1272,15 +1390,25 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     quiz_score = correct_count * 10
                     st.session_state.score = quiz_score
                     
-                    if correct_count == 5:
+                    if correct_count == num_questions:
                         st.session_state.perfect_scores += 1
                     
-                    if correct_count < 3 and st.session_state.current_topic:
+                    if correct_count < (num_questions // 2) and st.session_state.current_topic:
                         if st.session_state.current_topic not in st.session_state.weak_topics:
                             st.session_state.weak_topics.append(st.session_state.current_topic)
                     
                     st.session_state.total_score += quiz_score
                     st.session_state.quizzes_completed += 1
+                    
+                    # Save to quiz history
+                    st.session_state.quiz_history.append({
+                        'topic': st.session_state.current_topic,
+                        'score': correct_count,
+                        'total': num_questions,
+                        'difficulty': st.session_state.get('current_difficulty', 'Medium'),
+                        'grade_level': st.session_state.get('current_grade_level', 'None (Skip)'),
+                        'num_questions': num_questions,
+                    })
                     
                     check_and_award_badges()
                     
@@ -1319,15 +1447,27 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     st.session_state.wrong_questions = wrong_questions
                     st.session_state.score = correct_count * 10
                     
-                    if correct_count == 5:
+                    fallback_total = min(len(user_answers), len(correct_answers))
+                    if correct_count == fallback_total:
                         st.session_state.perfect_scores += 1
                     
-                    if correct_count < 3 and st.session_state.current_topic:
+                    if correct_count < (fallback_total // 2) and st.session_state.current_topic:
                         if st.session_state.current_topic not in st.session_state.weak_topics:
                             st.session_state.weak_topics.append(st.session_state.current_topic)
                     
                     st.session_state.total_score += st.session_state.score
                     st.session_state.quizzes_completed += 1
+                    
+                    # Save to quiz history (fallback form)
+                    st.session_state.quiz_history.append({
+                        'topic': st.session_state.current_topic,
+                        'score': correct_count,
+                        'total': fallback_total,
+                        'difficulty': st.session_state.get('current_difficulty', 'Medium'),
+                        'grade_level': st.session_state.get('current_grade_level', 'None (Skip)'),
+                        'num_questions': fallback_total,
+                    })
+                    
                     check_and_award_badges()
                     st.session_state.answers_submitted = True
                     st.rerun()
@@ -1350,26 +1490,28 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         
         st.balloons()
         
-        if correct_count == 5:
+        total_questions = st.session_state.get('quiz_length', 5)
+        
+        if correct_count == total_questions:
             st.success(f"""
             ## 🏆 PERFECT SCORE! 🏆
-            ### You got **{correct_count}/5** correct!
+            ### You got **{correct_count}/{total_questions}** correct!
             ### **+{score} XP** earned! 
             
             🌟 You're absolutely CRUSHING it! Your brain is on fire! 🔥
             """)
-        elif correct_count >= 4:
+        elif correct_count >= total_questions * 0.8:
             st.success(f"""
             ## 🎉 Amazing Job! 🎉
-            ### You got **{correct_count}/5** correct!
+            ### You got **{correct_count}/{total_questions}** correct!
             ### **+{score} XP** earned!
             
             💪 So close to perfect! You're a knowledge machine!
             """)
-        elif correct_count >= 3:
+        elif correct_count >= total_questions * 0.6:
             st.info(f"""
             ## 👍 Nice Work!
-            ### You got **{correct_count}/5** correct!
+            ### You got **{correct_count}/{total_questions}** correct!
             ### **+{score} XP** earned!
             
             📈 You're learning and growing! Keep going!
@@ -1377,7 +1519,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         else:
             st.warning(f"""
             ## 💪 Keep Practicing!
-            ### You got **{correct_count}/5** correct.
+            ### You got **{correct_count}/{total_questions}** correct.
             ### **+{score} XP** earned.
             
             🌱 Every quiz makes you smarter! Try again!
@@ -1406,10 +1548,10 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         st.markdown("### 📚 Answer Review & Explanations")
         st.markdown("*Here's the breakdown for each question:*")
         
-        question_labels = ["Question 1 🔢", "Question 2 🧮", "Question 3 🎯", "Question 4 🌟", "Question 5 🏆"]
+        question_emojis = ["🔢", "🧮", "🎯", "🌟", "🏆", "📚", "💡", "🔬", "🌍", "🎨", "🚀", "⭐", "🎓", "🧠", "✨"]
         parsed_questions = st.session_state.parsed_questions
         
-        for i in range(min(5, len(correct_answers))):
+        for i in range(min(total_questions, len(correct_answers))):
             user_ans = user_answers[i] if i < len(user_answers) else "?"
             correct_ans = correct_answers[i] if i < len(correct_answers) else "?"
             explanation = explanations[i] if i < len(explanations) else "Great job learning!"
@@ -1424,10 +1566,13 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 user_ans_text = options.get(user_ans.upper(), "")
                 correct_ans_text = options.get(correct_ans.upper(), "")
             
+            q_emoji = question_emojis[i % len(question_emojis)]
+            question_label = f"Question {i+1} {q_emoji}"
+            
             if is_correct:
                 st.markdown(f"""
 <div class="result-correct">
-<strong>{question_labels[i]}</strong><br>
+<strong>{question_label}</strong><br>
 <em style="color: #555;">{question_text}</em><br><br>
 ✅ You answered: <strong>{user_ans}) {user_ans_text}</strong> - Correct!<br><br>
 💡 <em>{explanation}</em>
@@ -1436,7 +1581,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             else:
                 st.markdown(f"""
 <div class="result-wrong">
-<strong>{question_labels[i]}</strong><br>
+<strong>{question_label}</strong><br>
 <em style="color: #555;">{question_text}</em><br><br>
 ❌ You answered: <strong>{user_ans}) {user_ans_text}</strong><br>
 ✅ Correct answer: <strong>{correct_ans}) {correct_ans_text}</strong><br><br>
@@ -1490,7 +1635,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             st.session_state.score = 0
             st.session_state.wrong_questions = []
             st.session_state.quiz_error = None
-            for i in range(1, 6):
+            for i in range(1, 16):  # Support up to 15 questions
                 if f"q{i}" in st.session_state:
                     del st.session_state[f"q{i}"]
             example_topics = [
