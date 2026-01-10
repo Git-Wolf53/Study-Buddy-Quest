@@ -547,6 +547,110 @@ Keep it friendly, supportive, and age-appropriate for a student. Use 1-2 emojis 
 
 
 # ============================================================
+# SOUND EFFECTS HELPER
+# ============================================================
+def play_sound(sound_type: str) -> str:
+    """Generate JavaScript to play a sound effect using Web Audio API."""
+    if not st.session_state.get('sound_enabled', True):
+        return ""
+    
+    sounds = {
+        'correct': """
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+            osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1);
+            osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2);
+            gain.gain.setValueAtTime(0.3, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.4);
+        """,
+        'wrong': """
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(200, ctx.currentTime);
+            osc.frequency.setValueAtTime(150, ctx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.2, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.3);
+        """,
+        'complete': """
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const notes = [523.25, 659.25, 783.99, 1046.50];
+            notes.forEach((freq, i) => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.15);
+                gain.gain.setValueAtTime(0.25, ctx.currentTime + i * 0.15);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.15 + 0.3);
+                osc.start(ctx.currentTime + i * 0.15);
+                osc.stop(ctx.currentTime + i * 0.15 + 0.3);
+            });
+        """,
+        'levelup': """
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const notes = [392, 523.25, 659.25, 783.99, 1046.50];
+            notes.forEach((freq, i) => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.12);
+                gain.gain.setValueAtTime(0.3, ctx.currentTime + i * 0.12);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.12 + 0.25);
+                osc.start(ctx.currentTime + i * 0.12);
+                osc.stop(ctx.currentTime + i * 0.12 + 0.25);
+            });
+        """,
+        'badge': """
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const notes = [440, 554.37, 659.25, 880];
+            notes.forEach((freq, i) => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.1);
+                gain.gain.setValueAtTime(0.25, ctx.currentTime + i * 0.1);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.1 + 0.3);
+                osc.start(ctx.currentTime + i * 0.1);
+                osc.stop(ctx.currentTime + i * 0.1 + 0.3);
+            });
+        """,
+        'click': """
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.frequency.setValueAtTime(800, ctx.currentTime);
+            gain.gain.setValueAtTime(0.15, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.05);
+        """
+    }
+    
+    js_code = sounds.get(sound_type, '')
+    if js_code:
+        return f'<script>try {{ {js_code} }} catch(e) {{}}</script>'
+    return ""
+
+
+# ============================================================
 # CUSTOM STYLING - Teen-Friendly & Mobile-First! 🎨
 # ============================================================
 st.markdown("""
@@ -1497,6 +1601,11 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         
         st.balloons()
         
+        # Play quiz complete sound
+        complete_sound = play_sound('complete')
+        if complete_sound:
+            st.markdown(complete_sound, unsafe_allow_html=True)
+        
         total_questions = st.session_state.get('quiz_length', 5)
         
         if correct_count == total_questions:
@@ -1535,10 +1644,29 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 st.info(f"📖 **{st.session_state.current_topic}** added to your practice list!")
         
         new_level = calculate_level(st.session_state.total_score)
+        old_level = calculate_level(st.session_state.total_score - score)
+        
+        # Check for level up
+        if new_level > old_level:
+            levelup_sound = play_sound('levelup')
+            if levelup_sound:
+                st.markdown(levelup_sound, unsafe_allow_html=True)
+            st.markdown(f"""
+            <div style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); 
+                        color: white; padding: 20px; border-radius: 12px; text-align: center; margin: 15px 0;">
+                <div style="font-size: 2rem;">🎉 LEVEL UP! 🎉</div>
+                <div style="font-size: 1.5rem; font-weight: bold;">Level {old_level} → Level {new_level}</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
         st.markdown(f"### 📈 Total: **{st.session_state.total_score} XP** | Level **{new_level}**")
         
         new_badges = check_and_award_badges()
         if new_badges:
+            # Play badge unlocked sound
+            badge_sound = play_sound('badge')
+            if badge_sound:
+                st.markdown(badge_sound, unsafe_allow_html=True)
             for badge_id in new_badges:
                 if badge_id in BADGES:
                     badge = BADGES[badge_id]
