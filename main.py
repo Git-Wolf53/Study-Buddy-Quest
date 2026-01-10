@@ -1524,68 +1524,106 @@ st.markdown("""
 # PERSISTENT BOTTOM BAR WITH DARK/LIGHT MODE TOGGLE
 # ============================================================
 bar_bg = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" if st.session_state.dark_mode else "linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%)"
-label_color = "white" if st.session_state.dark_mode else "#333"
 
 st.markdown(f"""
 <style>
-    [data-testid="stVerticalBlock"]:has(> [data-testid="stVerticalBlock"] > [data-testid="stMarkdown"] > .bottom-bar-anchor) {{
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: {bar_bg};
-        padding: 10px 20px;
-        z-index: 9999;
-        box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
-    }}
-    
     .main .block-container {{
         padding-bottom: 100px !important;
     }}
     
-    .bottom-bar-anchor {{
-        display: none;
-    }}
-    
-    .theme-row {{
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 12px;
+    .fixed-bottom-bar-wrapper {{
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        background: {bar_bg} !important;
+        padding: 12px 20px !important;
+        z-index: 999999 !important;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.2) !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        gap: 15px !important;
     }}
     
     .theme-icon {{
-        font-size: 1.3rem;
-    }}
-    
-    .theme-text {{
-        color: {label_color};
-        font-weight: 600;
-        font-size: 0.95rem;
+        font-size: 1.5rem;
+        cursor: pointer;
     }}
 </style>
+
+<div class="fixed-bottom-bar-wrapper" id="theme-bar">
+    <span class="theme-icon" id="dark-icon">🌙</span>
+    <label class="theme-switch">
+        <input type="checkbox" id="theme-checkbox" {'checked' if not st.session_state.dark_mode else ''}>
+        <span class="slider"></span>
+    </label>
+    <span class="theme-icon" id="light-icon">☀️</span>
+</div>
+
+<style>
+    .theme-switch {{
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 26px;
+    }}
+    
+    .theme-switch input {{
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }}
+    
+    .slider {{
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(255,255,255,0.3);
+        transition: 0.4s;
+        border-radius: 26px;
+    }}
+    
+    .slider:before {{
+        position: absolute;
+        content: "";
+        height: 20px;
+        width: 20px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+    }}
+    
+    input:checked + .slider {{
+        background-color: rgba(102, 126, 234, 0.6);
+    }}
+    
+    input:checked + .slider:before {{
+        transform: translateX(24px);
+    }}
+</style>
+
+<script>
+    const checkbox = document.getElementById('theme-checkbox');
+    if (checkbox) {{
+        checkbox.addEventListener('change', function() {{
+            const params = new URLSearchParams(window.location.search);
+            params.set('theme_toggle', '1');
+            window.location.search = params.toString();
+        }});
+    }}
+</script>
 """, unsafe_allow_html=True)
 
-bottom_bar = st.container()
-with bottom_bar:
-    st.markdown('<div class="bottom-bar-anchor">anchor</div>', unsafe_allow_html=True)
-    
-    col1, col2, col3, col4, col5 = st.columns([2, 1, 1, 1, 2])
-    with col2:
-        st.markdown(f'<span class="theme-icon">🌙</span>', unsafe_allow_html=True)
-    with col3:
-        theme_toggle = st.toggle(
-            "Theme",
-            value=not st.session_state.dark_mode,
-            key="theme_switch",
-            label_visibility="collapsed"
-        )
-    with col4:
-        st.markdown(f'<span class="theme-icon">☀️</span>', unsafe_allow_html=True)
-    
-    if theme_toggle == st.session_state.dark_mode:
-        st.session_state.dark_mode = not theme_toggle
-        st.rerun()
+if "theme_toggle" in st.query_params:
+    st.session_state.dark_mode = not st.session_state.dark_mode
+    st.query_params.clear()
+    st.rerun()
 
 if not st.session_state.dark_mode:
     st.markdown("""
