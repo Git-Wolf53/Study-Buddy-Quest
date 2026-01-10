@@ -64,7 +64,7 @@ defaults = {
     "perfect_scores": 0,
     "weak_topics": [],
     "wrong_questions": [],
-    "badges": set(),
+    "badges": [],
     "generation_error": None,
     "dark_mode": True,
     "quiz_history": [],
@@ -81,6 +81,9 @@ defaults = {
     "default_timed_mode": False,
     "default_quiz_length": 5,
     "compact_mode": False,
+    "student_name": "",
+    "tutor_chat_history": [],
+    "tutor_chat_active": False,
 }
 
 # ============================================================
@@ -179,7 +182,7 @@ def check_and_award_badges():
     
     for badge_id, condition in badge_conditions:
         if condition and badge_id not in st.session_state.badges:
-            st.session_state.badges.add(badge_id)
+            st.session_state.badges.append(badge_id)
             new_badges.append(badge_id)
     
     return new_badges
@@ -636,6 +639,204 @@ Make it engaging for a student. Use simple language."""
         return "Study notes could not be generated. Review the explanations above for key concepts!"
     except Exception:
         return "Study notes could not be generated. Review the explanations above for key concepts!"
+
+
+def generate_certificate_image(student_name: str) -> bytes:
+    """Generate a certificate image using Pillow and return as bytes."""
+    from PIL import Image, ImageDraw, ImageFont
+    from datetime import datetime
+    from io import BytesIO
+    
+    level = calculate_level(st.session_state.total_score)
+    title = get_level_title(level)
+    total_xp = st.session_state.total_score
+    quizzes = st.session_state.quizzes_completed
+    perfect_scores = st.session_state.perfect_scores
+    badges_earned = len(st.session_state.badges)
+    total_badges = len(BADGES)
+    date_str = datetime.now().strftime("%B %d, %Y")
+    
+    width, height = 800, 600
+    img = Image.new('RGB', (width, height), color='#667eea')
+    draw = ImageDraw.Draw(img)
+    
+    draw.rectangle([20, 20, width-20, height-20], outline='#ffd700', width=8)
+    draw.rectangle([30, 30, width-30, height-30], outline='#ffd700', width=2)
+    
+    try:
+        title_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 36)
+        subtitle_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 24)
+        name_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 32)
+        text_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 18)
+        small_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
+    except:
+        title_font = ImageFont.load_default()
+        subtitle_font = ImageFont.load_default()
+        name_font = ImageFont.load_default()
+        text_font = ImageFont.load_default()
+        small_font = ImageFont.load_default()
+    
+    draw.text((width//2, 60), "CERTIFICATE OF ACHIEVEMENT", fill='white', font=title_font, anchor='mm')
+    draw.text((width//2, 100), "Study Buddy Quest", fill='#ffd700', font=subtitle_font, anchor='mm')
+    
+    draw.text((width//2, 160), "This certifies that", fill='white', font=text_font, anchor='mm')
+    display_name = student_name if student_name else "Study Champion"
+    draw.text((width//2, 200), display_name, fill='#ffd700', font=name_font, anchor='mm')
+    draw.text((width//2, 240), "has achieved the rank of", fill='white', font=text_font, anchor='mm')
+    
+    title_clean = title.replace('🌱', '').replace('📖', '').replace('🗺️', '').replace('🧱', '').replace('🏅', '').replace('⚔️', '').replace('🎓', '').replace('🛡️', '').replace('🌟', '').replace('👑', '').replace('🦸', '').strip()
+    draw.text((width//2, 280), f"Level {level} - {title_clean}", fill='white', font=subtitle_font, anchor='mm')
+    
+    stats_y = 340
+    draw.text((200, stats_y), f"Experience Points: {total_xp}", fill='white', font=text_font, anchor='mm')
+    draw.text((600, stats_y), f"Quizzes: {quizzes}", fill='white', font=text_font, anchor='mm')
+    draw.text((200, stats_y + 30), f"Perfect Scores: {perfect_scores}", fill='white', font=text_font, anchor='mm')
+    draw.text((600, stats_y + 30), f"Badges: {badges_earned}/{total_badges}", fill='white', font=text_font, anchor='mm')
+    
+    draw.text((width//2, 500), f"Awarded on {date_str}", fill='white', font=small_font, anchor='mm')
+    draw.text((width//2, 540), "Presidential AI Challenge", fill='#ffd700', font=text_font, anchor='mm')
+    
+    buffer = BytesIO()
+    img.save(buffer, format='PNG')
+    buffer.seek(0)
+    return buffer.getvalue()
+
+
+def generate_certificate_html(student_name: str) -> str:
+    """Generate a beautiful certificate HTML for the student."""
+    from datetime import datetime
+    
+    level = calculate_level(st.session_state.total_score)
+    title = get_level_title(level)
+    total_xp = st.session_state.total_score
+    quizzes = st.session_state.quizzes_completed
+    perfect_scores = st.session_state.perfect_scores
+    badges_earned = len(st.session_state.badges)
+    total_badges = len(BADGES)
+    date_str = datetime.now().strftime("%B %d, %Y")
+    
+    badge_emojis = " ".join([BADGES[b]["emoji"] for b in st.session_state.badges]) if st.session_state.badges else "🎯"
+    
+    certificate_html = f"""
+    <div id="certificate" style="
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: 8px solid #ffd700;
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+        color: white;
+        font-family: 'Georgia', serif;
+        max-width: 600px;
+        margin: 20px auto;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    ">
+        <div style="font-size: 3rem; margin-bottom: 10px;">🏆</div>
+        <div style="font-size: 2rem; font-weight: bold; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 5px;">
+            Certificate of Achievement
+        </div>
+        <div style="font-size: 1rem; opacity: 0.9; margin-bottom: 20px;">
+            Study Buddy Quest 🧠
+        </div>
+        
+        <div style="border-top: 2px solid rgba(255,255,255,0.3); border-bottom: 2px solid rgba(255,255,255,0.3); padding: 20px; margin: 20px 0;">
+            <div style="font-size: 1rem; opacity: 0.8;">This certifies that</div>
+            <div style="font-size: 2rem; font-weight: bold; margin: 10px 0; color: #ffd700;">
+                {student_name if student_name else "Study Champion"}
+            </div>
+            <div style="font-size: 1rem; opacity: 0.8;">has achieved the rank of</div>
+            <div style="font-size: 1.5rem; font-weight: bold; margin: 10px 0;">
+                Level {level} - {title}
+            </div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 20px 0; text-align: center;">
+            <div style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 10px;">
+                <div style="font-size: 1.8rem; font-weight: bold;">{total_xp}</div>
+                <div style="font-size: 0.9rem; opacity: 0.8;">Experience Points</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 10px;">
+                <div style="font-size: 1.8rem; font-weight: bold;">{quizzes}</div>
+                <div style="font-size: 0.9rem; opacity: 0.8;">Quizzes Completed</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 10px;">
+                <div style="font-size: 1.8rem; font-weight: bold;">{perfect_scores}</div>
+                <div style="font-size: 0.9rem; opacity: 0.8;">Perfect Scores</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 10px;">
+                <div style="font-size: 1.8rem; font-weight: bold;">{badges_earned}/{total_badges}</div>
+                <div style="font-size: 0.9rem; opacity: 0.8;">Badges Earned</div>
+            </div>
+        </div>
+        
+        <div style="font-size: 1.5rem; margin: 15px 0;">{badge_emojis}</div>
+        
+        <div style="margin-top: 20px; font-size: 0.9rem; opacity: 0.8;">
+            Awarded on {date_str}
+        </div>
+        <div style="margin-top: 10px; font-size: 0.8rem; opacity: 0.6;">
+            🏛️ Presidential AI Challenge 🇺🇸
+        </div>
+    </div>
+    """
+    return certificate_html
+
+
+def generate_tutor_response(user_question: str, topic: str, wrong_questions: list, 
+                            parsed_questions: list, correct_answers: list, explanations: list,
+                            got_perfect_score: bool = False) -> str:
+    """Generate an AI tutor response to help the student understand concepts."""
+    
+    # Build context from quiz content
+    quiz_context = []
+    for i in range(min(len(parsed_questions), 5)):
+        q = parsed_questions[i]
+        correct_ans = correct_answers[i] if i < len(correct_answers) else "?"
+        explanation = explanations[i] if i < len(explanations) else ""
+        quiz_context.append(f"Q{i+1}: {q.get('text', 'Question')}\nAnswer: {correct_ans}) {q.get('options', {}).get(correct_ans, '')}\nExplanation: {explanation}")
+    
+    context_text = "\n\n".join(quiz_context) if quiz_context else "General topic discussion."
+    
+    if got_perfect_score:
+        score_context = "The student got a PERFECT SCORE! They're curious to learn more about the topic."
+    else:
+        wrong_context = []
+        for i, wq in enumerate(wrong_questions[:5]):
+            q_idx = wq.get('question_num', i) - 1
+            if q_idx < len(parsed_questions):
+                q = parsed_questions[q_idx]
+                wrong_context.append(f"- Q{q_idx+1}: {q.get('text', 'Question')}")
+        score_context = f"The student got some questions wrong:\n" + "\n".join(wrong_context) if wrong_context else "The student wants to understand the topic better."
+    
+    prompt = f"""You are a friendly, encouraging AI tutor helping a student who just took a quiz about "{topic}".
+
+Quiz content covered:
+{context_text}
+
+Student performance: {score_context}
+
+The student is now asking: "{user_question}"
+
+Respond as a helpful tutor:
+1. Answer their specific question directly and clearly
+2. Use simple, age-appropriate language
+3. Give examples if helpful
+4. Be encouraging and supportive
+5. Keep your response concise (2-4 short paragraphs max)
+6. If they ask something unrelated to the topic, gently guide them back to the quiz topic
+
+Remember: You're helping them LEARN, not just giving answers. Explain the "why" behind concepts!"""
+
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt
+        )
+        
+        if response.text:
+            return response.text
+        return "I'm here to help! Could you rephrase your question? I want to make sure I understand what you're asking. 🤔"
+    except Exception:
+        return "I'm having trouble thinking right now! Try asking your question again in a moment. 💭"
 
 
 # ============================================================
@@ -2093,6 +2294,113 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     st.session_state.study_notes = study_notes
                     st.rerun()
         
+        # AI Tutor Chat Section
+        st.markdown("---")
+        st.markdown("### 🤖 AI Tutor Chat")
+        got_perfect = correct_count == total_questions
+        if got_perfect:
+            st.markdown("*Perfect score! Ask questions to learn even more about this topic!*")
+        else:
+            st.markdown("*Got questions about what you got wrong? Ask your AI tutor!*")
+        
+        if st.toggle("💬 Open Tutor Chat", value=st.session_state.get('tutor_chat_active', False), key="tutor_toggle"):
+            st.session_state.tutor_chat_active = True
+            
+            # Display chat history
+            for msg in st.session_state.tutor_chat_history:
+                if msg["role"] == "user":
+                    st.markdown(f"""
+                    <div style="background: #e0e7ff; padding: 12px 16px; border-radius: 15px 15px 5px 15px; 
+                                margin: 8px 0; max-width: 85%; margin-left: auto; text-align: right;">
+                        <strong>You:</strong> {msg["content"]}
+                    </div>
+                    """, unsafe_allow_html=True)
+                else:
+                    st.markdown(f"""
+                    <div style="background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%); 
+                                color: white; padding: 12px 16px; border-radius: 15px 15px 15px 5px; 
+                                margin: 8px 0; max-width: 85%;">
+                        <strong>🤖 Tutor:</strong> {msg["content"]}
+                    </div>
+                    """, unsafe_allow_html=True)
+            
+            # Chat input
+            user_question = st.text_input(
+                "Ask a question about the quiz:",
+                placeholder="e.g., Why is the answer B? Can you explain this concept more?",
+                key="tutor_input"
+            )
+            
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                if st.button("📤 Ask Tutor", use_container_width=True, type="primary"):
+                    if user_question.strip():
+                        st.session_state.tutor_chat_history.append({
+                            "role": "user",
+                            "content": user_question
+                        })
+                        
+                        with st.spinner("🤔 Thinking..."):
+                            response = generate_tutor_response(
+                                user_question,
+                                st.session_state.current_topic,
+                                wrong_questions,
+                                parsed_questions,
+                                correct_answers,
+                                explanations,
+                                got_perfect_score=got_perfect
+                            )
+                        
+                        st.session_state.tutor_chat_history.append({
+                            "role": "tutor",
+                            "content": response
+                        })
+                        st.rerun()
+                    else:
+                        st.warning("Please type a question first!")
+            with col2:
+                if st.button("🗑️ Clear Chat", use_container_width=True):
+                    st.session_state.tutor_chat_history = []
+                    st.rerun()
+        else:
+            st.session_state.tutor_chat_active = False
+        
+        # Achievement Showcase Section
+        st.markdown("---")
+        st.markdown("### 🏆 Achievement Showcase")
+        st.markdown("*Create a certificate to show off your progress!*")
+        
+        with st.expander("📜 Generate Your Certificate"):
+            student_name = st.text_input(
+                "Your Name (for the certificate):",
+                value=st.session_state.get('student_name', ''),
+                placeholder="Enter your name here",
+                key="cert_name"
+            )
+            
+            if student_name != st.session_state.student_name:
+                st.session_state.student_name = student_name
+            
+            if st.button("🎨 Generate Certificate", use_container_width=True, type="primary"):
+                certificate_html = generate_certificate_html(student_name)
+                st.markdown(certificate_html, unsafe_allow_html=True)
+                
+                # Generate downloadable PNG certificate
+                try:
+                    cert_image = generate_certificate_image(student_name)
+                    st.download_button(
+                        label="📥 Download Certificate (PNG)",
+                        data=cert_image,
+                        file_name=f"study_buddy_certificate_{student_name.replace(' ', '_') if student_name else 'champion'}.png",
+                        mime="image/png",
+                        use_container_width=True
+                    )
+                    st.success("Your certificate is ready to download!")
+                except Exception as e:
+                    st.warning("Certificate image generation unavailable. Use screenshot to save!")
+                
+                st.info("📸 **Tip:** You can also take a screenshot or use your browser's print function (Ctrl+P / Cmd+P) to save as PDF!")
+        
         st.markdown("---")
         if correct_count >= 4:
             st.markdown("## 🌟 You're a Study Buddy Superstar! 🌟")
@@ -2114,6 +2422,8 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             st.session_state.score = 0
             st.session_state.wrong_questions = []
             st.session_state.quiz_error = None
+            st.session_state.tutor_chat_history = []
+            st.session_state.tutor_chat_active = False
             for i in range(1, 16):  # Support up to 15 questions
                 if f"q{i}" in st.session_state:
                     del st.session_state[f"q{i}"]

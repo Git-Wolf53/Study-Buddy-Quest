@@ -6,6 +6,7 @@ requires-python = ">=3.11"
 dependencies = [
     "google-genai>=1.56.0",
     "gtts>=2.5.4",
+    "pillow>=12.0.0",
     "sift-stack-py>=0.9.6",
     "streamlit>=1.52.2",
 ]
