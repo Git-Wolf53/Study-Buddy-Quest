@@ -1234,7 +1234,7 @@ with st.expander("⚙️ Accessibility Settings"):
     st.markdown("**Font Size**")
     font_col1, font_col2, font_col3 = st.columns(3)
     with font_col1:
-        if st.button("A", key="font_small", help="Small text"):
+        if st.button("A", key="font_small", help="Small text", type="primary" if st.session_state.font_size == "small" else "secondary"):
             st.session_state.font_size = "small"
             st.rerun()
     with font_col2:
@@ -1242,7 +1242,7 @@ with st.expander("⚙️ Accessibility Settings"):
             st.session_state.font_size = "medium"
             st.rerun()
     with font_col3:
-        if st.button("A", key="font_large", help="Large text"):
+        if st.button("A", key="font_large", help="Large text", type="primary" if st.session_state.font_size == "large" else "secondary"):
             st.session_state.font_size = "large"
             st.rerun()
     st.caption(f"Current: {st.session_state.font_size.title()}")
