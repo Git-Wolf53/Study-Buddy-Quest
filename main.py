@@ -72,6 +72,10 @@ defaults = {
     "font_size": "medium",
     "selected_category": None,
     "sound_enabled": True,
+    "timed_mode": False,
+    "quiz_start_time": None,
+    "time_per_question": 30,
+    "study_notes": None,
 }
 
 # ============================================================
@@ -544,6 +548,47 @@ Keep it friendly, supportive, and age-appropriate for a student. Use 1-2 emojis 
         return "Great effort on this quiz! Keep practicing and you'll keep improving! 🌟"
     except Exception:
         return "Great effort on this quiz! Keep practicing and you'll keep improving! 🌟"
+
+
+def generate_study_notes(topic: str, correct_count: int, total_questions: int,
+                         parsed_questions: list, correct_answers: list, explanations: list) -> str:
+    """Generate AI-powered study notes based on quiz content."""
+    
+    # Build summary of all questions and their key concepts
+    questions_summary = []
+    for i in range(min(len(parsed_questions), len(correct_answers), len(explanations))):
+        q = parsed_questions[i]
+        correct_ans = correct_answers[i].upper()
+        correct_option = q.get('options', {}).get(correct_ans, '')
+        explanation = explanations[i] if i < len(explanations) else ''
+        questions_summary.append(f"Q{i+1}: {q.get('text', '')} → Answer: {correct_ans}) {correct_option}")
+    
+    questions_text = "\n".join(questions_summary)
+    
+    prompt = f"""You are a helpful study assistant. Based on this quiz about "{topic}", create concise study notes.
+
+Quiz Questions and Answers:
+{questions_text}
+
+Create STUDY NOTES that:
+1. List 3-5 KEY CONCEPTS covered in this quiz (use bullet points)
+2. Provide 2-3 IMPORTANT FACTS to remember
+3. Suggest 2 RELATED TOPICS the student might want to explore next
+
+Format the notes clearly with headers. Keep it concise (under 200 words). 
+Make it engaging for a student. Use simple language."""
+
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt
+        )
+        
+        if response.text:
+            return response.text
+        return "Study notes could not be generated. Review the explanations above for key concepts!"
+    except Exception:
+        return "Study notes could not be generated. Review the explanations above for key concepts!"
 
 
 # ============================================================
@@ -1303,6 +1348,23 @@ elif difficulty == "Medium 🌿":
 else:
     st.warning("🏆 Brave choice! Time to show what you're made of!")
 
+# Timed Mode Toggle
+st.markdown("")
+timed_col1, timed_col2 = st.columns([3, 1])
+with timed_col1:
+    st.markdown("**⏱️ Timed Challenge Mode**")
+    st.caption("Race against the clock for bonus XP! 30 seconds per question.")
+with timed_col2:
+    timed_mode = st.toggle("Enable Timer", value=st.session_state.get('timed_mode', False), key="timed_toggle")
+
+if timed_mode:
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); 
+                color: white; padding: 12px 20px; border-radius: 10px; text-align: center;">
+        <strong>⚡ TIMED MODE ACTIVE!</strong> Answer quickly for bonus points!
+    </div>
+    """, unsafe_allow_html=True)
+
 # ============================================================
 # GENERATE QUIZ BUTTON
 # ============================================================
@@ -1349,6 +1411,11 @@ if st.button("🎲 START QUIZ! 🎲", use_container_width=True):
         st.session_state.quiz_length = quiz_length
         st.session_state.current_grade_level = grade_level
         st.session_state.current_difficulty = difficulty
+        st.session_state.timed_mode = timed_mode
+        st.session_state.quiz_start_time = time.time() if timed_mode else None
+        st.session_state.study_notes = None
+        st.session_state.time_bonus = 0
+        st.session_state.base_score = 0
         
         progress_bar = st.progress(0)
         status_text = st.empty()
@@ -1409,6 +1476,65 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         if parsed_questions and len(parsed_questions) >= num_questions:
             st.markdown(f"## 📝 Quiz Time!")
             st.markdown("*Select your answer for each question below, then click Submit!*")
+            
+            # Timer display for timed mode (uses JavaScript for live updates)
+            if st.session_state.get('timed_mode') and st.session_state.get('quiz_start_time'):
+                total_time = num_questions * st.session_state.get('time_per_question', 30)
+                start_time = st.session_state.quiz_start_time
+                
+                # JavaScript-based live countdown timer
+                st.markdown(f"""
+                <div id="timer-container" style="background: #d1fae5; border: 3px solid #10b981; 
+                            border-radius: 15px; padding: 15px; text-align: center; margin: 15px 0;">
+                    <div style="font-size: 0.9rem; font-weight: 600;">⏱️ TIME REMAINING</div>
+                    <div id="timer-display" style="font-size: 2.5rem; font-weight: 800;">--:--</div>
+                    <div style="font-size: 0.8rem; color: #666;">Bonus XP for fast completion!</div>
+                </div>
+                <script>
+                    (function() {{
+                        const startTime = {start_time};
+                        const totalTime = {total_time};
+                        const container = document.getElementById('timer-container');
+                        const display = document.getElementById('timer-display');
+                        
+                        function updateTimer() {{
+                            const now = Date.now() / 1000;
+                            const elapsed = now - startTime;
+                            const remaining = Math.max(0, totalTime - elapsed);
+                            const minutes = Math.floor(remaining / 60);
+                            const seconds = Math.floor(remaining % 60);
+                            
+                            display.textContent = String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+                            
+                            // Update colors based on time
+                            if (remaining > totalTime * 0.5) {{
+                                container.style.background = '#d1fae5';
+                                container.style.borderColor = '#10b981';
+                                display.style.color = '#10b981';
+                            }} else if (remaining > totalTime * 0.25) {{
+                                container.style.background = '#fef3c7';
+                                container.style.borderColor = '#f59e0b';
+                                display.style.color = '#f59e0b';
+                            }} else {{
+                                container.style.background = '#fee2e2';
+                                container.style.borderColor = '#ef4444';
+                                display.style.color = '#ef4444';
+                            }}
+                            
+                            if (remaining > 0) {{
+                                requestAnimationFrame(updateTimer);
+                            }} else {{
+                                display.textContent = '00:00';
+                                display.style.color = '#ef4444';
+                            }}
+                        }}
+                        
+                        updateTimer();
+                        setInterval(updateTimer, 1000);
+                    }})();
+                </script>
+                """, unsafe_allow_html=True)
+            
             st.markdown("")
             
             if 'quiz_error' not in st.session_state:
@@ -1499,7 +1625,22 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     st.session_state.wrong_questions = wrong_questions
                     
                     quiz_score = correct_count * 10
-                    st.session_state.score = quiz_score
+                    
+                    # Calculate time bonus for timed mode
+                    time_bonus = 0
+                    if st.session_state.get('timed_mode') and st.session_state.get('quiz_start_time'):
+                        total_time = num_questions * st.session_state.get('time_per_question', 30)
+                        elapsed = time.time() - st.session_state.quiz_start_time
+                        remaining = max(0, total_time - elapsed)
+                        
+                        if remaining > 0:
+                            # Bonus based on time remaining (up to 50% extra)
+                            time_bonus = int((remaining / total_time) * quiz_score * 0.5)
+                            st.session_state.time_bonus = time_bonus
+                    
+                    total_quiz_score = quiz_score + time_bonus
+                    st.session_state.score = total_quiz_score
+                    st.session_state.base_score = quiz_score
                     
                     if correct_count == num_questions:
                         st.session_state.perfect_scores += 1
@@ -1508,7 +1649,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                         if st.session_state.current_topic not in st.session_state.weak_topics:
                             st.session_state.weak_topics.append(st.session_state.current_topic)
                     
-                    st.session_state.total_score += quiz_score
+                    st.session_state.total_score += total_quiz_score
                     st.session_state.quizzes_completed += 1
                     
                     # Save to quiz history
@@ -1607,6 +1748,19 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             st.markdown(complete_sound, unsafe_allow_html=True)
         
         total_questions = st.session_state.get('quiz_length', 5)
+        base_score = st.session_state.get('base_score', score)
+        time_bonus = st.session_state.get('time_bonus', 0)
+        
+        # Show time bonus if earned
+        if time_bonus > 0:
+            st.markdown(f"""
+            <div style="background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); 
+                        color: white; padding: 15px; border-radius: 12px; text-align: center; margin: 10px 0;">
+                <div style="font-size: 1.2rem;">⚡ SPEED BONUS! ⚡</div>
+                <div style="font-size: 1.5rem; font-weight: bold;">+{time_bonus} XP</div>
+                <div style="font-size: 0.9rem;">You finished with time to spare!</div>
+            </div>
+            """, unsafe_allow_html=True)
         
         if correct_count == total_questions:
             st.success(f"""
@@ -1748,6 +1902,36 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
     {summary}
 </div>
         """, unsafe_allow_html=True)
+        
+        # Study Notes Section
+        st.markdown("---")
+        st.markdown("### 📝 Study Notes")
+        st.markdown("*Get AI-generated notes to help you remember key concepts!*")
+        
+        if st.session_state.get('study_notes'):
+            st.markdown(f"""
+<div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
+            color: white; 
+            padding: 20px; 
+            border-radius: 15px; 
+            margin: 10px 0;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
+    {st.session_state.study_notes}
+</div>
+            """, unsafe_allow_html=True)
+        else:
+            if st.button("📚 Generate Study Notes", use_container_width=True):
+                with st.spinner("Creating your personalized study notes..."):
+                    study_notes = generate_study_notes(
+                        st.session_state.current_topic,
+                        correct_count,
+                        total_questions,
+                        parsed_questions,
+                        correct_answers,
+                        explanations
+                    )
+                    st.session_state.study_notes = study_notes
+                    st.rerun()
         
         st.markdown("---")
         if correct_count >= 4:
