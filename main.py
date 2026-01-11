@@ -83,7 +83,7 @@ defaults = {
     "compact_mode": False,
     "student_name": "",
     "tutor_chat_history": [],
-    "tutor_chat_active": False,
+    "tutor_panel_open": False,
     "image_quiz_mode": False,
     "uploaded_image": None,
     "xp_history": [],
@@ -2603,9 +2603,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         else:
             st.markdown("*Got questions about what you got wrong? Ask your AI tutor!*")
         
-        if st.toggle("💬 Open Tutor Chat", value=st.session_state.get('tutor_chat_active', False), key="tutor_toggle"):
-            st.session_state.tutor_chat_active = True
-            
+        if st.checkbox("💬 Open Tutor Chat", key="tutor_panel_open"):
             # Display chat history
             for msg in st.session_state.tutor_chat_history:
                 if msg["role"] == "user":
@@ -2662,8 +2660,6 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 if st.button("🗑️ Clear Chat", use_container_width=True):
                     st.session_state.tutor_chat_history = []
                     st.rerun()
-        else:
-            st.session_state.tutor_chat_active = False
         
         # Achievement Showcase Section
         st.markdown("---")
@@ -2780,7 +2776,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             st.session_state.wrong_questions = []
             st.session_state.quiz_error = None
             st.session_state.tutor_chat_history = []
-            st.session_state.tutor_chat_active = False
+            st.session_state.tutor_panel_open = False
             for i in range(1, 16):  # Support up to 15 questions
                 if f"q{i}" in st.session_state:
                     del st.session_state[f"q{i}"]
