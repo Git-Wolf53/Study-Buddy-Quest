@@ -2806,6 +2806,19 @@ if not st.session_state.dark_mode:
             border-color: #e9ecef !important;
         }
         
+        /* Dropdown text - keep dark for readability */
+        .stSelectbox div[data-baseweb="select"] span,
+        .stSelectbox [data-baseweb="select"] div,
+        [data-baseweb="select"] span {
+            color: #1f2937 !important;
+        }
+        
+        /* Dropdown arrow icon */
+        .stSelectbox svg,
+        [data-baseweb="select"] svg {
+            fill: #1f2937 !important;
+        }
+        
         /* Dropdown menu items */
         [data-baseweb="menu"],
         [data-baseweb="popover"],
@@ -2816,6 +2829,7 @@ if not st.session_state.dark_mode:
         [data-baseweb="menu"] li,
         ul[role="listbox"] li {
             background-color: #f8f9fa !important;
+            color: #1f2937 !important;
         }
         
         [data-baseweb="menu"] li:hover,
