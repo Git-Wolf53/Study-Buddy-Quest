@@ -1829,6 +1829,7 @@ if st.button("🎲 START QUIZ! 🎲", use_container_width=True):
         """, unsafe_allow_html=True)
         
         st.session_state.answers_submitted = False
+        st.session_state.balloons_shown = False
         st.session_state.correct_answers = []
         st.session_state.explanations = []
         st.session_state.user_answers = []
@@ -2240,8 +2241,9 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         num_questions = min(len(user_answers), len(correct_answers))
         correct_count = sum(1 for i in range(num_questions) if user_answers[i].upper() == correct_answers[i].upper())
         
-        if not st.session_state.get('reduce_animations', False):
+        if not st.session_state.get('reduce_animations', False) and not st.session_state.get('balloons_shown', False):
             st.balloons()
+            st.session_state.balloons_shown = True
         
         total_questions = st.session_state.get('quiz_length', 5)
         base_score = st.session_state.get('base_score', score)
@@ -2624,6 +2626,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             st.session_state.quiz_questions_only = None
             st.session_state.parsed_questions = []
             st.session_state.answers_submitted = False
+            st.session_state.balloons_shown = False
             st.session_state.correct_answers = []
             st.session_state.explanations = []
             st.session_state.user_answers = []
