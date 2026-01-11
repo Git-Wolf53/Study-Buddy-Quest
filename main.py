@@ -65,7 +65,7 @@ defaults = {
     "weak_topics": [],
     "wrong_questions": [],
     "badges": [],
-    "generation_error": None,
+    "quiz_error": None,
     "dark_mode": True,
     "quiz_history": [],
     "quiz_length": 5,
@@ -164,6 +164,8 @@ LOADING_MESSAGES = [
     "🎯 Crafting perfect questions...",
     "🔥 Almost ready to challenge you...",
 ]
+
+QUESTION_EMOJIS = ["🔢", "🧮", "🎯", "🌟", "🏆", "📚", "💡", "🔬", "🌍", "🎨", "🚀", "⭐", "🎓", "🧠", "✨"]
 
 
 def check_and_award_badges():
@@ -396,9 +398,6 @@ def parse_individual_questions(quiz_text: str) -> list:
                 if len(match) > 10 and '?' in match:
                     q_text = match.strip()
                     break
-                elif len(match) > 15 and '?' in match:
-                    q_text = match.strip()
-                    break
             
             if not q_text:
                 lines = block.split('\n')
@@ -487,11 +486,9 @@ If any of these topics relate to {topic}, please include 1-2 gentle review quest
         elif "12th" in grade_level:
             age_description = "a 12th grade student (ages 17-18)"
     
-    question_emojis = ["🔢", "🧮", "🎯", "🌟", "🏆", "📚", "💡", "🔬", "🌍", "🎨", "🚀", "⭐", "🎓", "🧠", "✨"]
-    
     questions_template = ""
     for i in range(1, num_questions + 1):
-        emoji = question_emojis[(i - 1) % len(question_emojis)]
+        emoji = QUESTION_EMOJIS[(i - 1) % len(QUESTION_EMOJIS)]
         questions_template += f"""
 ### Question {i} {emoji}
 **[Question text here]**
@@ -1837,7 +1834,7 @@ if st.button("🎲 START QUIZ! 🎲", use_container_width=True):
         st.session_state.score = 0
         st.session_state.current_topic = clean_topic
         st.session_state.wrong_questions = []
-        st.session_state.generation_error = None
+        st.session_state.quiz_error = None
         st.session_state.quiz_length = quiz_length
         st.session_state.current_grade_level = grade_level
         st.session_state.current_difficulty = difficulty
@@ -1915,7 +1912,6 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         
         parsed_questions = st.session_state.parsed_questions
         num_questions = st.session_state.get('quiz_length', 5)
-        question_emojis = ["🔢", "🧮", "🎯", "🌟", "🏆", "📚", "💡", "🔬", "🌍", "🎨", "🚀", "⭐", "🎓", "🧠", "✨"]
         
         if parsed_questions and len(parsed_questions) >= num_questions:
             st.markdown(f"## 📝 Quiz Time!")
@@ -1988,7 +1984,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 st.error(st.session_state.quiz_error)
             
             for idx, q in enumerate(parsed_questions[:num_questions]):
-                emoji = question_emojis[idx] if idx < len(question_emojis) else "❓"
+                emoji = QUESTION_EMOJIS[idx] if idx < len(QUESTION_EMOJIS) else "❓"
                 
                 st.markdown(f"""
 <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
@@ -2355,7 +2351,6 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         st.markdown("### 📚 Answer Review & Explanations")
         st.markdown("*Here's the breakdown for each question:*")
         
-        question_emojis = ["🔢", "🧮", "🎯", "🌟", "🏆", "📚", "💡", "🔬", "🌍", "🎨", "🚀", "⭐", "🎓", "🧠", "✨"]
         parsed_questions = st.session_state.parsed_questions
         
         for i in range(min(total_questions, len(correct_answers))):
@@ -2373,7 +2368,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 user_ans_text = options.get(user_ans.upper(), "")
                 correct_ans_text = options.get(correct_ans.upper(), "")
             
-            q_emoji = question_emojis[i % len(question_emojis)]
+            q_emoji = QUESTION_EMOJIS[i % len(QUESTION_EMOJIS)]
             question_label = f"Question {i+1} {q_emoji}"
             
             if is_correct:
