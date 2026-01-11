@@ -2026,12 +2026,15 @@ if st.button("🎲 START QUIZ! 🎲", use_container_width=True):
             progress_bar.empty()
             status_text.empty()
             error_msg = str(e)
-            if "API" in error_msg or "key" in error_msg.lower():
-                st.error("🔑 There's an issue with the API connection. Please check your API key and try again!")
+            print(f"Quiz generation error: {type(e).__name__}: {e}")
+            if "API_KEY" in error_msg or "API key" in error_msg or "invalid" in error_msg.lower():
+                st.error("🔑 There's an issue with the API key. Please check that GEMINI_API_KEY is set correctly in your secrets!")
             elif "timeout" in error_msg.lower():
                 st.error("⏱️ The request took too long. Please try again!")
+            elif "quota" in error_msg.lower() or "limit" in error_msg.lower():
+                st.error("📊 API rate limit reached. Please wait a moment and try again!")
             else:
-                st.error(f"😅 Oops! Something went wrong: {error_msg}")
+                st.error(f"😅 Oops! Something went wrong: {error_msg[:200]}")
             st.info("💡 **Tip:** Try a different topic or refresh the page!")
 
 # ============================================================
