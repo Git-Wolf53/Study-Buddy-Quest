@@ -2795,6 +2795,15 @@ if not st.session_state.dark_mode:
             color: #6b7280 !important;
         }
         
+        /* Expander titles - keep dark for readability */
+        .stExpander summary,
+        .stExpander summary span,
+        .streamlit-expanderHeader,
+        [data-testid="stExpander"] summary,
+        [data-testid="stExpander"] summary span {
+            color: #1f2937 !important;
+        }
+        
         /* Light mode: Quest boxes and form elements */
         .stSelectbox > div > div,
         .stRadio > div,
