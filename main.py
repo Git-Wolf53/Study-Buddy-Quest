@@ -24,27 +24,26 @@ st.set_page_config(
 # ============================================================
 # API KEY VALIDATION
 # ============================================================
-# Using xAI Grok API (OpenAI-compatible)
-GROK_API_KEY = os.environ.get("GROK_API_KEY")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
-if not GROK_API_KEY:
+if not GEMINI_API_KEY:
     st.error("""
     ## 🔑 API Key Missing!
     
-    This app needs a Grok API key to generate quizzes.
+    This app needs a Google Gemini API key to generate quizzes.
     
     **To fix this:**
-    1. Get an API key from [xAI Console](https://console.x.ai/api-keys)
-    2. Add it to your Replit Secrets as `GROK_API_KEY`
+    1. Get a free API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
+    2. Add it to your Replit Secrets as `GEMINI_API_KEY`
     3. Refresh this page
     
     *Need help? Ask your teacher or check the Replit docs!*
     """)
     st.stop()
 
-# Import and configure xAI Grok client (OpenAI-compatible)
-from openai import OpenAI
-client = OpenAI(base_url="https://api.x.ai/v1", api_key=GROK_API_KEY)
+# Import and configure Gemini only after validating API key
+from google import genai
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 # ============================================================
 # SESSION STATE INITIALIZATION
@@ -443,8 +442,8 @@ def parse_individual_questions(quiz_text: str) -> list:
     return questions
 
 
-def generate_quiz_with_grok(topic: str, difficulty: str, weak_topics: list = None, grade_level: str = None, num_questions: int = 5) -> str:
-    """Generate a quiz using xAI Grok."""
+def generate_quiz_with_gemini(topic: str, difficulty: str, weak_topics: list = None, grade_level: str = None, num_questions: int = 5) -> str:
+    """Generate a quiz using Gemini AI."""
     clean_difficulty = difficulty.split()[0]
     
     adaptive_section = ""
@@ -539,19 +538,19 @@ IMPORTANT: You MUST follow this EXACT format for each question. Do not deviate!
 **Great job working through this quiz!** Keep learning and growing! 🌟
 """
     
-    response = client.chat.completions.create(
-        model="grok-2-1212",
-        messages=[{"role": "user", "content": prompt}]
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=prompt
     )
     
-    if not response.choices or not response.choices[0].message.content:
+    if not response.text:
         raise ValueError("No response received from AI. Please try again!")
     
-    return response.choices[0].message.content
+    return response.text
 
 
 def generate_quiz_from_image(image_bytes: bytes, difficulty: str, grade_level: str = None, num_questions: int = 5, mime_type: str = "image/jpeg") -> tuple:
-    """Generate a quiz from an uploaded image using Grok vision."""
+    """Generate a quiz from an uploaded image using Gemini vision."""
     import base64
     
     clean_difficulty = difficulty.split()[0]
@@ -619,23 +618,22 @@ Then format the quiz EXACTLY like this:
     
     image_base64 = base64.b64encode(image_bytes).decode('utf-8')
     
-    response = client.chat.completions.create(
-        model="grok-2-vision-1212",
-        messages=[
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=[
             {
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": prompt},
-                    {"type": "image_url", "image_url": {"url": f"data:{mime_type};base64,{image_base64}"}}
+                "parts": [
+                    {"text": prompt},
+                    {"inline_data": {"mime_type": mime_type, "data": image_base64}}
                 ]
             }
         ]
     )
     
-    if not response.choices or not response.choices[0].message.content:
+    if not response.text:
         raise ValueError("No response received from AI. Please try again!")
     
-    text = response.choices[0].message.content
+    text = response.text
     topic_match = re.search(r'\*\*📸 Image Topic:\s*(.+?)\*\*', text)
     detected_topic = topic_match.group(1).strip() if topic_match else "Image Analysis"
     
@@ -685,13 +683,13 @@ Write a SHORT, personalized summary (3-5 sentences max) that:
 Keep it friendly, supportive, and age-appropriate for a student. Use 1-2 emojis max. Be concise!"""
 
     try:
-        response = client.chat.completions.create(
-            model="grok-2-1212",
-            messages=[{"role": "user", "content": prompt}]
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt
         )
         
-        if response.choices and response.choices[0].message.content:
-            return response.choices[0].message.content
+        if response.text:
+            return response.text
         return "Great effort on this quiz! Keep practicing and you'll keep improving! 🌟"
     except Exception:
         return "Great effort on this quiz! Keep practicing and you'll keep improving! 🌟"
@@ -726,13 +724,13 @@ Format the notes clearly with headers. Keep it concise (under 200 words).
 Make it engaging for a student. Use simple language."""
 
     try:
-        response = client.chat.completions.create(
-            model="grok-2-1212",
-            messages=[{"role": "user", "content": prompt}]
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt
         )
         
-        if response.choices and response.choices[0].message.content:
-            return response.choices[0].message.content
+        if response.text:
+            return response.text
         return "Study notes could not be generated. Review the explanations above for key concepts!"
     except Exception:
         return "Study notes could not be generated. Review the explanations above for key concepts!"
@@ -928,13 +926,13 @@ Respond as a helpful tutor:
 Remember: You're helping them LEARN, not just giving answers. Explain the "why" behind concepts!"""
 
     try:
-        response = client.chat.completions.create(
-            model="grok-2-1212",
-            messages=[{"role": "user", "content": prompt}]
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt
         )
         
-        if response.choices and response.choices[0].message.content:
-            return response.choices[0].message.content
+        if response.text:
+            return response.text
         return "I'm here to help! Could you rephrase your question? I want to make sure I understand what you're asking. 🤔"
     except Exception as e:
         print(f"Tutor API error: {type(e).__name__}: {e}")
@@ -1999,7 +1997,7 @@ if st.button("🎲 START QUIZ! 🎲", use_container_width=True):
                 clean_topic = f"📸 {detected_topic}"
                 st.session_state.current_topic = clean_topic
             else:
-                quiz_content = generate_quiz_with_grok(clean_topic, difficulty, st.session_state.weak_topics, grade_level, quiz_length)
+                quiz_content = generate_quiz_with_gemini(clean_topic, difficulty, st.session_state.weak_topics, grade_level, quiz_length)
                 st.session_state.current_topic = clean_topic
             
             correct_answers, explanations = parse_quiz_answers(quiz_content)
@@ -2930,7 +2928,7 @@ st.markdown("""
 <div class="cool-footer">
     <strong>🏛️ Built for the Presidential AI Challenge 🇺🇸</strong><br><br>
     <small>This educational app was created to demonstrate responsible AI use in learning.</small><br>
-    <small>Quiz content is generated by <strong>xAI Grok</strong> 🤖✨</small><br><br>
+    <small>Quiz content is generated by <strong>Google Gemini AI</strong> 🤖✨</small><br><br>
     <small style="color: #636e72;">Study Buddy Quest v2.0 | Made with 💜 by a student, for students</small><br>
     <small>🧠 Learn. Level Up. Repeat! 🚀</small>
 </div>

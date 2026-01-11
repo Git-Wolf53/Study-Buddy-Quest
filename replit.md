@@ -17,7 +17,7 @@ Study Buddy Quest is an educational web application built for the Presidential A
 - **Accessibility**: Text-to-speech, font size controls, high contrast mode
 - **Sound Effects**: Audio feedback with toggle control
 - **Teen-Friendly Design**: Mobile-responsive with colorful UI and emojis
-- **Image-Based Questions**: Upload images (PNG, JPEG, GIF, WebP) and get AI-generated quizzes using Grok vision
+- **Image-Based Questions**: Upload images (PNG, JPEG, GIF, WebP) and get AI-generated quizzes using Gemini vision
 - **Progress Analytics Dashboard**: XP over time, score trends, topic performance breakdown, difficulty statistics
 - **Social Sharing**: Share achievements on X/Twitter, Facebook, LinkedIn with copy-to-clipboard
 
@@ -32,8 +32,8 @@ Preferred communication style: Simple, everyday language.
 - Single-file architecture (`main.py`) contains all application logic, which keeps the project simple and easy to understand.
 
 ### AI Integration
-- **xAI Grok API**: Used for dynamically generating quiz questions based on user-provided topics and difficulty levels. The API key is loaded from environment variables (`GROK_API_KEY`).
-- The OpenAI-compatible client library is used to interact with the xAI Grok API.
+- **Google Gemini API**: Used for dynamically generating quiz questions based on user-provided topics and difficulty levels. The API key is loaded from environment variables (`GEMINI_API_KEY`).
+- The `google-genai` client library is used to interact with the Gemini API.
 
 ### Text-to-Speech
 - **gTTS (Google Text-to-Speech)**: Integrated for accessibility, allowing quiz content to be read aloud to users.
@@ -47,13 +47,13 @@ Preferred communication style: Simple, everyday language.
 ## External Dependencies
 
 ### APIs
-- **xAI Grok API**: Required for quiz generation. Users must provide their own API key via the `GROK_API_KEY` environment variable. Keys can be obtained from xAI Console (https://console.x.ai/api-keys).
+- **Google Gemini API**: Required for quiz generation. Users must provide their own API key via the `GEMINI_API_KEY` environment variable. Free keys can be obtained from Google AI Studio.
 
 ### Python Libraries
 - `streamlit`: Web application framework
-- `openai`: OpenAI-compatible client library for xAI Grok API
+- `google-genai`: Google Gemini AI client library
 - `gtts`: Google Text-to-Speech for audio generation
 - `pillow`: Image generation for downloadable certificates
 
 ### Environment Variables
-- `GROK_API_KEY`: Required. The xAI Grok API key for AI-powered quiz generation.
+- `GEMINI_API_KEY`: Required. The Google Gemini API key for AI-powered quiz generation.
