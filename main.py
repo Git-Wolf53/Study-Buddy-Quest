@@ -10,6 +10,7 @@ import re
 import random
 import time
 import base64
+import html
 from io import BytesIO
 from gtts import gTTS
 
@@ -2413,6 +2414,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 user_answers,
                 correct_answers
             )
+        safe_summary = html.escape(summary).replace('\n', '<br>')
         st.markdown(f"""
 <div style="background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%); 
             color: white; 
@@ -2420,7 +2422,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             border-radius: 15px; 
             margin: 10px 0;
             box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);">
-    {summary}
+    {safe_summary}
 </div>
         """, unsafe_allow_html=True)
         
@@ -2430,6 +2432,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         st.markdown("*Get AI-generated notes to help you remember key concepts!*")
         
         if st.session_state.get('study_notes'):
+            safe_notes = html.escape(st.session_state.study_notes).replace('\n', '<br>')
             st.markdown(f"""
 <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
             color: white; 
@@ -2437,7 +2440,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             border-radius: 15px; 
             margin: 10px 0;
             box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
-    {st.session_state.study_notes}
+    {safe_notes}
 </div>
             """, unsafe_allow_html=True)
         else:
