@@ -934,8 +934,9 @@ Remember: You're helping them LEARN, not just giving answers. Explain the "why" 
         if response.text:
             return response.text
         return "I'm here to help! Could you rephrase your question? I want to make sure I understand what you're asking. 🤔"
-    except Exception:
-        return "I'm having trouble thinking right now! Try asking your question again in a moment. 💭"
+    except Exception as e:
+        print(f"Tutor API error: {type(e).__name__}: {e}")
+        return f"I'm having a little trouble right now. Error: {str(e)[:100]}. Try again in a moment! 💭"
 
 
 # ============================================================
