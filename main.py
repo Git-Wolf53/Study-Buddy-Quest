@@ -9,6 +9,7 @@ import os
 import re
 import random
 import time
+import base64
 from io import BytesIO
 from gtts import gTTS
 
@@ -2002,7 +2003,6 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 with tts_col1:
                     if st.button("🔊", key=f"tts_{idx}", help="Read question aloud"):
                         try:
-                            # Build full text to read
                             options_text = ". ".join([f"{letter}: {q['options'][letter]}" for letter in ['A', 'B', 'C', 'D']])
                             full_text = f"Question {q['number']}. {q['text']}. The options are: {options_text}"
                             
@@ -2010,7 +2010,13 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                             audio_bytes = BytesIO()
                             tts.write_to_fp(audio_bytes)
                             audio_bytes.seek(0)
-                            st.audio(audio_bytes, format='audio/mp3')
+                            audio_b64 = base64.b64encode(audio_bytes.read()).decode()
+                            audio_html = f'''
+                            <audio autoplay controls>
+                                <source src="data:audio/mp3;base64,{audio_b64}" type="audio/mp3">
+                            </audio>
+                            '''
+                            st.markdown(audio_html, unsafe_allow_html=True)
                         except Exception as e:
                             st.warning("Could not generate audio. Please try again.")
                 with tts_col2:
