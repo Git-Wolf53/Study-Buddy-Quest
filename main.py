@@ -895,9 +895,13 @@ def generate_tutor_response(user_question: str, topic: str, wrong_questions: lis
         score_context = "The student got a PERFECT SCORE! They're curious to learn more about the topic."
     else:
         wrong_context = []
-        for i, wq in enumerate(wrong_questions[:5]):
-            q_idx = wq.get('question_num', i) - 1
-            if q_idx < len(parsed_questions):
+        for wq in wrong_questions[:5]:
+            # Handle both integer question numbers and dict format
+            if isinstance(wq, dict):
+                q_idx = wq.get('question_num', 0) - 1
+            else:
+                q_idx = int(wq) - 1
+            if 0 <= q_idx < len(parsed_questions):
                 q = parsed_questions[q_idx]
                 wrong_context.append(f"- Q{q_idx+1}: {q.get('text', 'Question')}")
         score_context = f"The student got some questions wrong:\n" + "\n".join(wrong_context) if wrong_context else "The student wants to understand the topic better."
