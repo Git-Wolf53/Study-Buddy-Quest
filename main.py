@@ -2790,17 +2790,17 @@ if not st.session_state.dark_mode:
             background-color: #ffffff !important;
         }
         
+        /* All text in light mode - dark for readability */
         .stMarkdown, .stMarkdown p, .stMarkdown span, .stMarkdown div,
-        .stTextInput label, .stSelectbox label {
-            color: #6b7280 !important;
-        }
-        
-        /* Expander titles - keep dark for readability */
-        .stExpander summary,
-        .stExpander summary span,
+        .stTextInput label, .stSelectbox label,
+        .stRadio label, .stRadio div, .stRadio span,
+        .stExpander, .stExpander summary, .stExpander summary span,
         .streamlit-expanderHeader,
         [data-testid="stExpander"] summary,
-        [data-testid="stExpander"] summary span {
+        [data-testid="stExpander"] summary span,
+        [data-testid="stRadio"] label,
+        [data-testid="stRadio"] div[role="radiogroup"] label,
+        p, span, div, label, h1, h2, h3, h4, h5, h6, strong, em, small {
             color: #1f2937 !important;
         }
         
