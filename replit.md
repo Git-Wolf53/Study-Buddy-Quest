@@ -15,7 +15,6 @@ Study Buddy Quest is an educational web application built for the Presidential A
 - **Weak Topic Tracking**: Adaptive learning that identifies areas to practice
 - **Quiz History**: Review and retake past quizzes
 - **Accessibility**: Text-to-speech, font size controls, high contrast mode
-- **Sound Effects**: Audio feedback with toggle control
 - **Teen-Friendly Design**: Mobile-responsive with colorful UI and emojis
 - **Image-Based Questions**: Upload images (PNG, JPEG, GIF, WebP) and get AI-generated quizzes using Gemini vision
 - **Progress Analytics Dashboard**: XP over time, score trends, topic performance breakdown, difficulty statistics

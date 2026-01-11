@@ -71,7 +71,6 @@ defaults = {
     "quiz_length": 5,
     "font_size": "medium",
     "selected_category": None,
-    "sound_enabled": True,
     "timed_mode": False,
     "quiz_start_time": None,
     "time_per_question": 30,
@@ -939,125 +938,6 @@ Remember: You're helping them LEARN, not just giving answers. Explain the "why" 
         return f"I'm having a little trouble right now. Error: {str(e)[:100]}. Try again in a moment! 💭"
 
 
-# ============================================================
-# SOUND EFFECTS HELPER
-# ============================================================
-def get_sound_init_script() -> str:
-    """Return JavaScript to initialize global audio context on user interaction."""
-    return """
-    <script>
-    (function() {
-        if (window.studyBuddyAudioInit) return;
-        window.studyBuddyAudioInit = true;
-        
-        window.studyBuddyCtx = null;
-        
-        function initAudio() {
-            if (!window.studyBuddyCtx) {
-                window.studyBuddyCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (window.studyBuddyCtx.state === 'suspended') {
-                window.studyBuddyCtx.resume();
-            }
-        }
-        
-        document.addEventListener('click', initAudio, {once: false});
-        document.addEventListener('keydown', initAudio, {once: false});
-        document.addEventListener('touchstart', initAudio, {once: false});
-        
-        window.playStudySound = function(type) {
-            initAudio();
-            const ctx = window.studyBuddyCtx;
-            if (!ctx) return;
-            
-            try {
-                if (type === 'correct') {
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
-                    osc.frequency.setValueAtTime(523.25, ctx.currentTime);
-                    osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1);
-                    osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2);
-                    gain.gain.setValueAtTime(0.3, ctx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
-                    osc.start(ctx.currentTime);
-                    osc.stop(ctx.currentTime + 0.4);
-                } else if (type === 'wrong') {
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
-                    osc.type = 'square';
-                    osc.frequency.setValueAtTime(200, ctx.currentTime);
-                    osc.frequency.setValueAtTime(150, ctx.currentTime + 0.15);
-                    gain.gain.setValueAtTime(0.2, ctx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-                    osc.start(ctx.currentTime);
-                    osc.stop(ctx.currentTime + 0.3);
-                } else if (type === 'complete') {
-                    const notes = [523.25, 659.25, 783.99, 1046.50];
-                    notes.forEach((freq, i) => {
-                        const osc = ctx.createOscillator();
-                        const gain = ctx.createGain();
-                        osc.connect(gain);
-                        gain.connect(ctx.destination);
-                        osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.15);
-                        gain.gain.setValueAtTime(0.25, ctx.currentTime + i * 0.15);
-                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.15 + 0.3);
-                        osc.start(ctx.currentTime + i * 0.15);
-                        osc.stop(ctx.currentTime + i * 0.15 + 0.3);
-                    });
-                } else if (type === 'levelup') {
-                    const notes = [392, 523.25, 659.25, 783.99, 1046.50];
-                    notes.forEach((freq, i) => {
-                        const osc = ctx.createOscillator();
-                        const gain = ctx.createGain();
-                        osc.connect(gain);
-                        gain.connect(ctx.destination);
-                        osc.type = 'triangle';
-                        osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.12);
-                        gain.gain.setValueAtTime(0.3, ctx.currentTime + i * 0.12);
-                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.12 + 0.25);
-                        osc.start(ctx.currentTime + i * 0.12);
-                        osc.stop(ctx.currentTime + i * 0.12 + 0.25);
-                    });
-                } else if (type === 'badge') {
-                    const notes = [440, 554.37, 659.25, 880];
-                    notes.forEach((freq, i) => {
-                        const osc = ctx.createOscillator();
-                        const gain = ctx.createGain();
-                        osc.connect(gain);
-                        gain.connect(ctx.destination);
-                        osc.type = 'sine';
-                        osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.1);
-                        gain.gain.setValueAtTime(0.25, ctx.currentTime + i * 0.1);
-                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.1 + 0.3);
-                        osc.start(ctx.currentTime + i * 0.1);
-                        osc.stop(ctx.currentTime + i * 0.1 + 0.3);
-                    });
-                } else if (type === 'click') {
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
-                    osc.frequency.setValueAtTime(800, ctx.currentTime);
-                    gain.gain.setValueAtTime(0.15, ctx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
-                    osc.start(ctx.currentTime);
-                    osc.stop(ctx.currentTime + 0.05);
-                }
-            } catch(e) {}
-        };
-    })();
-    </script>
-    """
-
-def play_sound(sound_type: str) -> str:
-    """Generate JavaScript to play a sound effect using Web Audio API."""
-    if not st.session_state.get('sound_enabled', True):
-        return ""
-    return f'<script>if(window.playStudySound) window.playStudySound("{sound_type}");</script>'
 
 
 # ============================================================
@@ -1397,21 +1277,13 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown(get_sound_init_script(), unsafe_allow_html=True)
-
 # ============================================================
-# TOP RIGHT BUTTONS - HELP, SOUND & THEME TOGGLE
+# TOP RIGHT BUTTONS - THEME TOGGLE
 # ============================================================
 theme_icon = "☀️" if st.session_state.dark_mode else "🌙"
 theme_text = "Light" if st.session_state.dark_mode else "Dark"
-sound_icon = "🔊" if st.session_state.sound_enabled else "🔇"
-sound_text = "Off" if st.session_state.sound_enabled else "On"
 
-col_spacer, col_sound, col_theme = st.columns([10, 1, 1])
-with col_sound:
-    if st.button(f"{sound_icon}", key="sound_btn", help=f"Turn Sound {sound_text}"):
-        st.session_state.sound_enabled = not st.session_state.sound_enabled
-        st.rerun()
+col_spacer, col_theme = st.columns([10, 1])
 with col_theme:
     if st.button(f"{theme_icon}", key="theme_btn", help=f"Switch to {theme_text} Mode"):
         st.session_state.dark_mode = not st.session_state.dark_mode
@@ -1926,10 +1798,6 @@ if timed_mode:
 st.markdown("")
 
 if st.button("🎲 START QUIZ! 🎲", use_container_width=True):
-    click_sound = play_sound('click')
-    if click_sound:
-        st.markdown(click_sound, unsafe_allow_html=True)
-    
     # Check if image quiz mode with uploaded image
     is_image_quiz = st.session_state.get('image_quiz_mode', False) and st.session_state.get('uploaded_image')
     
@@ -2176,9 +2044,6 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             
             st.markdown("")
             if st.button("📨 SUBMIT ALL ANSWERS!", use_container_width=True):
-                submit_sound = play_sound('click')
-                if submit_sound:
-                    st.markdown(submit_sound, unsafe_allow_html=True)
                 user_answers = [st.session_state.get(f"q{i+1}") for i in range(num_questions)]
                 unanswered = [i+1 for i, ans in enumerate(user_answers) if ans is None]
                 
@@ -2376,11 +2241,6 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         if not st.session_state.get('reduce_animations', False):
             st.balloons()
         
-        # Play quiz complete sound
-        complete_sound = play_sound('complete')
-        if complete_sound:
-            st.markdown(complete_sound, unsafe_allow_html=True)
-        
         total_questions = st.session_state.get('quiz_length', 5)
         base_score = st.session_state.get('base_score', score)
         time_bonus = st.session_state.get('time_bonus', 0)
@@ -2455,9 +2315,6 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         
         # Level up notification (if applicable)
         if leveled_up:
-            levelup_sound = play_sound('levelup')
-            if levelup_sound:
-                st.markdown(levelup_sound, unsafe_allow_html=True)
             new_perk = get_level_perk(new_level)
             new_title = get_level_title(new_level)
             st.markdown(f"""
@@ -2482,10 +2339,6 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         
         new_badges = check_and_award_badges()
         if new_badges:
-            # Play badge unlocked sound
-            badge_sound = play_sound('badge')
-            if badge_sound:
-                st.markdown(badge_sound, unsafe_allow_html=True)
             for badge_id in new_badges:
                 if badge_id in BADGES:
                     badge = BADGES[badge_id]
@@ -2765,9 +2618,6 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         
         st.markdown("")
         if st.button("🔄 TAKE ANOTHER QUIZ!", use_container_width=True):
-            another_sound = play_sound('click')
-            if another_sound:
-                st.markdown(another_sound, unsafe_allow_html=True)
             st.session_state.quiz_generated = False
             st.session_state.quiz_content = None
             st.session_state.quiz_questions_only = None
