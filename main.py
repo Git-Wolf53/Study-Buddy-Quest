@@ -2380,23 +2380,28 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             q_emoji = QUESTION_EMOJIS[i % len(QUESTION_EMOJIS)]
             question_label = f"Question {i+1} {q_emoji}"
             
+            safe_question_text = html.escape(question_text)
+            safe_user_ans_text = html.escape(user_ans_text)
+            safe_correct_ans_text = html.escape(correct_ans_text)
+            safe_explanation = html.escape(explanation)
+            
             if is_correct:
                 st.markdown(f"""
 <div class="result-correct">
 <strong>{question_label}</strong><br>
-<em style="color: #6b7280;">{question_text}</em><br><br>
-✅ You answered: <strong>{user_ans}) {user_ans_text}</strong> - Correct!<br><br>
-💡 <em>{explanation}</em>
+<em style="color: #6b7280;">{safe_question_text}</em><br><br>
+✅ You answered: <strong>{user_ans}) {safe_user_ans_text}</strong> - Correct!<br><br>
+💡 <em>{safe_explanation}</em>
 </div>
                 """, unsafe_allow_html=True)
             else:
                 st.markdown(f"""
 <div class="result-wrong">
 <strong>{question_label}</strong><br>
-<em style="color: #6b7280;">{question_text}</em><br><br>
-❌ You answered: <strong>{user_ans}) {user_ans_text}</strong><br>
-✅ Correct answer: <strong>{correct_ans}) {correct_ans_text}</strong><br><br>
-💡 <em>{explanation}</em>
+<em style="color: #6b7280;">{safe_question_text}</em><br><br>
+❌ You answered: <strong>{user_ans}) {safe_user_ans_text}</strong><br>
+✅ Correct answer: <strong>{correct_ans}) {safe_correct_ans_text}</strong><br><br>
+💡 <em>{safe_explanation}</em>
 </div>
                 """, unsafe_allow_html=True)
         
@@ -2469,11 +2474,12 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         if st.checkbox("💬 Open Tutor Chat", key="tutor_panel_open"):
             # Display chat history
             for msg in st.session_state.tutor_chat_history:
+                safe_content = html.escape(msg["content"]).replace('\n', '<br>')
                 if msg["role"] == "user":
                     st.markdown(f"""
                     <div style="background: #e0e7ff; padding: 12px 16px; border-radius: 15px 15px 5px 15px; 
                                 margin: 8px 0; max-width: 85%; margin-left: auto; text-align: right;">
-                        <strong>You:</strong> {msg["content"]}
+                        <strong>You:</strong> {safe_content}
                     </div>
                     """, unsafe_allow_html=True)
                 else:
@@ -2481,7 +2487,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     <div style="background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%); 
                                 color: white; padding: 12px 16px; border-radius: 15px 15px 15px 5px; 
                                 margin: 8px 0; max-width: 85%;">
-                        <strong>🤖 Tutor:</strong> {msg["content"]}
+                        <strong>🤖 Tutor:</strong> {safe_content}
                     </div>
                     """, unsafe_allow_html=True)
             
