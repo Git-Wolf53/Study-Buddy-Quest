@@ -28,7 +28,7 @@ Preferred communication style: Simple, everyday language.
 
 ### Frontend Framework
 - **Streamlit**: The entire application is built using Streamlit, a Python framework for creating web applications. This was chosen for its simplicity and rapid development capabilities, making it ideal for educational projects and prototyping.
-- Single-file architecture (`main.py`) contains all application logic, which keeps the project simple and easy to understand.
+- Single-file architecture (`app.py`) contains all application logic, which keeps the project simple and easy to understand.
 
 ### AI Integration
 - **Google Gemini API**: Used for dynamically generating quiz questions based on user-provided topics and difficulty levels. The API key is loaded from environment variables (`GEMINI_API_KEY`).
