@@ -1950,60 +1950,76 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 
                 question_time_limit = 15  # 15 seconds per question
                 timer_start = st.session_state.question_timer_start
-                elapsed = time.time() - timer_start
-                remaining = max(0, question_time_limit - elapsed)
-                seconds_left = int(remaining)
                 
-                # Determine color based on time remaining
-                if remaining > 10:
-                    bg_color = "#d1fae5"
-                    border_color = "#10b981"
-                    text_color = "#10b981"
-                elif remaining > 5:
-                    bg_color = "#fef3c7"
-                    border_color = "#f59e0b"
-                    text_color = "#f59e0b"
-                else:
-                    bg_color = "#fee2e2"
-                    border_color = "#ef4444"
-                    text_color = "#ef4444"
-                
-                # Display timer using st.markdown with fixed positioning via CSS injection
+                # Inject timer into parent window using JavaScript
                 st.markdown(f"""
-                <style>
-                    #fixed-timer {{
-                        position: fixed;
-                        bottom: 20px;
-                        right: 20px;
-                        background: {bg_color};
-                        border: 3px solid {border_color};
-                        border-radius: 15px;
-                        padding: 12px 20px;
-                        text-align: center;
-                        font-family: 'Nunito', sans-serif;
-                        z-index: 9999;
-                        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-                    }}
-                    #fixed-timer .timer-label {{
-                        font-size: 0.8rem;
-                        font-weight: 600;
-                        color: #374151;
-                    }}
-                    #fixed-timer .timer-value {{
-                        font-size: 2rem;
-                        font-weight: 800;
-                        color: {text_color};
-                    }}
-                    #fixed-timer .timer-hint {{
-                        font-size: 0.7rem;
-                        color: #4b5563;
-                    }}
-                </style>
-                <div id="fixed-timer">
-                    <div class="timer-label">⏱️ QUESTION TIMER</div>
-                    <div class="timer-value">{seconds_left}</div>
-                    <div class="timer-hint">seconds left</div>
-                </div>
+                <script>
+                    (function() {{
+                        // Remove existing timer if any
+                        var existingTimer = window.parent.document.getElementById('quiz-timer-fixed');
+                        if (existingTimer) existingTimer.remove();
+                        
+                        // Create timer element
+                        var timer = document.createElement('div');
+                        timer.id = 'quiz-timer-fixed';
+                        timer.innerHTML = `
+                            <div style="font-size: 0.8rem; font-weight: 600; color: #374151;">⏱️ QUESTION TIMER</div>
+                            <div id="timer-seconds" style="font-size: 2rem; font-weight: 800; color: #10b981;">15</div>
+                            <div style="font-size: 0.7rem; color: #4b5563;">seconds left</div>
+                        `;
+                        timer.style.cssText = `
+                            position: fixed;
+                            bottom: 20px;
+                            right: 20px;
+                            background: #d1fae5;
+                            border: 3px solid #10b981;
+                            border-radius: 15px;
+                            padding: 12px 20px;
+                            text-align: center;
+                            font-family: 'Nunito', sans-serif;
+                            z-index: 999999;
+                            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+                        `;
+                        
+                        window.parent.document.body.appendChild(timer);
+                        
+                        var startTime = {timer_start};
+                        var timeLimit = {question_time_limit};
+                        var display = window.parent.document.getElementById('timer-seconds');
+                        var container = window.parent.document.getElementById('quiz-timer-fixed');
+                        
+                        function updateTimer() {{
+                            var now = Date.now() / 1000;
+                            var elapsed = now - startTime;
+                            var remaining = Math.max(0, timeLimit - elapsed);
+                            var seconds = Math.ceil(remaining);
+                            
+                            if (display) display.textContent = seconds;
+                            
+                            if (container) {{
+                                if (remaining > 10) {{
+                                    container.style.background = '#d1fae5';
+                                    container.style.borderColor = '#10b981';
+                                    if (display) display.style.color = '#10b981';
+                                }} else if (remaining > 5) {{
+                                    container.style.background = '#fef3c7';
+                                    container.style.borderColor = '#f59e0b';
+                                    if (display) display.style.color = '#f59e0b';
+                                }} else {{
+                                    container.style.background = '#fee2e2';
+                                    container.style.borderColor = '#ef4444';
+                                    if (display) display.style.color = '#ef4444';
+                                }}
+                            }}
+                            
+                            if (remaining > 0) {{
+                                setTimeout(updateTimer, 100);
+                            }}
+                        }}
+                        
+                        updateTimer();
+                    }})();
+                </script>
                 """, unsafe_allow_html=True)
             
             st.markdown("")
