@@ -1928,17 +1928,19 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             st.markdown(f"## 📝 Quiz Time!")
             st.markdown("*Select your answer for each question below, then click Submit!*")
             
-            # Timer display for timed mode (uses JavaScript for live updates)
+            # Timer display for timed mode (uses st.components.html for JavaScript)
             if st.session_state.get('timed_mode') and st.session_state.get('quiz_start_time'):
                 total_time = num_questions * st.session_state.get('time_per_question', 30)
                 start_time = st.session_state.quiz_start_time
                 
-                # JavaScript-based live countdown timer
-                st.markdown(f"""
+                # Use st.components.v1.html for JavaScript execution
+                import streamlit.components.v1 as components
+                
+                timer_html = f"""
                 <div id="timer-container" style="background: #d1fae5; border: 3px solid #10b981; 
-                            border-radius: 15px; padding: 15px; text-align: center; margin: 15px 0;">
-                    <div style="font-size: 0.9rem; font-weight: 600;">⏱️ TIME REMAINING</div>
-                    <div id="timer-display" style="font-size: 2.5rem; font-weight: 800;">--:--</div>
+                            border-radius: 15px; padding: 15px; text-align: center; font-family: 'Nunito', sans-serif;">
+                    <div style="font-size: 0.9rem; font-weight: 600; color: #374151;">⏱️ TIME REMAINING</div>
+                    <div id="timer-display" style="font-size: 2.5rem; font-weight: 800; color: #10b981;">--:--</div>
                     <div style="font-size: 0.8rem; color: #4b5563;">Bonus Experience Points for fast completion!</div>
                 </div>
                 <script>
@@ -1957,7 +1959,6 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                             
                             display.textContent = String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
                             
-                            // Update colors based on time
                             if (remaining > totalTime * 0.5) {{
                                 container.style.background = '#d1fae5';
                                 container.style.borderColor = '#10b981';
@@ -1973,7 +1974,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                             }}
                             
                             if (remaining > 0) {{
-                                requestAnimationFrame(updateTimer);
+                                setTimeout(updateTimer, 1000);
                             }} else {{
                                 display.textContent = '00:00';
                                 display.style.color = '#ef4444';
@@ -1981,10 +1982,10 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                         }}
                         
                         updateTimer();
-                        setInterval(updateTimer, 1000);
                     }})();
                 </script>
-                """, unsafe_allow_html=True)
+                """
+                components.html(timer_html, height=120)
             
             st.markdown("")
             
