@@ -1991,9 +1991,6 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             if 'quiz_error' not in st.session_state:
                 st.session_state.quiz_error = None
             
-            if st.session_state.quiz_error:
-                st.error(st.session_state.quiz_error)
-            
             for idx, q in enumerate(parsed_questions[:num_questions]):
                 emoji = QUESTION_EMOJIS[idx] if idx < len(QUESTION_EMOJIS) else "❓"
                 
@@ -2055,7 +2052,13 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     st.markdown("---")
             
             st.markdown("")
-            if st.button("📨 SUBMIT ALL ANSWERS!", use_container_width=True):
+            submit_clicked = st.button("📨 SUBMIT ALL ANSWERS!", use_container_width=True)
+            
+            # Show error below submit button if there's one
+            if st.session_state.quiz_error:
+                st.error(st.session_state.quiz_error)
+            
+            if submit_clicked:
                 user_answers = [st.session_state.get(f"q{i+1}") for i in range(num_questions)]
                 unanswered = [i+1 for i, ans in enumerate(user_answers) if ans is None]
                 
