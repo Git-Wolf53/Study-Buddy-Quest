@@ -1950,68 +1950,61 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 
                 question_time_limit = 15  # 15 seconds per question
                 timer_start = st.session_state.question_timer_start
+                elapsed = time.time() - timer_start
+                remaining = max(0, question_time_limit - elapsed)
+                seconds_left = int(remaining)
                 
-                import streamlit.components.v1 as components
+                # Determine color based on time remaining
+                if remaining > 10:
+                    bg_color = "#d1fae5"
+                    border_color = "#10b981"
+                    text_color = "#10b981"
+                elif remaining > 5:
+                    bg_color = "#fef3c7"
+                    border_color = "#f59e0b"
+                    text_color = "#f59e0b"
+                else:
+                    bg_color = "#fee2e2"
+                    border_color = "#ef4444"
+                    text_color = "#ef4444"
                 
-                timer_html = f"""
-                <div id="timer-container" style="
-                    position: fixed;
-                    bottom: 20px;
-                    right: 20px;
-                    background: #d1fae5;
-                    border: 3px solid #10b981;
-                    border-radius: 15px;
-                    padding: 12px 20px;
-                    text-align: center;
-                    font-family: 'Nunito', sans-serif;
-                    z-index: 9999;
-                    box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
-                    <div style="font-size: 0.8rem; font-weight: 600; color: #374151;">⏱️ QUESTION TIMER</div>
-                    <div id="timer-display" style="font-size: 2rem; font-weight: 800; color: #10b981;">15</div>
-                    <div style="font-size: 0.7rem; color: #4b5563;">seconds left</div>
+                # Display timer using st.markdown with fixed positioning via CSS injection
+                st.markdown(f"""
+                <style>
+                    #fixed-timer {{
+                        position: fixed;
+                        bottom: 20px;
+                        right: 20px;
+                        background: {bg_color};
+                        border: 3px solid {border_color};
+                        border-radius: 15px;
+                        padding: 12px 20px;
+                        text-align: center;
+                        font-family: 'Nunito', sans-serif;
+                        z-index: 9999;
+                        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+                    }}
+                    #fixed-timer .timer-label {{
+                        font-size: 0.8rem;
+                        font-weight: 600;
+                        color: #374151;
+                    }}
+                    #fixed-timer .timer-value {{
+                        font-size: 2rem;
+                        font-weight: 800;
+                        color: {text_color};
+                    }}
+                    #fixed-timer .timer-hint {{
+                        font-size: 0.7rem;
+                        color: #4b5563;
+                    }}
+                </style>
+                <div id="fixed-timer">
+                    <div class="timer-label">⏱️ QUESTION TIMER</div>
+                    <div class="timer-value">{seconds_left}</div>
+                    <div class="timer-hint">seconds left</div>
                 </div>
-                <script>
-                    (function() {{
-                        const startTime = {timer_start};
-                        const timeLimit = {question_time_limit};
-                        const container = document.getElementById('timer-container');
-                        const display = document.getElementById('timer-display');
-                        
-                        function updateTimer() {{
-                            const now = Date.now() / 1000;
-                            const elapsed = now - startTime;
-                            const remaining = Math.max(0, timeLimit - elapsed);
-                            const seconds = Math.ceil(remaining);
-                            
-                            display.textContent = seconds;
-                            
-                            if (remaining > 10) {{
-                                container.style.background = '#d1fae5';
-                                container.style.borderColor = '#10b981';
-                                display.style.color = '#10b981';
-                            }} else if (remaining > 5) {{
-                                container.style.background = '#fef3c7';
-                                container.style.borderColor = '#f59e0b';
-                                display.style.color = '#f59e0b';
-                            }} else {{
-                                container.style.background = '#fee2e2';
-                                container.style.borderColor = '#ef4444';
-                                display.style.color = '#ef4444';
-                            }}
-                            
-                            if (remaining > 0) {{
-                                setTimeout(updateTimer, 100);
-                            }} else {{
-                                display.textContent = '0';
-                                display.style.color = '#ef4444';
-                            }}
-                        }}
-                        
-                        updateTimer();
-                    }})();
-                </script>
-                """
-                components.html(timer_html, height=0)
+                """, unsafe_allow_html=True)
             
             st.markdown("")
             
