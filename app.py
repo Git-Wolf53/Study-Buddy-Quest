@@ -683,7 +683,8 @@ Write a SHORT, personalized summary (3-5 sentences max) that:
 2. If they got any wrong, gently explain what concepts they should review (without being discouraging)
 3. End with an encouraging tip or next step for studying this topic
 
-Keep it friendly, supportive, and age-appropriate for a student. Use 1-2 emojis max. Be concise!"""
+Keep it friendly, supportive, and age-appropriate for a student. Use 1-2 emojis max. Be concise!
+IMPORTANT: Use plain text only. Do NOT use any HTML tags, markdown formatting, or special formatting."""
 
     try:
         response = client.models.generate_content(
@@ -724,7 +725,8 @@ Create STUDY NOTES that:
 3. Suggest 2 RELATED TOPICS the student might want to explore next
 
 Format the notes clearly with headers. Keep it concise (under 200 words). 
-Make it engaging for a student. Use simple language."""
+Make it engaging for a student. Use simple language.
+IMPORTANT: Use plain text only. Do NOT use any HTML tags or special formatting. Use simple dashes for bullet points."""
 
     try:
         response = client.models.generate_content(
@@ -926,7 +928,8 @@ Respond as a helpful tutor:
 5. Keep your response concise (2-4 short paragraphs max)
 6. If they ask something unrelated to the topic, gently guide them back to the quiz topic
 
-Remember: You're helping them LEARN, not just giving answers. Explain the "why" behind concepts!"""
+Remember: You're helping them LEARN, not just giving answers. Explain the "why" behind concepts!
+IMPORTANT: Use plain text only. Do NOT use any HTML tags, markdown formatting, or special formatting."""
 
     try:
         response = client.models.generate_content(
