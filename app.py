@@ -1786,7 +1786,7 @@ st.markdown("")
 timed_col1, timed_col2 = st.columns([3, 1])
 with timed_col1:
     st.markdown("**⏱️ Timed Challenge Mode**")
-    st.caption("Race against the clock for bonus Experience Points! 30 seconds per question.")
+    st.caption("Race against the clock! 15 seconds per question - timer resets when you answer.")
 with timed_col2:
     default_timed = st.session_state.get('default_timed_mode', False)
     timed_mode = st.toggle("Enable Timer", value=st.session_state.get('timed_mode', default_timed), key="timed_toggle")
@@ -1855,6 +1855,8 @@ if st.button("🎲 START QUIZ! 🎲", use_container_width=True):
         st.session_state.time_bonus = 0
         st.session_state.base_score = 0
         st.session_state.level_bonus = 0
+        st.session_state.question_timer_start = time.time()
+        st.session_state.last_answered_count = 0
         
         progress_bar = st.progress(0)
         status_text = st.empty()
@@ -1928,42 +1930,66 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             st.markdown(f"## 📝 Quiz Time!")
             st.markdown("*Select your answer for each question below, then click Submit!*")
             
-            # Timer display for timed mode (uses st.components.html for JavaScript)
+            # Fixed timer display in bottom right for timed mode
             if st.session_state.get('timed_mode') and st.session_state.get('quiz_start_time'):
-                total_time = num_questions * st.session_state.get('time_per_question', 30)
-                start_time = st.session_state.quiz_start_time
+                # Track answered questions to know when timer should reset
+                answered_count = sum(1 for i in range(num_questions) if st.session_state.get(f"q{i+1}") is not None)
                 
-                # Use st.components.v1.html for JavaScript execution
+                # Store the last answered count to detect new answers
+                if 'last_answered_count' not in st.session_state:
+                    st.session_state.last_answered_count = 0
+                
+                # Reset timer when a new question is answered
+                if answered_count > st.session_state.last_answered_count:
+                    st.session_state.question_timer_start = time.time()
+                    st.session_state.last_answered_count = answered_count
+                
+                # Initialize question timer if not set
+                if 'question_timer_start' not in st.session_state:
+                    st.session_state.question_timer_start = time.time()
+                
+                question_time_limit = 15  # 15 seconds per question
+                timer_start = st.session_state.question_timer_start
+                
                 import streamlit.components.v1 as components
                 
                 timer_html = f"""
-                <div id="timer-container" style="background: #d1fae5; border: 3px solid #10b981; 
-                            border-radius: 15px; padding: 15px; text-align: center; font-family: 'Nunito', sans-serif;">
-                    <div style="font-size: 0.9rem; font-weight: 600; color: #374151;">⏱️ TIME REMAINING</div>
-                    <div id="timer-display" style="font-size: 2.5rem; font-weight: 800; color: #10b981;">--:--</div>
-                    <div style="font-size: 0.8rem; color: #4b5563;">Bonus Experience Points for fast completion!</div>
+                <div id="timer-container" style="
+                    position: fixed;
+                    bottom: 20px;
+                    right: 20px;
+                    background: #d1fae5;
+                    border: 3px solid #10b981;
+                    border-radius: 15px;
+                    padding: 12px 20px;
+                    text-align: center;
+                    font-family: 'Nunito', sans-serif;
+                    z-index: 9999;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+                    <div style="font-size: 0.8rem; font-weight: 600; color: #374151;">⏱️ QUESTION TIMER</div>
+                    <div id="timer-display" style="font-size: 2rem; font-weight: 800; color: #10b981;">15</div>
+                    <div style="font-size: 0.7rem; color: #4b5563;">seconds left</div>
                 </div>
                 <script>
                     (function() {{
-                        const startTime = {start_time};
-                        const totalTime = {total_time};
+                        const startTime = {timer_start};
+                        const timeLimit = {question_time_limit};
                         const container = document.getElementById('timer-container');
                         const display = document.getElementById('timer-display');
                         
                         function updateTimer() {{
                             const now = Date.now() / 1000;
                             const elapsed = now - startTime;
-                            const remaining = Math.max(0, totalTime - elapsed);
-                            const minutes = Math.floor(remaining / 60);
-                            const seconds = Math.floor(remaining % 60);
+                            const remaining = Math.max(0, timeLimit - elapsed);
+                            const seconds = Math.ceil(remaining);
                             
-                            display.textContent = String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+                            display.textContent = seconds;
                             
-                            if (remaining > totalTime * 0.5) {{
+                            if (remaining > 10) {{
                                 container.style.background = '#d1fae5';
                                 container.style.borderColor = '#10b981';
                                 display.style.color = '#10b981';
-                            }} else if (remaining > totalTime * 0.25) {{
+                            }} else if (remaining > 5) {{
                                 container.style.background = '#fef3c7';
                                 container.style.borderColor = '#f59e0b';
                                 display.style.color = '#f59e0b';
@@ -1974,9 +2000,9 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                             }}
                             
                             if (remaining > 0) {{
-                                setTimeout(updateTimer, 1000);
+                                setTimeout(updateTimer, 100);
                             }} else {{
-                                display.textContent = '00:00';
+                                display.textContent = '0';
                                 display.style.color = '#ef4444';
                             }}
                         }}
@@ -1985,7 +2011,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     }})();
                 </script>
                 """
-                components.html(timer_html, height=120)
+                components.html(timer_html, height=0)
             
             st.markdown("")
             
