@@ -2294,36 +2294,23 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         if level_bonus > 0:
             bonus_parts.append(f"🌟 Level: +{level_bonus}")
         
-        # Only show breakdown if there are multiple bonus sources
-        bonus_html = ""
+        # Build XP display text
+        xp_display = f"+{score} Experience Points"
         if len(bonus_parts) > 1:
             bonus_text = " | ".join(bonus_parts)
-            bonus_html = f"<div style='font-size: 0.9rem; opacity: 0.8; margin-top: 5px;'>{bonus_text}</div>"
+            xp_display += f"<br><span style='font-size: 0.9rem; opacity: 0.8;'>{bonus_text}</span>"
         
         # Main celebration card
         st.markdown(f"""
-        <div style="background: {card_gradient}; 
-                    color: white; 
-                    padding: 30px; 
-                    border-radius: 20px; 
-                    text-align: center; 
-                    margin: 20px 0;
-                    box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
-            <div style="font-size: 4rem; margin-bottom: 10px;">{card_emoji}</div>
-            <div style="font-size: 2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">{card_title}</div>
-            <div style="font-size: 3rem; font-weight: 700; margin: 15px 0;">
-                {correct_count} / {total_questions}
-            </div>
-            <div style="font-size: 1.1rem; opacity: 0.9; margin-bottom: 15px;">{card_message}</div>
-            <div style="background: rgba(255,255,255,0.2); 
-                        padding: 15px 25px; 
-                        border-radius: 12px; 
-                        display: inline-block;
-                        margin-top: 10px;">
-                <div style="font-size: 1.8rem; font-weight: 700;">+{score} Experience Points</div>
-                {bonus_html}
-            </div>
-        </div>
+<div style="background: {card_gradient}; color: white; padding: 30px; border-radius: 20px; text-align: center; margin: 20px 0; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+<div style="font-size: 4rem; margin-bottom: 10px;">{card_emoji}</div>
+<div style="font-size: 2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">{card_title}</div>
+<div style="font-size: 3rem; font-weight: 700; margin: 15px 0;">{correct_count} / {total_questions}</div>
+<div style="font-size: 1.1rem; opacity: 0.9; margin-bottom: 15px;">{card_message}</div>
+<div style="background: rgba(255,255,255,0.2); padding: 15px 25px; border-radius: 12px; display: inline-block; margin-top: 10px;">
+<span style="font-size: 1.8rem; font-weight: 700;">{xp_display}</span>
+</div>
+</div>
         """, unsafe_allow_html=True)
         
         # Level up notification (if applicable)
