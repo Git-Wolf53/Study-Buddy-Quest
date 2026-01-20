@@ -31,8 +31,9 @@ Preferred communication style: Simple, everyday language.
 - Single-file architecture (`app.py`) contains all application logic, which keeps the project simple and easy to understand.
 
 ### AI Integration
-- **Google Gemini API**: Used for dynamically generating quiz questions based on user-provided topics and difficulty levels. The API key is loaded from environment variables (`GEMINI_API_KEY`).
-- The `google-genai` client library is used to interact with the Gemini API.
+- **Google Gemini API via Replit AI Integrations**: Used for dynamically generating quiz questions based on user-provided topics and difficulty levels. Uses Replit's managed Gemini access (no personal API key needed).
+- The `google-genai` client library is used to interact with the Gemini API through Replit's AI Integrations service.
+- Usage is billed through the user's Replit account/credits at standard API rates.
 
 ### Text-to-Speech
 - **gTTS (Google Text-to-Speech)**: Integrated for accessibility, allowing quiz content to be read aloud to users.
@@ -46,7 +47,7 @@ Preferred communication style: Simple, everyday language.
 ## External Dependencies
 
 ### APIs
-- **Google Gemini API**: Required for quiz generation. Users must provide their own API key via the `GEMINI_API_KEY` environment variable. Free keys can be obtained from Google AI Studio.
+- **Google Gemini API**: Powered by Replit AI Integrations. No personal API key required - Replit handles authentication and billing through your account.
 
 ### Python Libraries
 - `streamlit`: Web application framework
@@ -55,4 +56,5 @@ Preferred communication style: Simple, everyday language.
 - `pillow`: Image generation for downloadable certificates
 
 ### Environment Variables
-- `GEMINI_API_KEY`: Required. The Google Gemini API key for AI-powered quiz generation.
+- `AI_INTEGRATIONS_GEMINI_API_KEY`: Automatically configured by Replit AI Integrations
+- `AI_INTEGRATIONS_GEMINI_BASE_URL`: Automatically configured by Replit AI Integrations

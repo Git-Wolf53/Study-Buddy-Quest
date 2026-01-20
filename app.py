@@ -24,28 +24,33 @@ st.set_page_config(
 )
 
 # ============================================================
-# API KEY VALIDATION
+# GEMINI AI SETUP - Using Replit AI Integrations
+# This uses Replit's managed Gemini access (no personal API key needed)
+# Usage is billed through your Replit account/credits
 # ============================================================
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+from google import genai
 
-if not GEMINI_API_KEY:
+AI_INTEGRATIONS_GEMINI_API_KEY = os.environ.get("AI_INTEGRATIONS_GEMINI_API_KEY")
+AI_INTEGRATIONS_GEMINI_BASE_URL = os.environ.get("AI_INTEGRATIONS_GEMINI_BASE_URL")
+
+if not AI_INTEGRATIONS_GEMINI_API_KEY or not AI_INTEGRATIONS_GEMINI_BASE_URL:
     st.error("""
-    ## 🔑 API Key Missing!
+    ## 🔧 AI Integration Setup Required
     
-    This app needs a Google Gemini API key to generate quizzes.
+    The Gemini AI integration needs to be configured.
     
-    **To fix this:**
-    1. Get a free API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
-    2. Add it to your Replit Secrets as `GEMINI_API_KEY`
-    3. Refresh this page
-    
-    *Need help? Ask your teacher or check the Replit docs!*
+    Please contact support or re-deploy the app to set up AI access.
     """)
     st.stop()
 
-# Import and configure Gemini only after validating API key
-from google import genai
-client = genai.Client(api_key=GEMINI_API_KEY)
+# Configure Gemini client using Replit AI Integrations
+client = genai.Client(
+    api_key=AI_INTEGRATIONS_GEMINI_API_KEY,
+    http_options={
+        'api_version': '',
+        'base_url': AI_INTEGRATIONS_GEMINI_BASE_URL
+    }
+)
 
 # ============================================================
 # SESSION STATE INITIALIZATION
@@ -1896,7 +1901,7 @@ if st.button("🎲 START QUIZ! 🎲", use_container_width=True):
             error_msg = str(e)
             print(f"Quiz generation error: {type(e).__name__}: {e}")
             if "API_KEY" in error_msg or "API key" in error_msg or "invalid" in error_msg.lower():
-                st.error("🔑 There's an issue with the API key. Please check that GEMINI_API_KEY is set correctly in your secrets!")
+                st.error("🔑 There's an issue with the AI connection. Please try again or contact support!")
             elif "timeout" in error_msg.lower():
                 st.error("⏱️ The request took too long. Please try again!")
             elif "quota" in error_msg.lower() or "limit" in error_msg.lower():
