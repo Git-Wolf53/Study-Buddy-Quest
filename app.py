@@ -652,8 +652,8 @@ def generate_quiz_summary(topic: str, correct_count: int, total_questions: int,
     
     for i in range(min(len(user_answers), len(correct_answers), len(parsed_questions))):
         q = parsed_questions[i]
-        user_ans = user_answers[i].upper()
-        correct_ans = correct_answers[i].upper()
+        user_ans = (user_answers[i] or '').upper()
+        correct_ans = (correct_answers[i] or '').upper()
         question_text = q.get('text', f'Question {i+1}')
         options = q.get('options', {})
         
@@ -2442,7 +2442,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         st.markdown("*Get AI-generated notes to help you remember key concepts!*")
         
         if st.session_state.get('study_notes'):
-            safe_notes = html.escape(st.session_state.study_notes).replace('\n', '<br>')
+            safe_notes = html.escape(st.session_state.study_notes or '').replace('\n', '<br>')
             st.markdown(f"""
 <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
             color: white; 
