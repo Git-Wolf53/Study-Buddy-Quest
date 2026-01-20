@@ -2060,7 +2060,10 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 unanswered = [i+1 for i, ans in enumerate(user_answers) if ans is None]
                 
                 if unanswered:
-                    st.session_state.quiz_error = f"⚠️ Please answer all questions! You haven't picked an answer for: Question {', '.join(map(str, unanswered))}"
+                    if len(unanswered) == 1:
+                        st.session_state.quiz_error = f"⚠️ Please answer Question {unanswered[0]} before submitting!"
+                    else:
+                        st.session_state.quiz_error = f"⚠️ Please answer Questions {', '.join(map(str, unanswered))} before submitting!"
                     st.rerun()
                 else:
                     st.session_state.quiz_error = None
@@ -2166,6 +2169,16 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 
                 if submitted:
                     user_answers = [q1, q2, q3, q4, q5]
+                    
+                    # Check for unanswered questions
+                    unanswered = [i+1 for i, ans in enumerate(user_answers) if ans is None]
+                    if unanswered:
+                        if len(unanswered) == 1:
+                            st.error(f"Please answer Question {unanswered[0]} before submitting!")
+                        else:
+                            st.error(f"Please answer Questions {', '.join(map(str, unanswered))} before submitting!")
+                        st.stop()
+                    
                     st.session_state.user_answers = user_answers
                     
                     correct_count = 0
