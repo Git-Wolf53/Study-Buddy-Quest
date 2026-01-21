@@ -1791,8 +1791,14 @@ if image_quiz_mode:
             }
         </style>
         """, unsafe_allow_html=True)
+        
+        # Read the raw bytes from the uploaded file
+        uploaded_image.seek(0)  # Reset to beginning of file
+        raw_image_bytes = uploaded_image.read()
+        uploaded_image.seek(0)  # Reset again for display
+        
         st.image(uploaded_image, caption="Your uploaded image", use_container_width=True)
-        st.session_state.uploaded_image = uploaded_image.getvalue()
+        st.session_state.uploaded_image = raw_image_bytes
         st.session_state.uploaded_image_type = uploaded_image.type
         st.success("🎯 Great! Click START QUIZ to get questions about this image!")
     else:
