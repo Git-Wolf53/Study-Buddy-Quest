@@ -2763,12 +2763,15 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         
         # Study Notes Section
         st.markdown("---")
-        st.markdown("### 📝 Study Notes")
-        st.markdown("*Get AI-generated notes to help you remember key concepts!*")
+        study_notes_unlocked = new_level >= 4
         
-        if st.session_state.get('study_notes'):
-            safe_notes = html.escape(st.session_state.study_notes or '').replace('\n', '<br>')
-            st.markdown(f"""
+        if study_notes_unlocked:
+            st.markdown("### 📝 Study Notes")
+            st.markdown("*Get AI-generated notes to help you remember key concepts!*")
+            
+            if st.session_state.get('study_notes'):
+                safe_notes = html.escape(st.session_state.study_notes or '').replace('\n', '<br>')
+                st.markdown(f"""
 <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
             color: white; 
             padding: 20px; 
@@ -2777,20 +2780,24 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
     {safe_notes}
 </div>
-            """, unsafe_allow_html=True)
+                """, unsafe_allow_html=True)
+            else:
+                if st.button("📚 Generate Study Notes", use_container_width=True):
+                    with st.spinner("Creating your personalized study notes..."):
+                        study_notes = generate_study_notes(
+                            st.session_state.current_topic,
+                            correct_count,
+                            total_questions,
+                            parsed_questions,
+                            correct_answers,
+                            explanations
+                        )
+                        st.session_state.study_notes = study_notes
+                        st.rerun()
         else:
-            if st.button("📚 Generate Study Notes", use_container_width=True):
-                with st.spinner("Creating your personalized study notes..."):
-                    study_notes = generate_study_notes(
-                        st.session_state.current_topic,
-                        correct_count,
-                        total_questions,
-                        parsed_questions,
-                        correct_answers,
-                        explanations
-                    )
-                    st.session_state.study_notes = study_notes
-                    st.rerun()
+            st.markdown("### 🔒 Study Notes")
+            st.markdown(f"*Unlocks at Level 4! You're currently Level {new_level}.*")
+            st.button("📚 Generate Study Notes", use_container_width=True, disabled=True)
         
         # AI Tutor Chat Section
         st.markdown("---")
