@@ -1092,6 +1092,10 @@ animation_css = "" if reduce_anims else """
         animation: quizFadeIn 0.8s ease-out;
     }
     
+    .quiz-fade-in * {
+        animation: quizFadeIn 0.8s ease-out;
+    }
+    
     @keyframes quizFadeIn {
         0% {
             opacity: 0;
@@ -1101,6 +1105,15 @@ animation_css = "" if reduce_anims else """
             opacity: 1;
             transform: translateY(0);
         }
+    }
+    
+    /* Apply fade to all quiz-related Streamlit elements */
+    .quiz-fade-in + div,
+    .quiz-fade-in ~ div,
+    .quiz-fade-in ~ .stRadio,
+    .quiz-fade-in ~ .stButton,
+    .quiz-fade-in ~ .element-container {
+        animation: quizFadeIn 0.8s ease-out;
     }
 """
 
