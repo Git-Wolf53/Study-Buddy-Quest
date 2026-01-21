@@ -1117,6 +1117,22 @@ st.markdown("<style>" + animation_css + """
     [data-testid="stHeader"] {display: none;}
     .stDeployButton {display: none;}
     
+    /* Custom input styling */
+    .stTextInput input {
+        border-radius: 10px !important;
+        outline: 2px solid #6366f1 !important;
+        border: 0 !important;
+        background-color: #f0f0f5 !important;
+        outline-offset: 3px;
+        padding: 10px 1rem !important;
+        transition: 0.25s !important;
+    }
+    
+    .stTextInput input:focus {
+        outline-offset: 5px;
+        background-color: #fff !important;
+    }
+    
     .block-container {
         padding-top: 2rem;
         padding-bottom: 2rem;
