@@ -12,9 +12,7 @@ import time
 import base64
 import html
 from io import BytesIO
-from datetime import datetime
 from gtts import gTTS
-from PIL import Image, ImageDraw, ImageFont
 
 # ============================================================
 # PAGE CONFIGURATION - Must be first Streamlit command
@@ -45,19 +43,14 @@ if not AI_INTEGRATIONS_GEMINI_API_KEY or not AI_INTEGRATIONS_GEMINI_BASE_URL:
     """)
     st.stop()
 
-# Configure Gemini client using Replit AI Integrations (cached for efficiency)
-@st.cache_resource
-def get_gemini_client():
-    """Create and cache the Gemini client for reuse across reruns."""
-    return genai.Client(
-        api_key=AI_INTEGRATIONS_GEMINI_API_KEY,
-        http_options={
-            'api_version': '',
-            'base_url': AI_INTEGRATIONS_GEMINI_BASE_URL
-        }
-    )
-
-client = get_gemini_client()
+# Configure Gemini client using Replit AI Integrations
+client = genai.Client(
+    api_key=AI_INTEGRATIONS_GEMINI_API_KEY,
+    http_options={
+        'api_version': '',
+        'base_url': AI_INTEGRATIONS_GEMINI_BASE_URL
+    }
+)
 
 # ============================================================
 # SESSION STATE INITIALIZATION
@@ -207,7 +200,6 @@ def check_and_award_badges():
     return new_badges
 
 
-@st.cache_data
 def xp_required_for_level(level: int) -> int:
     """Get total XP required to reach a specific level.
     Level 1: 0 XP, Level 2: 50 XP, Level 3: 125 XP (50+75), Level 4: 225 XP (50+75+100), etc.
@@ -220,17 +212,6 @@ def xp_required_for_level(level: int) -> int:
     return total
 
 
-@st.cache_data
-def generate_tts_audio(text: str) -> str:
-    """Generate and cache TTS audio as base64 string."""
-    tts = gTTS(text=text, lang='en')
-    audio_bytes = BytesIO()
-    tts.write_to_fp(audio_bytes)
-    audio_bytes.seek(0)
-    return base64.b64encode(audio_bytes.read()).decode()
-
-
-@st.cache_data
 def calculate_level(total_points: int) -> int:
     """Calculate player level based on total points (progressive XP requirements)."""
     level = 1
@@ -249,7 +230,6 @@ def get_points_for_next_level(total_points: int) -> tuple:
     return points_into_level, xp_needed
 
 
-@st.cache_data
 def get_level_title(level: int) -> str:
     """Get fun title based on level."""
     titles = {
@@ -576,6 +556,8 @@ IMPORTANT: You MUST follow this EXACT format for each question. Do not deviate!
 
 def generate_quiz_from_image(image_bytes: bytes, difficulty: str, grade_level: str = None, num_questions: int = 5, mime_type: str = "image/jpeg") -> tuple:
     """Generate a quiz from an uploaded image using Gemini vision."""
+    from io import BytesIO
+    
     # Preprocess image: convert to RGB with white background for transparent areas
     try:
         img = Image.open(BytesIO(image_bytes))
@@ -795,6 +777,9 @@ IMPORTANT: Use plain text only. Do NOT use any HTML tags or special formatting. 
 
 def generate_certificate_image(student_name: str) -> bytes:
     """Generate a certificate image using Pillow and return as bytes."""
+    from PIL import Image, ImageDraw, ImageFont
+    from datetime import datetime
+    from io import BytesIO
     
     level = calculate_level(st.session_state.total_score)
     title = get_level_title(level)
@@ -853,6 +838,7 @@ def generate_certificate_image(student_name: str) -> bytes:
 
 def generate_certificate_html(student_name: str) -> str:
     """Generate a beautiful certificate HTML for the student."""
+    from datetime import datetime
     
     level = calculate_level(st.session_state.total_score)
     title = get_level_title(level)
@@ -2526,7 +2512,11 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                             options_text = ". ".join([f"{letter}: {q['options'][letter]}" for letter in ['A', 'B', 'C', 'D']])
                             full_text = f"Question {q['number']}. {q['text']}. The options are: {options_text}"
                             
-                            audio_b64 = generate_tts_audio(full_text)
+                            tts = gTTS(text=full_text, lang='en')
+                            audio_bytes = BytesIO()
+                            tts.write_to_fp(audio_bytes)
+                            audio_bytes.seek(0)
+                            audio_b64 = base64.b64encode(audio_bytes.read()).decode()
                             audio_html = f'''
                             <audio autoplay controls>
                                 <source src="data:audio/mp3;base64,{audio_b64}" type="audio/mp3">
@@ -2643,7 +2633,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                         'grade_level': st.session_state.get('current_grade_level', 'None (Skip)'),
                         'num_questions': num_questions,
                         'xp_earned': total_quiz_score,
-                        'timestamp': datetime.now().isoformat(),
+                        'timestamp': datetime.datetime.now().isoformat(),
                         'percentage': round((correct_count / num_questions) * 100) if num_questions > 0 else 0,
                     })
                     
@@ -2740,7 +2730,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                         'grade_level': st.session_state.get('current_grade_level', 'None (Skip)'),
                         'num_questions': fallback_total,
                         'xp_earned': total_quiz_score,
-                        'timestamp': datetime.now().isoformat(),
+                        'timestamp': datetime.datetime.now().isoformat(),
                         'percentage': round((correct_count / fallback_total) * 100) if fallback_total > 0 else 0,
                     })
                     
