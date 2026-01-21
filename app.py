@@ -1789,7 +1789,7 @@ st.markdown("")
 image_col1, image_col2 = st.columns([3, 1])
 with image_col1:
     st.markdown("**📸 Image Quiz Mode**")
-    st.caption("Upload an image and get quizzed on what's in it! Great for diagrams, charts, photos, and more. (Avoid images with transparent backgrounds)")
+    st.caption("Upload an image and get quizzed on what's in it! Great for diagrams, charts, photos, and more.")
 with image_col2:
     image_quiz_mode = st.toggle("Enable Image Quiz", value=st.session_state.get('image_quiz_mode', False), key="image_mode_toggle")
     st.session_state.image_quiz_mode = image_quiz_mode
@@ -1805,9 +1805,9 @@ if image_quiz_mode:
     st.markdown("")
     
     uploaded_image = st.file_uploader(
-        "Upload an image to quiz on:",
+        "Upload an image to quiz on (avoid transparent backgrounds):",
         type=['png', 'jpg', 'jpeg', 'gif', 'webp'],
-        help="Upload a diagram, chart, photo, or any educational image!",
+        help="Upload a diagram, chart, photo, or any educational image! Avoid images with transparent backgrounds.",
         key="image_uploader"
     )
     
