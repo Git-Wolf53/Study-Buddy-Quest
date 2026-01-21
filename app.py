@@ -2256,7 +2256,6 @@ if st.session_state.get('quiz_generating', False):
                     </div>
                 </div>
             </div>
-            <p style="text-align: center; color: #8b5cf6; font-size: 1.1rem; margin-top: 10px;">⬇️ Scroll down to see your quiz ⬇️</p>
             """, unsafe_allow_html=True)
             
             # Generate quiz based on mode (image or text)
@@ -2317,6 +2316,26 @@ if st.session_state.get('quiz_generating', False):
 if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
     
     if not st.session_state.answers_submitted:
+        # Anchor for scrolling to quiz
+        st.markdown('<div id="quiz-start"></div>', unsafe_allow_html=True)
+        
+        # Scroll to quiz after generation
+        import streamlit.components.v1 as components
+        components.html("""
+        <script>
+            function scrollToQuiz() {
+                const doc = window.parent.document;
+                const anchor = doc.getElementById('quiz-start');
+                if (anchor) {
+                    anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+            scrollToQuiz();
+            setTimeout(scrollToQuiz, 100);
+            setTimeout(scrollToQuiz, 300);
+        </script>
+        """, height=0)
+        
         st.markdown("---")
         
         # Fade in the entire quiz area as one unit using JavaScript
