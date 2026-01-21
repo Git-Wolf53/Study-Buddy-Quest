@@ -2532,11 +2532,34 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
     # SHOW RESULTS AFTER SUBMISSION
     # ============================================================
     if st.session_state.answers_submitted:
-        # Scroll to top of page when showing results
+        # Scroll to top using an anchor element
+        st.markdown('<div id="results-top"></div>', unsafe_allow_html=True)
+        
         import streamlit.components.v1 as components
         components.html("""
         <script>
-            window.parent.document.querySelector('section.main').scrollTo({top: 0, behavior: 'smooth'});
+            function scrollToResults() {
+                const doc = window.parent.document;
+                
+                // Find our anchor
+                const anchor = doc.getElementById('results-top');
+                if (anchor) {
+                    anchor.scrollIntoView({ behavior: 'instant', block: 'start' });
+                    return;
+                }
+                
+                // Fallback: scroll the main containers
+                const containers = doc.querySelectorAll('[data-testid="stAppViewContainer"], section.main, .main, .stApp');
+                containers.forEach(c => { if(c) c.scrollTop = 0; });
+                
+                window.parent.scrollTo(0, 0);
+            }
+            
+            // Multiple attempts with delays
+            scrollToResults();
+            setTimeout(scrollToResults, 50);
+            setTimeout(scrollToResults, 150);
+            setTimeout(scrollToResults, 300);
         </script>
         """, height=0)
         
