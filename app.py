@@ -1068,6 +1068,33 @@ animation_css = "" if reduce_anims else """
         animation: fadeInUp 0.4s ease-out;
     }
     
+    /* Expander border-radius styling */
+    .stExpander > details,
+    .stExpander details,
+    [data-testid="stExpander"],
+    [data-testid="stExpander"] > details,
+    .streamlit-expanderHeader,
+    details[data-testid="stExpander"],
+    .stExpander summary,
+    [data-testid="stExpander"] summary {
+        border-radius: 20px !important;
+    }
+    
+    .stExpander > details > summary,
+    [data-testid="stExpander"] > details > summary {
+        border-radius: 20px !important;
+    }
+    
+    .stExpander > details[open] > summary,
+    [data-testid="stExpander"] > details[open] > summary {
+        border-radius: 20px 20px 0 0 !important;
+    }
+    
+    .stExpander > details > div,
+    [data-testid="stExpander"] > details > div {
+        border-radius: 0 0 20px 20px !important;
+    }
+    
     .question-box {
         animation: fadeInUp 0.4s ease-out;
     }
