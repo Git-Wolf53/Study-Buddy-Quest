@@ -1207,7 +1207,7 @@ st.markdown("<style>" + animation_css + """
         background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
         color: white;
         padding: 25px;
-        border-radius: 20px;
+        border-radius: 28px;
         text-align: center;
         margin: 20px 0;
         box-shadow: 0 4px 20px rgba(99, 102, 241, 0.25);
@@ -1490,7 +1490,7 @@ st.markdown("<style>" + animation_css + """
         
         .level-card {
             padding: 15px;
-            border-radius: 20px;
+            border-radius: 28px;
             margin: 15px 0;
         }
         
