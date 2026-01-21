@@ -1010,12 +1010,6 @@ animation_css = "" if reduce_anims else """
     
     .level-card {
         animation: fadeInUp 0.5s ease-out;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    
-    .level-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
     }
     
     .stButton > button {
@@ -1058,11 +1052,40 @@ animation_css = "" if reduce_anims else """
     }
     
     .stat-item {
+        animation: fadeInUp 0.3s ease-out;
         transition: transform 0.2s ease;
     }
     
     .stat-item:hover {
         transform: scale(1.05);
+    }
+    
+    .subtitle {
+        animation: fadeInUp 0.7s ease-out;
+    }
+    
+    .stExpander {
+        animation: fadeInUp 0.4s ease-out;
+    }
+    
+    .question-box {
+        animation: fadeInUp 0.4s ease-out;
+    }
+    
+    .stRadio {
+        animation: fadeInUp 0.5s ease-out;
+    }
+    
+    .xp-bar-container {
+        animation: fadeInUp 0.4s ease-out;
+    }
+    
+    .notes-container {
+        animation: fadeInUp 0.5s ease-out;
+    }
+    
+    .certificate-container {
+        animation: fadeInUp 0.5s ease-out;
     }
 """
 
