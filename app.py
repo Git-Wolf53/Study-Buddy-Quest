@@ -554,7 +554,38 @@ IMPORTANT: You MUST follow this EXACT format for each question. Do not deviate!
 
 def generate_quiz_from_image(image_bytes: bytes, difficulty: str, grade_level: str = None, num_questions: int = 5, mime_type: str = "image/jpeg") -> tuple:
     """Generate a quiz from an uploaded image using Gemini vision."""
-    import base64
+    from io import BytesIO
+    
+    # Preprocess image: convert to RGB with white background for transparent areas
+    try:
+        img = Image.open(BytesIO(image_bytes))
+        
+        # If image has alpha channel (transparency), composite onto white background
+        if img.mode in ('RGBA', 'LA', 'P'):
+            # Create a white background
+            background = Image.new('RGB', img.size, (255, 255, 255))
+            # Convert to RGBA if needed
+            if img.mode == 'P':
+                img = img.convert('RGBA')
+            elif img.mode == 'LA':
+                img = img.convert('RGBA')
+            # Paste the image onto white background using alpha as mask
+            if img.mode == 'RGBA':
+                background.paste(img, mask=img.split()[3])  # Use alpha channel as mask
+            else:
+                background.paste(img)
+            img = background
+        elif img.mode != 'RGB':
+            img = img.convert('RGB')
+        
+        # Save as JPEG for consistent results
+        output_buffer = BytesIO()
+        img.save(output_buffer, format='JPEG', quality=95)
+        image_bytes = output_buffer.getvalue()
+        mime_type = "image/jpeg"
+    except Exception as e:
+        print(f"Image preprocessing warning: {e}")
+        # If preprocessing fails, continue with original bytes
     
     clean_difficulty = difficulty.split()[0]
     
