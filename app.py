@@ -2133,10 +2133,74 @@ st.markdown("")
 if 'quiz_generating' not in st.session_state:
     st.session_state.quiz_generating = False
 
-# Button text changes based on generating state
-button_text = "⏳ QUIZ GENERATING! SCROLL DOWN ⏳" if st.session_state.quiz_generating else "🎲 START QUIZ! 🎲"
+# Uiverse Generate button styling
+st.markdown("""
+<style>
+.generate-btn-container .stButton {
+    position: relative;
+    display: inline-block;
+}
+.generate-btn-container .stButton > button {
+    --border-radius: 24px;
+    --transition: 0.4s;
+    --button-color: #101010;
+    --highlight-color-hue: 270deg;
+    
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 0.8em 1.5em !important;
+    font-family: 'Nunito', sans-serif !important;
+    font-size: 1.1em !important;
+    font-weight: 600 !important;
+    background-color: var(--button-color) !important;
+    box-shadow:
+        inset 0px 1px 1px rgba(255, 255, 255, 0.2),
+        inset 0px 2px 2px rgba(255, 255, 255, 0.15),
+        inset 0px 4px 4px rgba(255, 255, 255, 0.1),
+        inset 0px 8px 8px rgba(255, 255, 255, 0.05),
+        0px -2px 2px rgba(0, 0, 0, 0.03),
+        0px -4px 4px rgba(0, 0, 0, 0.05),
+        0px -8px 8px rgba(0, 0, 0, 0.06) !important;
+    border: solid 1px rgba(255,255,255,0.13) !important;
+    border-radius: var(--border-radius) !important;
+    color: rgba(255,255,255,0.6) !important;
+    transition: all var(--transition) !important;
+    animation: btn-glow 2s ease-in-out infinite !important;
+}
+@keyframes btn-glow {
+    0%, 100% { color: rgba(255,255,255,0.5); text-shadow: none; }
+    50% { color: #fff; text-shadow: 0 0 8px rgba(139, 92, 246, 0.8); }
+}
+.generate-btn-container .stButton > button:hover {
+    border: solid 1px hsla(var(--highlight-color-hue), 100%, 80%, 40%) !important;
+    box-shadow:
+        inset 0px 1px 1px rgba(255, 255, 255, 0.3),
+        inset 0px 4px 8px rgba(139, 92, 246, 0.2),
+        0px 0px 20px rgba(139, 92, 246, 0.3),
+        0px -8px 16px rgba(0, 0, 0, 0.1) !important;
+    color: #fff !important;
+    text-shadow: 0 0 10px rgba(139, 92, 246, 0.8) !important;
+    animation: none !important;
+}
+.generate-btn-container .stButton > button:active {
+    border: solid 1px hsla(var(--highlight-color-hue), 100%, 80%, 70%) !important;
+    background-color: hsla(var(--highlight-color-hue), 50%, 20%, 0.5) !important;
+    transform: scale(0.98) !important;
+}
+.generate-btn-container .stButton > button:disabled {
+    animation: none !important;
+    opacity: 0.7 !important;
+    color: #8b5cf6 !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# Button text changes based on generating state  
+button_text = "⏳ GENERATING..." if st.session_state.quiz_generating else "✨ Generate"
 button_disabled = st.session_state.quiz_generating
 
+st.markdown('<div class="generate-btn-container">', unsafe_allow_html=True)
 if st.button(button_text, use_container_width=True, disabled=button_disabled):
     # Check if image quiz mode with uploaded image
     is_image_quiz = st.session_state.get('image_quiz_mode', False) and st.session_state.get('uploaded_image')
@@ -2161,6 +2225,8 @@ if st.button(button_text, use_container_width=True, disabled=button_disabled):
         # Set generating state to show updated button text
         st.session_state.quiz_generating = True
         st.rerun()
+
+st.markdown('</div>', unsafe_allow_html=True)
 
 # Handle the actual quiz generation after rerun
 if st.session_state.get('quiz_generating', False):
