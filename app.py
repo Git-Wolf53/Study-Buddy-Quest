@@ -1955,13 +1955,24 @@ if image_quiz_mode:
 
 # Timed Mode Toggle
 st.markdown("")
+current_level = calculate_level(st.session_state.total_score)
+timed_unlocked = current_level >= 3
+
 timed_col1, timed_col2 = st.columns([3, 1])
 with timed_col1:
-    st.markdown("**⏱️ Timed Challenge Mode**")
-    st.caption("Race against the clock! 8 seconds per question - timer resets when you answer.")
+    if timed_unlocked:
+        st.markdown("**⏱️ Timed Challenge Mode**")
+        st.caption("Race against the clock! 8 seconds per question - timer resets when you answer.")
+    else:
+        st.markdown("**🔒 Timed Challenge Mode**")
+        st.caption(f"Unlocks at Level 3! You're currently Level {current_level}.")
 with timed_col2:
-    default_timed = st.session_state.get('default_timed_mode', False)
-    timed_mode = st.toggle("Enable Timer", value=st.session_state.get('timed_mode', default_timed), key="timed_toggle")
+    if timed_unlocked:
+        default_timed = st.session_state.get('default_timed_mode', False)
+        timed_mode = st.toggle("Enable Timer", value=st.session_state.get('timed_mode', default_timed), key="timed_toggle")
+    else:
+        st.toggle("Enable Timer", value=False, disabled=True, key="timed_toggle_locked")
+        timed_mode = False
 
 if timed_mode:
     st.markdown("""
