@@ -619,17 +619,18 @@ Then format the quiz EXACTLY like this:
 **Great job working through this quiz!** Keep learning and growing! 🌟
 """
     
-    image_base64 = base64.b64encode(image_bytes).decode('utf-8')
+    from google.genai import types
     
     response = client.models.generate_content(
         model="gemini-2.5-flash",
         contents=[
-            {
-                "parts": [
-                    {"text": prompt},
-                    {"inline_data": {"mime_type": mime_type, "data": image_base64}}
-                ]
-            }
+            prompt,
+            types.Part(
+                inline_data=types.Blob(
+                    mime_type=mime_type,
+                    data=image_bytes
+                )
+            )
         ]
     )
     
