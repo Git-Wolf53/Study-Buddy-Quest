@@ -3026,6 +3026,16 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         else:
             st.markdown("### 🔒 Study Notes")
             st.markdown(f"*Unlocks at Level 4! You're currently Level {new_level}.*")
+            st.markdown("""
+            <style>
+            div[data-testid="stButton"]:has(button[disabled]) button {
+                background-color: #9ca3af !important;
+                color: #6b7280 !important;
+                cursor: not-allowed !important;
+                opacity: 0.6 !important;
+            }
+            </style>
+            """, unsafe_allow_html=True)
             st.button("📚 Generate Study Notes", use_container_width=True, disabled=True)
         
         # AI Tutor Chat Section
