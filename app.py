@@ -1755,23 +1755,30 @@ else:
 
 # Image Quiz Mode
 st.markdown("")
-st.markdown("### 📸 Image Quiz Mode (Optional)")
-st.caption("Upload an image and get quizzed on what's in it! Great for diagrams, charts, photos, and more.")
-
-image_col1, image_col2 = st.columns([1, 3])
+image_col1, image_col2 = st.columns([3, 1])
 with image_col1:
+    st.markdown("**📸 Image Quiz Mode**")
+    st.caption("Upload an image and get quizzed on what's in it! Great for diagrams, charts, photos, and more.")
+with image_col2:
     image_quiz_mode = st.toggle("Enable Image Quiz", value=st.session_state.get('image_quiz_mode', False), key="image_mode_toggle")
     st.session_state.image_quiz_mode = image_quiz_mode
 
 uploaded_image = None
 if image_quiz_mode:
-    with image_col2:
-        uploaded_image = st.file_uploader(
-            "Upload an image to quiz on:",
-            type=['png', 'jpg', 'jpeg', 'gif', 'webp'],
-            help="Upload a diagram, chart, photo, or any educational image!",
-            key="image_uploader"
-        )
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); 
+                color: white; padding: 12px 20px; border-radius: 10px; text-align: center;">
+        <strong>📷 IMAGE MODE ACTIVE!</strong> Upload an image below to generate a quiz!
+    </div>
+    """, unsafe_allow_html=True)
+    st.markdown("")
+    
+    uploaded_image = st.file_uploader(
+        "Upload an image to quiz on:",
+        type=['png', 'jpg', 'jpeg', 'gif', 'webp'],
+        help="Upload a diagram, chart, photo, or any educational image!",
+        key="image_uploader"
+    )
     
     if uploaded_image:
         # Add white background CSS for the image to ensure visibility in all modes
@@ -1787,7 +1794,7 @@ if image_quiz_mode:
         st.image(uploaded_image, caption="Your uploaded image", use_container_width=True)
         st.session_state.uploaded_image = uploaded_image.getvalue()
         st.session_state.uploaded_image_type = uploaded_image.type
-        st.info("🎯 Great! Click START QUIZ to get questions about this image!")
+        st.success("🎯 Great! Click START QUIZ to get questions about this image!")
     else:
         st.session_state.uploaded_image = None
         st.session_state.uploaded_image_type = None
