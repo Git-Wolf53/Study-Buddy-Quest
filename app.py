@@ -2296,25 +2296,68 @@ generate_btn_css = """
   transform: scale(0.98);
 }
 
-/* Hide the actual Streamlit button visually but keep it functional */
-.generate-btn-container .stButton {
-  position: absolute;
-  opacity: 0;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  z-index: 10;
-}
-.generate-btn-container .stButton > button {
-  width: 100% !important;
-  height: 100% !important;
-  min-height: 50px;
-}
+/* Container for overlaying buttons */
 .generate-btn-container {
   position: relative;
   display: flex;
   justify-content: center;
+  align-items: center;
+  min-height: 60px;
+}
+.generate-btn-container .btn-wrapper {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+}
+/* Hide the actual Streamlit button text but keep it clickable */
+.generate-btn-container .stButton {
+  position: relative;
+  z-index: 10;
+}
+.generate-btn-container .stButton > button {
+  background: transparent !important;
+  border: none !important;
+  color: transparent !important;
+  box-shadow: none !important;
+  min-height: 50px !important;
+  padding: 0.6em 3em !important;
+}
+.generate-btn-container .stButton > button:hover {
+  background: transparent !important;
+  border: none !important;
+}
+.generate-btn-container .stButton > button:disabled {
+  background: transparent !important;
+  border: none !important;
+}
+/* Trigger HTML button hover when hovering container */
+.generate-btn-container:hover .gen-btn {
+  border: solid 1px hsla(var(--highlight-color-hue), 100%, 80%, 40%);
+}
+.generate-btn-container:hover .gen-btn::before {
+  box-shadow: 0 -8px 8px -6px rgba(255,255,255,0.67) inset,
+    0 -16px 16px -8px hsla(270deg, 100%, 70%, 30%) inset,
+    1px 1px 1px rgba(255,255,255,0.13), 2px 2px 2px rgba(255,255,255,0.07),
+    -1px -1px 1px rgba(0,0,0,0.13), -2px -2px 2px rgba(0,0,0,0.07);
+}
+.generate-btn-container:hover .gen-btn::after {
+  opacity: 1;
+  mask-image: linear-gradient(0deg, #fff, transparent);
+}
+.generate-btn-container:hover .btn-svg {
+  fill: #fff;
+  filter: drop-shadow(0 0 3px hsl(270deg, 100%, 70%)) drop-shadow(0 -4px 6px rgba(0,0,0,0.6));
+  animation: none;
+}
+.generate-btn-container:hover .btn-letter {
+  color: #fff;
+  text-shadow: 0 0 8px hsla(270deg, 100%, 70%, 0.8);
+}
+/* Active state when clicking */
+.generate-btn-container:active .gen-btn {
+  border: solid 1px hsla(270deg, 100%, 80%, 70%);
+  background-color: hsla(270deg, 50%, 20%, 0.5);
+  transform: scale(0.98);
 }
 </style>
 """
@@ -2373,13 +2416,13 @@ st.markdown(generate_btn_css, unsafe_allow_html=True)
 
 # Show appropriate button state
 button_disabled = st.session_state.quiz_generating
+
+# Put HTML button inside the container, Streamlit button will overlay it
+st.markdown('<div class="generate-btn-container">', unsafe_allow_html=True)
 if button_disabled:
     st.markdown(generate_btn_html_loading, unsafe_allow_html=True)
 else:
     st.markdown(generate_btn_html, unsafe_allow_html=True)
-
-# Invisible Streamlit button overlaid on top
-st.markdown('<div class="generate-btn-container">', unsafe_allow_html=True)
 if st.button("Generate", use_container_width=True, disabled=button_disabled, key="gen_quiz_btn"):
     # Check if image quiz mode with uploaded image
     is_image_quiz = st.session_state.get('image_quiz_mode', False) and st.session_state.get('uploaded_image')
