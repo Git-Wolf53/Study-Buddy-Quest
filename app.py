@@ -1951,42 +1951,51 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 question_time_limit = 15  # 15 seconds per question
                 timer_start = st.session_state.question_timer_start
                 
-                # Inject timer into parent window using JavaScript
-                st.markdown(f"""
-                <script>
-                    (function() {{
-                        // Remove existing timer if any
-                        var existingTimer = window.parent.document.getElementById('quiz-timer-fixed');
-                        if (existingTimer) existingTimer.remove();
-                        
-                        // Create timer element
-                        var timer = document.createElement('div');
-                        timer.id = 'quiz-timer-fixed';
-                        timer.innerHTML = `
-                            <div style="font-size: 0.8rem; font-weight: 600; color: #374151;">⏱️ QUESTION TIMER</div>
-                            <div id="timer-seconds" style="font-size: 2rem; font-weight: 800; color: #10b981;">15</div>
-                            <div style="font-size: 0.7rem; color: #4b5563;">seconds left</div>
-                        `;
-                        timer.style.cssText = `
-                            position: fixed;
-                            bottom: 20px;
-                            right: 20px;
+                import streamlit.components.v1 as components
+                
+                timer_html = f"""
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <style>
+                        body {{ margin: 0; padding: 0; overflow: hidden; }}
+                        #timer-box {{
                             background: #d1fae5;
                             border: 3px solid #10b981;
                             border-radius: 15px;
                             padding: 12px 20px;
                             text-align: center;
-                            font-family: 'Nunito', sans-serif;
-                            z-index: 999999;
+                            font-family: 'Nunito', Arial, sans-serif;
                             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-                        `;
-                        
-                        window.parent.document.body.appendChild(timer);
-                        
+                            display: inline-block;
+                        }}
+                        .timer-label {{
+                            font-size: 0.8rem;
+                            font-weight: 600;
+                            color: #374151;
+                        }}
+                        #timer-value {{
+                            font-size: 2rem;
+                            font-weight: 800;
+                            color: #10b981;
+                        }}
+                        .timer-hint {{
+                            font-size: 0.7rem;
+                            color: #4b5563;
+                        }}
+                    </style>
+                </head>
+                <body>
+                    <div id="timer-box">
+                        <div class="timer-label">⏱️ QUESTION TIMER</div>
+                        <div id="timer-value">15</div>
+                        <div class="timer-hint">seconds left</div>
+                    </div>
+                    <script>
                         var startTime = {timer_start};
                         var timeLimit = {question_time_limit};
-                        var display = window.parent.document.getElementById('timer-seconds');
-                        var container = window.parent.document.getElementById('quiz-timer-fixed');
+                        var display = document.getElementById('timer-value');
+                        var container = document.getElementById('timer-box');
                         
                         function updateTimer() {{
                             var now = Date.now() / 1000;
@@ -1994,22 +2003,20 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                             var remaining = Math.max(0, timeLimit - elapsed);
                             var seconds = Math.ceil(remaining);
                             
-                            if (display) display.textContent = seconds;
+                            display.textContent = seconds;
                             
-                            if (container) {{
-                                if (remaining > 10) {{
-                                    container.style.background = '#d1fae5';
-                                    container.style.borderColor = '#10b981';
-                                    if (display) display.style.color = '#10b981';
-                                }} else if (remaining > 5) {{
-                                    container.style.background = '#fef3c7';
-                                    container.style.borderColor = '#f59e0b';
-                                    if (display) display.style.color = '#f59e0b';
-                                }} else {{
-                                    container.style.background = '#fee2e2';
-                                    container.style.borderColor = '#ef4444';
-                                    if (display) display.style.color = '#ef4444';
-                                }}
+                            if (remaining > 10) {{
+                                container.style.background = '#d1fae5';
+                                container.style.borderColor = '#10b981';
+                                display.style.color = '#10b981';
+                            }} else if (remaining > 5) {{
+                                container.style.background = '#fef3c7';
+                                container.style.borderColor = '#f59e0b';
+                                display.style.color = '#f59e0b';
+                            }} else {{
+                                container.style.background = '#fee2e2';
+                                container.style.borderColor = '#ef4444';
+                                display.style.color = '#ef4444';
                             }}
                             
                             if (remaining > 0) {{
@@ -2018,9 +2025,15 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                         }}
                         
                         updateTimer();
-                    }})();
-                </script>
-                """, unsafe_allow_html=True)
+                    </script>
+                </body>
+                </html>
+                """
+                
+                # Create a container that floats to the right
+                timer_col1, timer_col2 = st.columns([3, 1])
+                with timer_col2:
+                    components.html(timer_html, height=100)
             
             st.markdown("")
             
