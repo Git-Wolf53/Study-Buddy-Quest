@@ -1471,16 +1471,39 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ============================================================
-# TOP RIGHT BUTTONS - THEME TOGGLE
+# TOP RIGHT BUTTONS - HOME AND THEME TOGGLE
 # ============================================================
 theme_icon = "☀️" if st.session_state.dark_mode else "🌙"
 theme_text = "Light" if st.session_state.dark_mode else "Dark"
 
-col_spacer, col_theme = st.columns([10, 1])
+col_spacer, col_home, col_theme = st.columns([9, 1, 1])
+with col_home:
+    if st.button("🏠", key="home_btn", help="Go to Choose Your Quest"):
+        st.session_state.scroll_to_quest = True
+        st.rerun()
 with col_theme:
     if st.button(f"{theme_icon}", key="theme_btn", help=f"Switch to {theme_text} Mode"):
         st.session_state.dark_mode = not st.session_state.dark_mode
         st.rerun()
+
+# Handle scroll to quest section
+if st.session_state.get('scroll_to_quest', False):
+    st.session_state.scroll_to_quest = False
+    import streamlit.components.v1 as components
+    components.html("""
+    <script>
+        function scrollToQuest() {
+            const doc = window.parent.document;
+            const anchor = doc.getElementById('choose-quest');
+            if (anchor) {
+                anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        scrollToQuest();
+        setTimeout(scrollToQuest, 100);
+        setTimeout(scrollToQuest, 300);
+    </script>
+    """, height=0)
 
 # ============================================================
 # MAIN TITLE AND WELCOME
@@ -3155,40 +3178,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Right sidebar with Home button
-import streamlit.components.v1 as components
-components.html("""
-<div style="position: fixed; left: 20px; top: 80px; z-index: 9999;">
-    <button onclick="scrollToQuest()" title="Go to Choose Your Quest" style="
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        font-size: 1.5rem;
-        cursor: pointer;
-        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    ">🏠</button>
-</div>
-<script>
-    function scrollToQuest() {
-        const doc = window.parent.document;
-        const anchor = doc.getElementById('choose-quest');
-        if (anchor) {
-            anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } else {
-            // Fallback: scroll containers
-            const containers = doc.querySelectorAll('[data-testid="stAppViewContainer"], section.main, .main, .stApp');
-            containers.forEach(c => { if(c) c.scrollTop = 0; });
-            window.parent.scrollTo(0, 0);
-        }
-    }
-</script>
-""", height=60)
 
 st.markdown("""
 <div class="cool-footer">
