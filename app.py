@@ -1460,7 +1460,7 @@ with st.expander("💡 Why Use Study Buddy Quest? Boost Your Grades!"):
     
     🎓 **Grade-Appropriate** - Questions are tailored to your grade level, from Pre-K to 12th grade.
     
-    🔊 **Accessibility** - Listen to questions read aloud, adjust font sizes, and customize your experience.
+    🗣️ **Accessibility** - Listen to questions read aloud, adjust font sizes, and customize your experience.
     
     *Start your learning quest today and watch your knowledge grow!*
     """)
@@ -2296,7 +2296,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 # Text-to-Speech button for this question
                 tts_col1, tts_col2 = st.columns([1, 8])
                 with tts_col1:
-                    if st.button("🔊", key=f"tts_{idx}", help="Read question aloud"):
+                    if st.button("🗣️", key=f"tts_{idx}", help="Read question aloud"):
                         try:
                             options_text = ". ".join([f"{letter}: {q['options'][letter]}" for letter in ['A', 'B', 'C', 'D']])
                             full_text = f"Question {q['number']}. {q['text']}. The options are: {options_text}"
