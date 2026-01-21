@@ -967,7 +967,7 @@ IMPORTANT: Use plain text only. Do NOT use any HTML tags, markdown formatting, o
 
     try:
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-2.0-flash-lite",
             contents=prompt
         )
         
