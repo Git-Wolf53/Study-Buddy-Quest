@@ -1087,6 +1087,10 @@ animation_css = "" if reduce_anims else """
     .certificate-container {
         animation: fadeInUp 0.5s ease-out;
     }
+    
+    .quiz-fade-in {
+        animation: fadeInUp 0.5s ease-out;
+    }
 """
 
 st.markdown("<style>" + animation_css + """
@@ -2240,6 +2244,9 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
     if not st.session_state.answers_submitted:
         st.markdown("---")
         
+        # Fade in the entire quiz area
+        st.markdown('<div class="quiz-fade-in">', unsafe_allow_html=True)
+        
         parsed_questions = st.session_state.parsed_questions
         num_questions = st.session_state.get('quiz_length', 5)
         
@@ -2644,6 +2651,9 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     check_and_award_badges()
                     st.session_state.answers_submitted = True
                     st.rerun()
+        
+        # Close the quiz fade-in wrapper
+        st.markdown('</div>', unsafe_allow_html=True)
     
     # ============================================================
     # SHOW RESULTS AFTER SUBMISSION
