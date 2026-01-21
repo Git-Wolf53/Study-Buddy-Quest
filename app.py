@@ -1789,7 +1789,7 @@ st.markdown("")
 image_col1, image_col2 = st.columns([3, 1])
 with image_col1:
     st.markdown("**📸 Image Quiz Mode**")
-    st.caption("Upload an image and get quizzed on what's in it! Great for diagrams, charts, photos, and more.")
+    st.caption("Upload an image and get quizzed on what's in it! Great for diagrams, charts, photos, and more. (Avoid images with transparent backgrounds)")
 with image_col2:
     image_quiz_mode = st.toggle("Enable Image Quiz", value=st.session_state.get('image_quiz_mode', False), key="image_mode_toggle")
     st.session_state.image_quiz_mode = image_quiz_mode
