@@ -2052,14 +2052,16 @@ if st.session_state.get('quiz_generating', False):
         
         try:
             generation_steps = [
-                "Step 1/4: Analyzing your topic...",
-                "Step 2/4: Creating questions...",
-                "Step 3/4: Adding answer choices...",
-                "Step 4/4: Finalizing your quiz..."
+                "Analyzing your topic",
+                "Creating questions",
+                "Adding answer choices",
+                "Finalizing your quiz"
             ]
+            dot_patterns = [".", "..", "...", "....", "...", "..", "."]
             for step in generation_steps:
-                status_text.markdown(f'<div class="loading-box">{step}</div>', unsafe_allow_html=True)
-                time.sleep(0.4)
+                for dots in dot_patterns:
+                    status_text.markdown(f'<p style="text-align: center; color: #8b5cf6; font-size: 1.2rem; font-weight: 600;">{step}{dots}</p>', unsafe_allow_html=True)
+                    time.sleep(0.15)
             
             # Generate quiz based on mode (image or text)
             if is_image_quiz:
