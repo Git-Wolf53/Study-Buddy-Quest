@@ -2207,23 +2207,18 @@ if st.session_state.get('quiz_generating', False):
             # Animated loading text with cycling words
             status_text.markdown("""
             <style>
-            @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap');
+            @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600&display=swap');
             .loading-card {
-                --bg-color: transparent;
-                background-color: transparent;
-                padding: 1rem 2rem;
-                border-radius: 1.25rem;
                 display: flex;
                 justify-content: center;
                 margin: 20px auto;
-                max-width: 320px;
+                max-width: 380px;
             }
             .word-loader {
-                color: rgb(124, 124, 124);
-                font-family: "Poppins", sans-serif;
-                font-weight: 500;
-                font-size: 25px;
-                box-sizing: content-box;
+                color: #a0a0b0;
+                font-family: 'Nunito', sans-serif;
+                font-weight: 600;
+                font-size: 24px;
                 height: 40px;
                 padding: 10px 10px;
                 display: flex;
@@ -2233,24 +2228,12 @@ if st.session_state.get('quiz_generating', False):
                 overflow: hidden;
                 position: relative;
             }
-            .cycling-words::after {
-                content: "";
-                position: absolute;
-                inset: 0;
-                background: linear-gradient(
-                    var(--bg-color) 10%,
-                    transparent 30%,
-                    transparent 70%,
-                    var(--bg-color) 90%
-                );
-                z-index: 20;
-            }
             .cycling-word {
                 display: block;
                 height: 100%;
-                padding-left: 6px;
-                color: #956afa;
-                animation: spin_words 4s infinite;
+                padding-left: 8px;
+                color: #8b5cf6;
+                animation: spin_words 5s infinite;
             }
             @keyframes spin_words {
                 10% { transform: translateY(-102%); }
@@ -2265,12 +2248,12 @@ if st.session_state.get('quiz_generating', False):
             </style>
             <div class="loading-card">
                 <div class="word-loader">
-                    <p>loading</p>
+                    <p>generating</p>
                     <div class="cycling-words">
                         <span class="cycling-word">questions</span>
-                        <span class="cycling-word">topics</span>
                         <span class="cycling-word">answers</span>
-                        <span class="cycling-word">hints</span>
+                        <span class="cycling-word">explanations</span>
+                        <span class="cycling-word">your quiz</span>
                         <span class="cycling-word">questions</span>
                     </div>
                 </div>
