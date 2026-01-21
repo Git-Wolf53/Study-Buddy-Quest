@@ -1976,7 +1976,15 @@ if timed_mode:
 # ============================================================
 st.markdown("")
 
-if st.button("🎲 START QUIZ! 🎲", use_container_width=True):
+# Initialize generating state if not exists
+if 'quiz_generating' not in st.session_state:
+    st.session_state.quiz_generating = False
+
+# Button text changes based on generating state
+button_text = "⏳ QUIZ GENERATING! SCROLL DOWN ⏳" if st.session_state.quiz_generating else "🎲 START QUIZ! 🎲"
+button_disabled = st.session_state.quiz_generating
+
+if st.button(button_text, use_container_width=True, disabled=button_disabled):
     # Check if image quiz mode with uploaded image
     is_image_quiz = st.session_state.get('image_quiz_mode', False) and st.session_state.get('uploaded_image')
     
@@ -1997,6 +2005,27 @@ if st.button("🎲 START QUIZ! 🎲", use_container_width=True):
     elif not is_image_quiz and len(clean_topic) < 2:
         st.warning("⚠️ That topic is too short! Try something like 'volcanoes' or 'ancient Egypt' 🤔")
     elif is_image_quiz or clean_topic:
+        # Set generating state to show updated button text
+        st.session_state.quiz_generating = True
+        st.rerun()
+
+# Handle the actual quiz generation after rerun
+if st.session_state.get('quiz_generating', False):
+    # Get the values we need
+    is_image_quiz = st.session_state.get('image_quiz_mode', False) and st.session_state.get('uploaded_image')
+    
+    # Combine category with topic if a category is selected
+    if selected_category and selected_category != "Any Topic":
+        if topic:
+            full_topic = f"{selected_category}: {topic}"
+        else:
+            full_topic = selected_category
+    else:
+        full_topic = topic
+    
+    clean_topic = sanitize_topic(full_topic) if full_topic else ""
+    
+    if is_image_quiz or clean_topic:
         st.markdown("""
         <div style="text-align: center; padding: 20px;">
             <div style="font-size: 3rem; animation: spin 2s linear infinite;">⚙️</div>
@@ -2070,10 +2099,16 @@ if st.button("🎲 START QUIZ! 🎲", use_container_width=True):
             status_text.empty()
             progress_bar.empty()
             
+            # Reset generating state
+            st.session_state.quiz_generating = False
+            
             st.success(f"🎉 Your quiz is ready! Let's see what you know about **{clean_topic}**! Good luck! 🍀")
             st.rerun()
             
         except Exception as e:
+            # Reset generating state on error
+            st.session_state.quiz_generating = False
+            
             progress_bar.empty()
             status_text.empty()
             error_msg = str(e)
@@ -2087,6 +2122,7 @@ if st.button("🎲 START QUIZ! 🎲", use_container_width=True):
             else:
                 st.error(f"😅 Oops! Something went wrong: {error_msg[:200]}")
             st.info("💡 **Tip:** Try a different topic or refresh the page!")
+            st.rerun()
 
 # ============================================================
 # DISPLAY QUIZ WITH INLINE RADIO BUTTONS
