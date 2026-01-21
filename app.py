@@ -1855,8 +1855,9 @@ if st.button("🎲 START QUIZ! 🎲", use_container_width=True):
         st.session_state.time_bonus = 0
         st.session_state.base_score = 0
         st.session_state.level_bonus = 0
-        st.session_state.question_timer_start = time.time()
+        st.session_state.question_timer_start = None  # Will be set when questions display
         st.session_state.last_answered_count = 0
+        st.session_state.timer_initialized_for_quiz = False  # Reset so timer starts fresh when displayed
         
         progress_bar = st.progress(0)
         status_text = st.empty()
@@ -1944,9 +1945,11 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     st.session_state.question_timer_start = time.time()
                     st.session_state.last_answered_count = answered_count
                 
-                # Initialize question timer if not set
-                if 'question_timer_start' not in st.session_state:
+                # Initialize question timer fresh when questions are first displayed
+                # Use a flag to track if the timer has been initialized for this quiz
+                if 'timer_initialized_for_quiz' not in st.session_state or not st.session_state.timer_initialized_for_quiz:
                     st.session_state.question_timer_start = time.time()
+                    st.session_state.timer_initialized_for_quiz = True
                 
                 question_time_limit = 8  # 8 seconds per question
                 # Timer will be shown inline with each unanswered question below
