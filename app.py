@@ -2209,8 +2209,8 @@ if st.session_state.get('quiz_generating', False):
             <style>
             @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap');
             .loading-card {
-                --bg-color: #1a1a2e;
-                background-color: var(--bg-color);
+                --bg-color: transparent;
+                background-color: transparent;
                 padding: 1rem 2rem;
                 border-radius: 1.25rem;
                 display: flex;
