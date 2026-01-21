@@ -1804,10 +1804,17 @@ if image_quiz_mode:
     """, unsafe_allow_html=True)
     st.markdown("")
     
+    st.markdown("""
+    <div style="background: #fee2e2; border: 2px solid #ef4444; color: #991b1b; 
+                padding: 12px 20px; border-radius: 10px; text-align: center; margin-bottom: 15px;">
+        <strong>⚠️ WARNING:</strong> Avoid uploading images with transparent backgrounds!
+    </div>
+    """, unsafe_allow_html=True)
+    
     uploaded_image = st.file_uploader(
-        "Upload an image to quiz on (avoid transparent backgrounds):",
+        "Upload an image to quiz on:",
         type=['png', 'jpg', 'jpeg', 'gif', 'webp'],
-        help="Upload a diagram, chart, photo, or any educational image! Avoid images with transparent backgrounds.",
+        help="Upload a diagram, chart, photo, or any educational image!",
         key="image_uploader"
     )
     
