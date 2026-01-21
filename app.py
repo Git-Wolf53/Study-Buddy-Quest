@@ -3155,14 +3155,40 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Right sidebar with Home button (uses st.markdown for same DOM as anchor)
-st.markdown("""
-<div class="right-sidebar">
-    <button class="sidebar-btn" onclick="document.getElementById('choose-quest').scrollIntoView({ behavior: 'smooth', block: 'start' })" title="Go to Choose Your Quest">
-        🏠
-    </button>
+# Right sidebar with Home button
+import streamlit.components.v1 as components
+components.html("""
+<div style="position: fixed; left: 20px; top: 80px; z-index: 9999;">
+    <button onclick="scrollToQuest()" title="Go to Choose Your Quest" style="
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    ">🏠</button>
 </div>
-""", unsafe_allow_html=True)
+<script>
+    function scrollToQuest() {
+        const doc = window.parent.document;
+        const anchor = doc.getElementById('choose-quest');
+        if (anchor) {
+            anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+            // Fallback: scroll containers
+            const containers = doc.querySelectorAll('[data-testid="stAppViewContainer"], section.main, .main, .stApp');
+            containers.forEach(c => { if(c) c.scrollTop = 0; });
+            window.parent.scrollTo(0, 0);
+        }
+    }
+</script>
+""", height=60)
 
 st.markdown("""
 <div class="cool-footer">
