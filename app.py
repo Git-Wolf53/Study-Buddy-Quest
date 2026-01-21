@@ -855,7 +855,7 @@ def generate_certificate_html(student_name: str) -> str:
     <div id="certificate" style="
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         border: 8px solid #ffd700;
-        border-radius: 15px;
+        border-radius: 20px;
         padding: 40px;
         text-align: center;
         color: white;
@@ -884,19 +884,19 @@ def generate_certificate_html(student_name: str) -> str:
         </div>
         
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 20px 0; text-align: center;">
-            <div style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 15px;">
+            <div style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 20px;">
                 <div style="font-size: 1.8rem; font-weight: bold;">{total_xp}</div>
                 <div style="font-size: 0.9rem; opacity: 0.8;">Experience Points</div>
             </div>
-            <div style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 15px;">
+            <div style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 20px;">
                 <div style="font-size: 1.8rem; font-weight: bold;">{quizzes}</div>
                 <div style="font-size: 0.9rem; opacity: 0.8;">Quizzes Completed</div>
             </div>
-            <div style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 15px;">
+            <div style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 20px;">
                 <div style="font-size: 1.8rem; font-weight: bold;">{perfect_scores}</div>
                 <div style="font-size: 0.9rem; opacity: 0.8;">Perfect Scores</div>
             </div>
-            <div style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 15px;">
+            <div style="background: rgba(255,255,255,0.15); padding: 15px; border-radius: 20px;">
                 <div style="font-size: 1.8rem; font-weight: bold;">{badges_earned}/{total_badges}</div>
                 <div style="font-size: 0.9rem; opacity: 0.8;">Badges Earned</div>
             </div>
@@ -1119,7 +1119,7 @@ st.markdown("<style>" + animation_css + """
     
     /* Custom input styling */
     .stTextInput input {
-        border-radius: 15px !important;
+        border-radius: 20px !important;
         outline: 2px solid #6366f1 !important;
         border: 0 !important;
         background-color: #1e1e2e !important;
@@ -1167,7 +1167,7 @@ st.markdown("<style>" + animation_css + """
         background: #f0f4f8;
         border-left: 4px solid #6366f1;
         padding: 15px 25px;
-        border-radius: 15px;
+        border-radius: 20px;
         text-align: center;
         font-size: 1.1rem;
         font-weight: 600;
@@ -1180,7 +1180,7 @@ st.markdown("<style>" + animation_css + """
         background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
         color: white;
         padding: 25px;
-        border-radius: 15px;
+        border-radius: 20px;
         text-align: center;
         margin: 20px 0;
         box-shadow: 0 4px 20px rgba(99, 102, 241, 0.25);
@@ -1212,7 +1212,7 @@ st.markdown("<style>" + animation_css + """
     .stat-item {
         background: rgba(255,255,255,0.2);
         padding: 8px 16px;
-        border-radius: 15px;
+        border-radius: 20px;
         backdrop-filter: blur(10px);
     }
     
@@ -1220,7 +1220,7 @@ st.markdown("<style>" + animation_css + """
         background: #f8fafc;
         border: 1px solid #e2e8f0;
         padding: 20px;
-        border-radius: 15px;
+        border-radius: 20px;
         margin: 20px 0;
         text-align: center;
     }
@@ -1241,7 +1241,7 @@ st.markdown("<style>" + animation_css + """
         background: #6366f1;
         color: white;
         padding: 20px;
-        border-radius: 15px;
+        border-radius: 20px;
         text-align: center;
         margin: 15px 0;
     }
@@ -1256,7 +1256,7 @@ st.markdown("<style>" + animation_css + """
         background: #fffbeb;
         border-left: 4px solid #f59e0b;
         padding: 20px;
-        border-radius: 15px;
+        border-radius: 20px;
         margin: 20px 0;
     }
     
@@ -1279,7 +1279,7 @@ st.markdown("<style>" + animation_css + """
         font-size: 1.2rem !important;
         font-weight: 600 !important;
         padding: 16px 32px !important;
-        border-radius: 15px !important;
+        border-radius: 20px !important;
         border: none !important;
         width: 100% !important;
         transition: all 0.2s ease !important;
@@ -1307,7 +1307,7 @@ st.markdown("<style>" + animation_css + """
     }
     
     .stTextInput > div > div > input {
-        border-radius: 15px !important;
+        border-radius: 20px !important;
         border: 2px solid #dfe6e9 !important;
         padding: 15px 20px !important;
         font-size: 1.1rem !important;
@@ -1320,7 +1320,7 @@ st.markdown("<style>" + animation_css + """
     }
     
     .stSelectbox > div > div {
-        border-radius: 15px !important;
+        border-radius: 20px !important;
     }
     
     .result-correct {
@@ -1328,7 +1328,7 @@ st.markdown("<style>" + animation_css + """
         border-left: 5px solid #28a745;
         padding: 20px;
         margin: 15px 0;
-        border-radius: 15px;
+        border-radius: 20px;
         font-size: 1.1rem;
     }
     
@@ -1337,7 +1337,7 @@ st.markdown("<style>" + animation_css + """
         border-left: 5px solid #dc3545;
         padding: 20px;
         margin: 15px 0;
-        border-radius: 15px;
+        border-radius: 20px;
         font-size: 1.1rem;
     }
     
@@ -1352,7 +1352,7 @@ st.markdown("<style>" + animation_css + """
     
     .stRadio > div > label {
         padding: 12px 20px !important;
-        border-radius: 15px !important;
+        border-radius: 20px !important;
         border: 2px solid #dfe6e9 !important;
         transition: all 0.2s ease !important;
         font-size: 1.1rem !important;
@@ -1365,7 +1365,7 @@ st.markdown("<style>" + animation_css + """
     }
     
     .stSuccess, .stInfo, .stWarning, .stError {
-        border-radius: 15px !important;
+        border-radius: 20px !important;
         font-size: 1.1rem !important;
     }
     
@@ -1387,7 +1387,7 @@ st.markdown("<style>" + animation_css + """
         background: #6366f1;
         color: white;
         padding: 25px;
-        border-radius: 15px;
+        border-radius: 20px;
         text-align: center;
         margin: 20px 0;
         font-size: 1.2rem;
@@ -1444,7 +1444,7 @@ st.markdown("<style>" + animation_css + """
         
         .level-card {
             padding: 15px;
-            border-radius: 15px;
+            border-radius: 20px;
             margin: 15px 0;
         }
         
@@ -2050,7 +2050,7 @@ uploaded_image = None
 if image_quiz_mode:
     st.markdown("""
     <div style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); 
-                color: white; padding: 12px 20px; border-radius: 15px; text-align: center;">
+                color: white; padding: 12px 20px; border-radius: 20px; text-align: center;">
         <strong>📷 IMAGE MODE ACTIVE!</strong> Upload an image below to generate a quiz!
     </div>
     """, unsafe_allow_html=True)
@@ -2058,7 +2058,7 @@ if image_quiz_mode:
     
     st.markdown("""
     <div style="background: #fee2e2; border: 2px solid #ef4444; color: #991b1b; 
-                padding: 12px 20px; border-radius: 15px; text-align: center; margin-bottom: 15px;">
+                padding: 12px 20px; border-radius: 20px; text-align: center; margin-bottom: 15px;">
         <strong>⚠️ WARNING:</strong> Avoid uploading images with transparent backgrounds!
     </div>
     """, unsafe_allow_html=True)
@@ -2077,7 +2077,7 @@ if image_quiz_mode:
             [data-testid="stImage"] img {
                 background-color: white !important;
                 padding: 10px;
-                border-radius: 15px;
+                border-radius: 20px;
             }
         </style>
         """, unsafe_allow_html=True)
@@ -2422,7 +2422,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                         st.markdown(f"""
 <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
             padding: 20px; 
-            border-radius: 15px; 
+            border-radius: 20px; 
             margin: 15px 0;
             border-left: 5px solid #667eea;">
     <h4 style="color: #667eea; margin-bottom: 10px;">Question {q['number']} {emoji}</h4>
@@ -2442,7 +2442,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                                 #timer-box {{
                                     background: #d1fae5;
                                     border: 3px solid #10b981;
-                                    border-radius: 15px;
+                                    border-radius: 20px;
                                     padding: 10px 15px;
                                     text-align: center;
                                     font-family: 'Nunito', Arial, sans-serif;
@@ -2514,7 +2514,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     st.markdown(f"""
 <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
             padding: 20px; 
-            border-radius: 15px; 
+            border-radius: 20px; 
             margin: 15px 0;
             border-left: 5px solid #667eea;">
     <h4 style="color: #667eea; margin-bottom: 10px;">Question {q['number']} {emoji}</h4>
@@ -2866,12 +2866,12 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         
         # Main celebration card
         st.markdown(f"""
-<div style="background: {card_gradient}; color: white; padding: 30px; border-radius: 15px; text-align: center; margin: 20px 0; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+<div style="background: {card_gradient}; color: white; padding: 30px; border-radius: 20px; text-align: center; margin: 20px 0; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
 <div style="font-size: 4rem; margin-bottom: 10px;">{card_emoji}</div>
 <div style="font-size: 2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">{card_title}</div>
 <div style="font-size: 3rem; font-weight: 700; margin: 15px 0;">{correct_count} / {total_questions}</div>
 <div style="font-size: 1.1rem; opacity: 0.9; margin-bottom: 15px;">{card_message}</div>
-<div style="background: rgba(255,255,255,0.2); padding: 15px 25px; border-radius: 15px; display: inline-block; margin-top: 10px;">
+<div style="background: rgba(255,255,255,0.2); padding: 15px 25px; border-radius: 20px; display: inline-block; margin-top: 10px;">
 <span style="font-size: 1.8rem; font-weight: 700;">{xp_display}</span>
 </div>
 </div>
@@ -2883,12 +2883,12 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             new_title = get_level_title(new_level)
             st.markdown(f"""
             <div style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); 
-                        color: white; padding: 20px; border-radius: 15px; text-align: center; margin: 15px 0;
+                        color: white; padding: 20px; border-radius: 20px; text-align: center; margin: 15px 0;
                         box-shadow: 0 5px 20px rgba(99,102,241,0.3);">
                 <div style="font-size: 2rem;">🎉 LEVEL UP! 🎉</div>
                 <div style="font-size: 1.5rem; font-weight: bold;">Level {old_level} → Level {new_level}</div>
                 <div style="font-size: 1.2rem; margin-top: 8px;">{new_title}</div>
-                <div style="font-size: 1rem; margin-top: 8px; background: rgba(255,255,255,0.2); padding: 8px; border-radius: 15px;">🎁 Unlocked: {new_perk}</div>
+                <div style="font-size: 1rem; margin-top: 8px; background: rgba(255,255,255,0.2); padding: 8px; border-radius: 20px;">🎁 Unlocked: {new_perk}</div>
             </div>
             """, unsafe_allow_html=True)
         
@@ -2983,7 +2983,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
 <div style="background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%); 
             color: white; 
             padding: 20px; 
-            border-radius: 15px; 
+            border-radius: 20px; 
             margin: 10px 0;
             box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);">
     {safe_summary}
@@ -3004,7 +3004,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
 <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
             color: white; 
             padding: 20px; 
-            border-radius: 15px; 
+            border-radius: 20px; 
             margin: 10px 0;
             box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
     {safe_notes}
@@ -3063,7 +3063,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             position: absolute;
             inset: 0;
             margin: auto;
-            border-radius: 15px;
+            border-radius: 20px;
             filter: blur(0);
             z-index: -1;
             background: conic-gradient(
@@ -3089,7 +3089,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             font-weight: 600 !important;
             position: relative !important;
             background: linear-gradient(90deg, #5bfcc4, #f593e4, #71a4f0) !important;
-            border-radius: 15px !important;
+            border-radius: 20px !important;
             color: #fff !important;
             transition: all 0.3s ease !important;
             box-shadow:
@@ -3125,7 +3125,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 safe_content = html.escape(msg["content"]).replace('\n', '<br>')
                 if msg["role"] == "user":
                     st.markdown(f"""
-                    <div style="background: #e0e7ff; padding: 12px 16px; border-radius: 15px 15px 5px 15px; 
+                    <div style="background: #e0e7ff; padding: 12px 16px; border-radius: 20px 15px 5px 15px; 
                                 margin: 8px 0; max-width: 85%; margin-left: auto; text-align: right;">
                         <strong>You:</strong> {safe_content}
                     </div>
@@ -3133,7 +3133,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 else:
                     st.markdown(f"""
                     <div style="background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%); 
-                                color: white; padding: 12px 16px; border-radius: 15px 15px 15px 5px; 
+                                color: white; padding: 12px 16px; border-radius: 20px 15px 15px 5px; 
                                 margin: 8px 0; max-width: 85%;">
                         <strong>🤖 Tutor:</strong> {safe_content}
                     </div>
@@ -3232,7 +3232,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     twitter_url = f"https://twitter.com/intent/tweet?text={share_text_encoded}"
                     st.markdown(f'''
                     <a href="{twitter_url}" target="_blank" style="text-decoration: none;">
-                        <div style="background: #1DA1F2; color: white; padding: 12px; border-radius: 15px; text-align: center; font-weight: 600;">
+                        <div style="background: #1DA1F2; color: white; padding: 12px; border-radius: 20px; text-align: center; font-weight: 600;">
                             🐦 Share on X
                         </div>
                     </a>
@@ -3242,7 +3242,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     facebook_url = f"https://www.facebook.com/sharer/sharer.php?quote={share_text_encoded}"
                     st.markdown(f'''
                     <a href="{facebook_url}" target="_blank" style="text-decoration: none;">
-                        <div style="background: #4267B2; color: white; padding: 12px; border-radius: 15px; text-align: center; font-weight: 600;">
+                        <div style="background: #4267B2; color: white; padding: 12px; border-radius: 20px; text-align: center; font-weight: 600;">
                             📘 Share on Facebook
                         </div>
                     </a>
@@ -3252,7 +3252,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     linkedin_url = f"https://www.linkedin.com/sharing/share-offsite/?url=https://replit.com"
                     st.markdown(f'''
                     <a href="{linkedin_url}" target="_blank" style="text-decoration: none;">
-                        <div style="background: #0077B5; color: white; padding: 12px; border-radius: 15px; text-align: center; font-weight: 600;">
+                        <div style="background: #0077B5; color: white; padding: 12px; border-radius: 20px; text-align: center; font-weight: 600;">
                             💼 Share on LinkedIn
                         </div>
                     </a>
@@ -3317,7 +3317,7 @@ st.markdown("""
             border-left: 4px solid #6366f1;
             color: #6b7280; 
             padding: 15px 25px; 
-            border-radius: 15px; 
+            border-radius: 20px; 
             text-align: center; 
             margin: 15px 0;">
     <strong>Learning Pledge:</strong> This tool helps you learn and understand – always think for yourself and never use it to cheat! 
@@ -3428,7 +3428,7 @@ st.markdown("---")
 st.markdown("""
 <div style="background: #f1f5f9; 
             padding: 20px; 
-            border-radius: 15px; 
+            border-radius: 20px; 
             text-align: center; 
             margin-bottom: 20px;
             color: #6b7280;">
