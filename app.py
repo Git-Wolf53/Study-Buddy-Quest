@@ -2532,6 +2532,14 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
     # SHOW RESULTS AFTER SUBMISSION
     # ============================================================
     if st.session_state.answers_submitted:
+        # Scroll to top of page when showing results
+        import streamlit.components.v1 as components
+        components.html("""
+        <script>
+            window.parent.document.querySelector('section.main').scrollTo({top: 0, behavior: 'smooth'});
+        </script>
+        """, height=0)
+        
         st.markdown("---")
         
         user_answers = st.session_state.user_answers
