@@ -984,8 +984,89 @@ IMPORTANT: Use plain text only. Do NOT use any HTML tags, markdown formatting, o
 # ============================================================
 # CUSTOM STYLING - Teen-Friendly & Mobile-First! 🎨
 # ============================================================
-st.markdown("""
-<style>
+reduce_anims = st.session_state.get('reduce_animations', False)
+
+# Base CSS with optional animations
+animation_css = "" if reduce_anims else """
+    /* Animations - only when reduce_animations is off */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+    }
+    
+    @keyframes shimmer {
+        0% { background-position: -200% center; }
+        100% { background-position: 200% center; }
+    }
+    
+    .mega-title {
+        animation: fadeInUp 0.6s ease-out;
+    }
+    
+    .level-card {
+        animation: fadeInUp 0.5s ease-out;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .level-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
+    }
+    
+    .stButton > button {
+        transition: all 0.3s ease !important;
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4) !important;
+    }
+    
+    .stButton > button:active {
+        transform: translateY(0) !important;
+    }
+    
+    .badge-showcase {
+        animation: fadeInUp 0.4s ease-out;
+        transition: transform 0.2s ease;
+    }
+    
+    .badge-showcase:hover {
+        transform: scale(1.02);
+    }
+    
+    .encourage-box {
+        animation: fadeInUp 0.5s ease-out;
+        transition: border-color 0.3s ease;
+    }
+    
+    .encourage-box:hover {
+        border-left-color: #8b5cf6;
+    }
+    
+    .result-correct, .result-wrong {
+        animation: fadeInUp 0.4s ease-out;
+    }
+    
+    .stRadio > div > label {
+        transition: all 0.2s ease !important;
+    }
+    
+    .stat-item {
+        transition: transform 0.2s ease;
+    }
+    
+    .stat-item:hover {
+        transform: scale(1.05);
+    }
+"""
+
+st.markdown("<style>" + animation_css + """
     @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
     
     html, body, [class*="css"] {
