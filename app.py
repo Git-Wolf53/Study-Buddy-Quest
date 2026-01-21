@@ -2430,6 +2430,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     check_and_award_badges()
                     
                     st.session_state.answers_submitted = True
+                    st.session_state.scroll_to_top = True
                     
                     st.rerun()
         else:
@@ -2526,12 +2527,26 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     
                     check_and_award_badges()
                     st.session_state.answers_submitted = True
+                    st.session_state.scroll_to_top = True
                     st.rerun()
     
     # ============================================================
     # SHOW RESULTS AFTER SUBMISSION
     # ============================================================
     if st.session_state.answers_submitted:
+        # Scroll to top after submission
+        if st.session_state.get('scroll_to_top', False):
+            import streamlit.components.v1 as components
+            components.html(
+                """
+                <script>
+                    window.parent.document.querySelector('section.main').scrollTo({top: 0, behavior: 'smooth'});
+                </script>
+                """,
+                height=0
+            )
+            st.session_state.scroll_to_top = False
+        
         st.markdown("---")
         
         user_answers = st.session_state.user_answers
