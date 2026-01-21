@@ -2133,34 +2133,32 @@ st.markdown("")
 if 'quiz_generating' not in st.session_state:
     st.session_state.quiz_generating = False
 
-# Simple generate button
-button_disabled = st.session_state.quiz_generating
-button_text = "⬇️ SCROLL DOWN ⬇️" if button_disabled else "🎲 GENERATE QUIZ!"
-
-if st.button(button_text, use_container_width=True, disabled=button_disabled):
-    # Check if image quiz mode with uploaded image
-    is_image_quiz = st.session_state.get('image_quiz_mode', False) and st.session_state.get('uploaded_image')
-    
-    # Combine category with topic if a category is selected
-    if selected_category and selected_category != "Any Topic":
-        if topic:
-            full_topic = f"{selected_category}: {topic}"
+# Generate button - hide while generating
+if not st.session_state.quiz_generating:
+    if st.button("🎲 GENERATE QUIZ!", use_container_width=True):
+        # Check if image quiz mode with uploaded image
+        is_image_quiz = st.session_state.get('image_quiz_mode', False) and st.session_state.get('uploaded_image')
+        
+        # Combine category with topic if a category is selected
+        if selected_category and selected_category != "Any Topic":
+            if topic:
+                full_topic = f"{selected_category}: {topic}"
+            else:
+                full_topic = selected_category
         else:
-            full_topic = selected_category
-    else:
-        full_topic = topic
-    
-    clean_topic = sanitize_topic(full_topic) if full_topic else ""
-    
-    # Validation - either need topic OR image
-    if not is_image_quiz and not clean_topic:
-        st.warning("⚠️ Oops! Enter a topic first! What do you want to learn about today? 🤔")
-    elif not is_image_quiz and len(clean_topic) < 2:
-        st.warning("⚠️ That topic is too short! Try something like 'volcanoes' or 'ancient Egypt' 🤔")
-    elif is_image_quiz or clean_topic:
-        # Set generating state to show updated button text
-        st.session_state.quiz_generating = True
-        st.rerun()
+            full_topic = topic
+        
+        clean_topic = sanitize_topic(full_topic) if full_topic else ""
+        
+        # Validation - either need topic OR image
+        if not is_image_quiz and not clean_topic:
+            st.warning("⚠️ Oops! Enter a topic first! What do you want to learn about today? 🤔")
+        elif not is_image_quiz and len(clean_topic) < 2:
+            st.warning("⚠️ That topic is too short! Try something like 'volcanoes' or 'ancient Egypt' 🤔")
+        elif is_image_quiz or clean_topic:
+            # Set generating state
+            st.session_state.quiz_generating = True
+            st.rerun()
 
 # Handle the actual quiz generation after rerun
 if st.session_state.get('quiz_generating', False):
@@ -2258,6 +2256,7 @@ if st.session_state.get('quiz_generating', False):
                     </div>
                 </div>
             </div>
+            <p style="text-align: center; color: #8b5cf6; font-size: 1.1rem; margin-top: 10px;">⬇️ Scroll down to see your quiz ⬇️</p>
             """, unsafe_allow_html=True)
             
             # Generate quiz based on mode (image or text)
