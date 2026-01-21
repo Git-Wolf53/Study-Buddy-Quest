@@ -2968,14 +2968,84 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         
         # AI Tutor Chat Section
         st.markdown("---")
-        st.markdown("### 🤖 AI Tutor Chat")
+        
         got_perfect = correct_count == total_questions
         if got_perfect:
-            st.markdown("*Perfect score! Ask questions to learn even more about this topic!*")
+            st.markdown("<p style='text-align: center; color: #888; margin-bottom: 10px;'>*Perfect score! Ask questions to learn even more about this topic!*</p>", unsafe_allow_html=True)
         else:
-            st.markdown("*Got questions about what you got wrong? Ask your AI tutor!*")
+            st.markdown("<p style='text-align: center; color: #888; margin-bottom: 10px;'>*Got questions about what you got wrong? Ask your AI tutor!*</p>", unsafe_allow_html=True)
         
-        if st.checkbox("💬 Open Tutor Chat", key="tutor_panel_open"):
+        # Initialize tutor panel state if not exists
+        if 'tutor_panel_open' not in st.session_state:
+            st.session_state.tutor_panel_open = False
+        
+        # Apply sparkle button styling to tutor button with glow effect
+        st.markdown("""
+        <style>
+        .tutor-sparkle-container .stButton {
+            position: relative;
+            z-index: 1;
+        }
+        .tutor-sparkle-container .stButton::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            margin: auto;
+            border-radius: 12px;
+            filter: blur(0);
+            z-index: -1;
+            background: conic-gradient(
+                #00000000 80deg,
+                #40baf7,
+                #f34ad7,
+                #5bfcc4,
+                #00000000 280deg
+            );
+            transition: all 0.3s ease;
+        }
+        .tutor-sparkle-container .stButton:hover::before {
+            filter: blur(15px);
+        }
+        .tutor-sparkle-container .stButton > button {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 8px !important;
+            padding: 14px 24px !important;
+            border: none !important;
+            font-size: 1.1rem !important;
+            font-weight: 600 !important;
+            position: relative !important;
+            background: linear-gradient(90deg, #5bfcc4, #f593e4, #71a4f0) !important;
+            border-radius: 12px !important;
+            color: #fff !important;
+            transition: all 0.3s ease !important;
+            box-shadow:
+                inset 0px 0px 5px #ffffffa9,
+                inset 0px 35px 30px #000,
+                0px 5px 10px #000000cc !important;
+            text-shadow: 1px 1px 1px #000 !important;
+        }
+        .tutor-sparkle-container .stButton > button:hover {
+            transform: translateY(-3px) !important;
+            box-shadow:
+                inset 0px 0px 5px #ffffffa9,
+                inset 0px 35px 30px #000,
+                0px 8px 20px #000000cc !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        # Center the button with sparkle styling
+        st.markdown('<div class="tutor-sparkle-container">', unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            if st.button("✨ Ask AI Tutor", key="sparkle_tutor_btn", use_container_width=True):
+                st.session_state.tutor_panel_open = not st.session_state.tutor_panel_open
+                st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        if st.session_state.tutor_panel_open:
             # Display chat history
             for msg in st.session_state.tutor_chat_history:
                 safe_content = html.escape(msg["content"]).replace('\n', '<br>')
