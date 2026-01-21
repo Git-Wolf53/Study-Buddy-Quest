@@ -335,8 +335,10 @@ def get_emoji_for_answer(answer_text: str) -> str:
             if keyword in text:
                 return emoji
     
+    # Use deterministic selection based on text hash to prevent emojis changing on rerun
     fun_defaults = ["✨", "🎯", "💫", "🌟", "🔮", "💎", "🎲", "🧩"]
-    return random.choice(fun_defaults)
+    text_hash = sum(ord(c) for c in text)
+    return fun_defaults[text_hash % len(fun_defaults)]
 
 
 def sanitize_topic(topic: str) -> str:
