@@ -1423,6 +1423,51 @@ st.markdown("""
     .page-padding {
         padding-bottom: 80px !important;
     }
+    
+    /* Right sidebar */
+    .right-sidebar {
+        position: fixed;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .sidebar-btn {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .sidebar-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+    }
+    
+    @media (max-width: 768px) {
+        .right-sidebar {
+            right: 10px;
+        }
+        
+        .sidebar-btn {
+            width: 45px;
+            height: 45px;
+            font-size: 1.3rem;
+        }
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -1811,6 +1856,9 @@ if 'topic_placeholder' not in st.session_state:
 retake_topic = st.session_state.get('retake_topic', '')
 if retake_topic:
     del st.session_state['retake_topic']
+
+# Anchor for home button to scroll to
+st.markdown('<div id="quiz-maker"></div>', unsafe_allow_html=True)
 
 col1, col2 = st.columns(2)
 
@@ -3106,6 +3154,15 @@ st.markdown("""
     <strong>Remember:</strong> The best learning happens when you challenge yourself! 
     <br>Use this tool to <em>strengthen</em> your understanding, not replace it.
     <br><small>Think critically. Question everything. Stay curious!</small>
+</div>
+""", unsafe_allow_html=True)
+
+# Right sidebar with Home button (uses st.markdown for same DOM as anchor)
+st.markdown("""
+<div class="right-sidebar">
+    <button class="sidebar-btn" onclick="document.getElementById('quiz-maker').scrollIntoView({ behavior: 'smooth', block: 'start' })" title="Go to Quiz Maker">
+        🏠
+    </button>
 </div>
 """, unsafe_allow_html=True)
 
