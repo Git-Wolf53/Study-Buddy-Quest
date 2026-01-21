@@ -2133,297 +2133,78 @@ st.markdown("")
 if 'quiz_generating' not in st.session_state:
     st.session_state.quiz_generating = False
 
-# Uiverse Generate button - full HTML/CSS implementation
-generate_btn_css = """
+# Uiverse Generate button - styled Streamlit button
+st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400&display=swap');
 
-.btn-wrapper {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  margin: 10px 0;
+/* Style the generate button */
+div[data-testid="stButton"]:has(button[kind="secondary"]):has(button:contains("Generate")) > button,
+.generate-btn-wrap .stButton > button {
+    --highlight-hue: 270deg;
+    background-color: #101010 !important;
+    color: rgba(255,255,255,0.5) !important;
+    border: solid 1px rgba(255,255,255,0.13) !important;
+    border-radius: 24px !important;
+    padding: 0.7em 2em !important;
+    font-family: "Poppins", sans-serif !important;
+    font-size: 1.1em !important;
+    font-weight: 400 !important;
+    box-shadow:
+        inset 0px 1px 1px rgba(255, 255, 255, 0.2),
+        inset 0px 2px 2px rgba(255, 255, 255, 0.15),
+        inset 0px 4px 4px rgba(255, 255, 255, 0.1),
+        inset 0px 8px 8px rgba(255, 255, 255, 0.05),
+        0px -2px 2px rgba(0, 0, 0, 0.03),
+        0px -4px 4px rgba(0, 0, 0, 0.05),
+        0px -8px 8px rgba(0, 0, 0, 0.06) !important;
+    transition: all 0.4s ease !important;
+    animation: gen-btn-glow 2s ease-in-out infinite !important;
 }
 
-.gen-btn {
-  --border-radius: 24px;
-  --padding: 4px;
-  --transition: 0.4s;
-  --button-color: #101010;
-  --highlight-color-hue: 270deg;
-
-  user-select: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0.6em 1em 0.6em 1.2em;
-  font-family: "Poppins", "Inter", "Segoe UI", sans-serif;
-  font-size: 1.1em;
-  font-weight: 400;
-  background-color: var(--button-color);
-  box-shadow:
-    inset 0px 1px 1px rgba(255, 255, 255, 0.2),
-    inset 0px 2px 2px rgba(255, 255, 255, 0.15),
-    inset 0px 4px 4px rgba(255, 255, 255, 0.1),
-    inset 0px 8px 8px rgba(255, 255, 255, 0.05),
-    inset 0px 16px 16px rgba(255, 255, 255, 0.05),
-    0px -1px 1px rgba(0, 0, 0, 0.02),
-    0px -2px 2px rgba(0, 0, 0, 0.03),
-    0px -4px 4px rgba(0, 0, 0, 0.05),
-    0px -8px 8px rgba(0, 0, 0, 0.06),
-    0px -16px 16px rgba(0, 0, 0, 0.08);
-  border: solid 1px rgba(255,255,255,0.13);
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  transition: box-shadow var(--transition), border var(--transition), background-color var(--transition);
-  position: relative;
-  text-decoration: none;
+@keyframes gen-btn-glow {
+    0%, 100% { 
+        color: rgba(255,255,255,0.4) !important;
+        text-shadow: none;
+    }
+    50% { 
+        color: #fff !important;
+        text-shadow: 0 0 8px rgba(139, 92, 246, 0.6);
+    }
 }
 
-.gen-btn::before {
-  content: "";
-  position: absolute;
-  top: calc(0px - var(--padding));
-  left: calc(0px - var(--padding));
-  width: calc(100% + var(--padding) * 2);
-  height: calc(100% + var(--padding) * 2);
-  border-radius: calc(var(--border-radius) + var(--padding));
-  pointer-events: none;
-  background-image: linear-gradient(0deg, #0004, #000a);
-  z-index: -1;
-  transition: box-shadow var(--transition), filter var(--transition);
-  box-shadow: 0 -8px 8px -6px transparent inset, 0 -16px 16px -8px transparent inset,
-    1px 1px 1px rgba(255,255,255,0.13), 2px 2px 2px rgba(255,255,255,0.07),
-    -1px -1px 1px rgba(0,0,0,0.13), -2px -2px 2px rgba(0,0,0,0.07);
+.generate-btn-wrap .stButton > button:hover {
+    border: solid 1px hsla(270deg, 100%, 80%, 50%) !important;
+    color: #fff !important;
+    text-shadow: 0 0 12px rgba(139, 92, 246, 0.9) !important;
+    box-shadow:
+        inset 0px 1px 1px rgba(255, 255, 255, 0.3),
+        inset 0px 4px 8px rgba(139, 92, 246, 0.15),
+        0px 0px 25px rgba(139, 92, 246, 0.4),
+        0px -4px 8px rgba(0, 0, 0, 0.08) !important;
+    animation: none !important;
 }
 
-.gen-btn::after {
-  content: "";
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  border-radius: inherit;
-  pointer-events: none;
-  background-image: linear-gradient(0deg, #fff, hsl(var(--highlight-color-hue), 100%, 70%),
-    hsla(var(--highlight-color-hue), 100%, 70%, 50%), 8%, transparent);
-  opacity: 0;
-  transition: opacity var(--transition), filter var(--transition);
+.generate-btn-wrap .stButton > button:active {
+    border: solid 1px hsla(270deg, 100%, 80%, 70%) !important;
+    background-color: hsla(270deg, 50%, 15%, 0.6) !important;
+    transform: scale(0.98) !important;
 }
 
-.btn-letter {
-  position: relative;
-  display: inline-block;
-  color: rgba(255,255,255,0.33);
-  animation: letter-anim 2s ease-in-out infinite;
-  transition: color var(--transition), text-shadow var(--transition);
-}
-
-@keyframes letter-anim {
-  50% { text-shadow: 0 0 3px rgba(255,255,255,0.5); color: #fff; }
-}
-
-.btn-svg {
-  height: 24px;
-  margin-right: 0.5rem;
-  fill: #e8e8e8;
-  stroke: none;
-  animation: flicker 2s linear infinite;
-  animation-delay: 0.5s;
-  filter: drop-shadow(0 0 2px rgba(255,255,255,0.6));
-  transition: fill var(--transition), filter var(--transition);
-}
-
-@keyframes flicker {
-  50% { opacity: 0.3; }
-}
-
-.txt-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  min-width: 5.5em;
-  height: 1.4em;
-}
-
-.txt-1, .txt-2 {
-  position: absolute;
-  word-spacing: -0.2em;
-}
-
-.txt-1 { opacity: 1; }
-.txt-2 { opacity: 0; }
-
-/* Letter animation delays */
-.btn-letter:nth-child(1) { animation-delay: 0s; }
-.btn-letter:nth-child(2) { animation-delay: 0.08s; }
-.btn-letter:nth-child(3) { animation-delay: 0.16s; }
-.btn-letter:nth-child(4) { animation-delay: 0.24s; }
-.btn-letter:nth-child(5) { animation-delay: 0.32s; }
-.btn-letter:nth-child(6) { animation-delay: 0.4s; }
-.btn-letter:nth-child(7) { animation-delay: 0.48s; }
-.btn-letter:nth-child(8) { animation-delay: 0.56s; }
-.btn-letter:nth-child(9) { animation-delay: 0.64s; }
-.btn-letter:nth-child(10) { animation-delay: 0.72s; }
-
-/* Hover state */
-.gen-btn:hover {
-  border: solid 1px hsla(var(--highlight-color-hue), 100%, 80%, 40%);
-}
-.gen-btn:hover::before {
-  box-shadow: 0 -8px 8px -6px rgba(255,255,255,0.67) inset,
-    0 -16px 16px -8px hsla(var(--highlight-color-hue), 100%, 70%, 30%) inset,
-    1px 1px 1px rgba(255,255,255,0.13), 2px 2px 2px rgba(255,255,255,0.07),
-    -1px -1px 1px rgba(0,0,0,0.13), -2px -2px 2px rgba(0,0,0,0.07);
-}
-.gen-btn:hover::after {
-  opacity: 1;
-  mask-image: linear-gradient(0deg, #fff, transparent);
-}
-.gen-btn:hover .btn-svg {
-  fill: #fff;
-  filter: drop-shadow(0 0 3px hsl(var(--highlight-color-hue), 100%, 70%)) drop-shadow(0 -4px 6px rgba(0,0,0,0.6));
-  animation: none;
-}
-.gen-btn:hover .btn-letter {
-  color: #fff;
-  text-shadow: 0 0 8px hsla(var(--highlight-color-hue), 100%, 70%, 0.8);
-}
-
-/* Active state */
-.gen-btn:active {
-  border: solid 1px hsla(var(--highlight-color-hue), 100%, 80%, 70%);
-  background-color: hsla(var(--highlight-color-hue), 50%, 20%, 0.5);
-  transform: scale(0.98);
-}
-
-/* Container for overlaying buttons */
-.generate-btn-container {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 60px;
-}
-.generate-btn-container .btn-wrapper {
-  position: absolute;
-  pointer-events: none;
-  z-index: 1;
-}
-/* Hide the actual Streamlit button text but keep it clickable */
-.generate-btn-container .stButton {
-  position: relative;
-  z-index: 10;
-}
-.generate-btn-container .stButton > button {
-  background: transparent !important;
-  border: none !important;
-  color: transparent !important;
-  box-shadow: none !important;
-  min-height: 50px !important;
-  padding: 0.6em 3em !important;
-}
-.generate-btn-container .stButton > button:hover {
-  background: transparent !important;
-  border: none !important;
-}
-.generate-btn-container .stButton > button:disabled {
-  background: transparent !important;
-  border: none !important;
-}
-/* Trigger HTML button hover when hovering container */
-.generate-btn-container:hover .gen-btn {
-  border: solid 1px hsla(var(--highlight-color-hue), 100%, 80%, 40%);
-}
-.generate-btn-container:hover .gen-btn::before {
-  box-shadow: 0 -8px 8px -6px rgba(255,255,255,0.67) inset,
-    0 -16px 16px -8px hsla(270deg, 100%, 70%, 30%) inset,
-    1px 1px 1px rgba(255,255,255,0.13), 2px 2px 2px rgba(255,255,255,0.07),
-    -1px -1px 1px rgba(0,0,0,0.13), -2px -2px 2px rgba(0,0,0,0.07);
-}
-.generate-btn-container:hover .gen-btn::after {
-  opacity: 1;
-  mask-image: linear-gradient(0deg, #fff, transparent);
-}
-.generate-btn-container:hover .btn-svg {
-  fill: #fff;
-  filter: drop-shadow(0 0 3px hsl(270deg, 100%, 70%)) drop-shadow(0 -4px 6px rgba(0,0,0,0.6));
-  animation: none;
-}
-.generate-btn-container:hover .btn-letter {
-  color: #fff;
-  text-shadow: 0 0 8px hsla(270deg, 100%, 70%, 0.8);
-}
-/* Active state when clicking */
-.generate-btn-container:active .gen-btn {
-  border: solid 1px hsla(270deg, 100%, 80%, 70%);
-  background-color: hsla(270deg, 50%, 20%, 0.5);
-  transform: scale(0.98);
+.generate-btn-wrap .stButton > button:disabled {
+    animation: none !important;
+    color: #8b5cf6 !important;
+    opacity: 0.8 !important;
 }
 </style>
-"""
-
-generate_btn_html = """
-<div class="btn-wrapper">
-  <div class="gen-btn">
-    <svg class="btn-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-      <path fill="currentColor"
-        d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"
-      ></path>
-    </svg>
-    <div class="txt-wrapper">
-      <div class="txt-1">
-        <span class="btn-letter">G</span>
-        <span class="btn-letter">e</span>
-        <span class="btn-letter">n</span>
-        <span class="btn-letter">e</span>
-        <span class="btn-letter">r</span>
-        <span class="btn-letter">a</span>
-        <span class="btn-letter">t</span>
-        <span class="btn-letter">e</span>
-      </div>
-    </div>
-  </div>
-</div>
-"""
-
-generate_btn_html_loading = """
-<div class="btn-wrapper">
-  <div class="gen-btn" style="opacity: 0.7;">
-    <svg class="btn-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="animation: none;">
-      <path fill="currentColor"
-        d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"
-      ></path>
-    </svg>
-    <div class="txt-wrapper">
-      <div class="txt-2" style="opacity: 1;">
-        <span class="btn-letter" style="color: #8b5cf6; animation: none;">G</span>
-        <span class="btn-letter" style="color: #8b5cf6; animation: none;">e</span>
-        <span class="btn-letter" style="color: #8b5cf6; animation: none;">n</span>
-        <span class="btn-letter" style="color: #8b5cf6; animation: none;">e</span>
-        <span class="btn-letter" style="color: #8b5cf6; animation: none;">r</span>
-        <span class="btn-letter" style="color: #8b5cf6; animation: none;">a</span>
-        <span class="btn-letter" style="color: #8b5cf6; animation: none;">t</span>
-        <span class="btn-letter" style="color: #8b5cf6; animation: none;">i</span>
-        <span class="btn-letter" style="color: #8b5cf6; animation: none;">n</span>
-        <span class="btn-letter" style="color: #8b5cf6; animation: none;">g</span>
-      </div>
-    </div>
-  </div>
-</div>
-"""
-
-st.markdown(generate_btn_css, unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
 # Show appropriate button state
 button_disabled = st.session_state.quiz_generating
+button_text = "✨ Generating..." if button_disabled else "✨ Generate"
 
-# Put HTML button inside the container, Streamlit button will overlay it
-st.markdown('<div class="generate-btn-container">', unsafe_allow_html=True)
-if button_disabled:
-    st.markdown(generate_btn_html_loading, unsafe_allow_html=True)
-else:
-    st.markdown(generate_btn_html, unsafe_allow_html=True)
-if st.button("Generate", use_container_width=True, disabled=button_disabled, key="gen_quiz_btn"):
+st.markdown('<div class="generate-btn-wrap">', unsafe_allow_html=True)
+if st.button(button_text, use_container_width=True, disabled=button_disabled, key="gen_quiz_btn"):
     # Check if image quiz mode with uploaded image
     is_image_quiz = st.session_state.get('image_quiz_mode', False) and st.session_state.get('uploaded_image')
     
