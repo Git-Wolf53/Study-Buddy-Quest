@@ -2327,10 +2327,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 const doc = window.parent.document;
                 const anchor = doc.getElementById('quiz-start');
                 if (anchor) {
-                    const rect = anchor.getBoundingClientRect();
-                    const scrollTop = window.parent.pageYOffset || doc.documentElement.scrollTop;
-                    // Scroll to anchor position minus 100px to show a bit more
-                    window.parent.scrollTo({ top: scrollTop + rect.top - 50, behavior: 'smooth' });
+                    anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             }
             scrollToQuiz();
