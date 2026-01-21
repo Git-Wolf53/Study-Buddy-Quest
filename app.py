@@ -1524,7 +1524,7 @@ with col_theme:
 # ============================================================
 # MAIN TITLE AND WELCOME
 # ============================================================
-st.markdown('<h1 class="mega-title">🎮 Study Buddy Quest 🧠</h1>', unsafe_allow_html=True)
+st.markdown('<h1 class="mega-title">📚 Study Buddy Quest 🧠</h1>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">Level up your knowledge, one quiz at a time! 🚀</p>', unsafe_allow_html=True)
 
 with st.expander("💡 Why Use Study Buddy Quest? Boost Your Grades!"):
