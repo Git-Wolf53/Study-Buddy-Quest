@@ -1374,7 +1374,7 @@ st.markdown("<style>" + animation_css + """
         border-left: 5px solid #28a745;
         padding: 20px;
         margin: 15px 0;
-        border-radius: 20px;
+        border-radius: 28px;
         font-size: 1.1rem;
     }
     
@@ -1383,7 +1383,7 @@ st.markdown("<style>" + animation_css + """
         border-left: 5px solid #dc3545;
         padding: 20px;
         margin: 15px 0;
-        border-radius: 20px;
+        border-radius: 28px;
         font-size: 1.1rem;
     }
     
@@ -2468,7 +2468,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                         st.markdown(f"""
 <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
             padding: 20px; 
-            border-radius: 20px; 
+            border-radius: 28px; 
             margin: 15px 0;
             border-left: 5px solid #667eea;">
     <h4 style="color: #667eea; margin-bottom: 10px;">Question {q['number']} {emoji}</h4>
@@ -2560,7 +2560,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     st.markdown(f"""
 <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
             padding: 20px; 
-            border-radius: 20px; 
+            border-radius: 28px; 
             margin: 15px 0;
             border-left: 5px solid #667eea;">
     <h4 style="color: #667eea; margin-bottom: 10px;">Question {q['number']} {emoji}</h4>
@@ -2912,7 +2912,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         
         # Main celebration card
         st.markdown(f"""
-<div style="background: {card_gradient}; color: white; padding: 30px; border-radius: 20px; text-align: center; margin: 20px 0; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+<div style="background: {card_gradient}; color: white; padding: 30px; border-radius: 28px; text-align: center; margin: 20px 0; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
 <div style="font-size: 4rem; margin-bottom: 10px;">{card_emoji}</div>
 <div style="font-size: 2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">{card_title}</div>
 <div style="font-size: 3rem; font-weight: 700; margin: 15px 0;">{correct_count} / {total_questions}</div>
@@ -2929,7 +2929,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             new_title = get_level_title(new_level)
             st.markdown(f"""
             <div style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); 
-                        color: white; padding: 20px; border-radius: 20px; text-align: center; margin: 15px 0;
+                        color: white; padding: 20px; border-radius: 28px; text-align: center; margin: 15px 0;
                         box-shadow: 0 5px 20px rgba(99,102,241,0.3);">
                 <div style="font-size: 2rem;">🎉 LEVEL UP! 🎉</div>
                 <div style="font-size: 1.5rem; font-weight: bold;">Level {old_level} → Level {new_level}</div>
@@ -3029,7 +3029,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
 <div style="background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%); 
             color: white; 
             padding: 20px; 
-            border-radius: 20px; 
+            border-radius: 28px; 
             margin: 10px 0;
             box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);">
     {safe_summary}
@@ -3050,7 +3050,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
 <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
             color: white; 
             padding: 20px; 
-            border-radius: 20px; 
+            border-radius: 28px; 
             margin: 10px 0;
             box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
     {safe_notes}
