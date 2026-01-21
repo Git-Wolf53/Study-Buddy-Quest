@@ -2185,15 +2185,15 @@ if st.session_state.get('quiz_generating', False):
         try:
             generation_steps = [
                 "Analyzing your topic",
-                "Creating questions",
+                "Crafting questions",
                 "Adding answer choices",
-                "Finalizing your quiz"
+                "Polishing your quiz"
             ]
-            dot_patterns = [".", "..", "...", "....", "...", "..", "."]
+            dot_patterns = [".", "..", "...", "....", ".....", "....", "...", "..", "."]
             for step in generation_steps:
                 for dots in dot_patterns:
                     status_text.markdown(f'<p style="text-align: center; color: #8b5cf6; font-size: 1.2rem; font-weight: 600;">{step}{dots}</p>', unsafe_allow_html=True)
-                    time.sleep(0.15)
+                    time.sleep(0.25)
             
             # Generate quiz based on mode (image or text)
             if is_image_quiz:
