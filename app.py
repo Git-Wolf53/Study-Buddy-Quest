@@ -1836,6 +1836,7 @@ if st.session_state.quiz_history and len(st.session_state.quiz_history) >= 2:
 # ============================================================
 # USER INPUT SECTION
 # ============================================================
+st.markdown('<div id="choose-quest"></div>', unsafe_allow_html=True)
 st.markdown("### 🎯 Choose Your Quest!")
 
 example_topics = [
@@ -1856,8 +1857,6 @@ retake_topic = st.session_state.get('retake_topic', '')
 if retake_topic:
     del st.session_state['retake_topic']
 
-# Anchor for home button to scroll to
-st.markdown('<div id="quiz-maker"></div>', unsafe_allow_html=True)
 
 col1, col2 = st.columns(2)
 
@@ -3159,7 +3158,7 @@ st.markdown("""
 # Right sidebar with Home button (uses st.markdown for same DOM as anchor)
 st.markdown("""
 <div class="right-sidebar">
-    <button class="sidebar-btn" onclick="document.getElementById('quiz-maker').scrollIntoView({ behavior: 'smooth', block: 'start' })" title="Go to Quiz Maker">
+    <button class="sidebar-btn" onclick="document.getElementById('choose-quest').scrollIntoView({ behavior: 'smooth', block: 'start' })" title="Go to Choose Your Quest">
         🏠
     </button>
 </div>
