@@ -2248,13 +2248,13 @@ if st.session_state.get('quiz_generating', False):
             </style>
             <div class="loading-card">
                 <div class="word-loader">
-                    <p>generating</p>
+                    <p>GENERATING</p>
                     <div class="cycling-words">
-                        <span class="cycling-word">questions</span>
-                        <span class="cycling-word">answers</span>
-                        <span class="cycling-word">explanations</span>
-                        <span class="cycling-word">your quiz</span>
-                        <span class="cycling-word">questions</span>
+                        <span class="cycling-word">QUESTIONS</span>
+                        <span class="cycling-word">ANSWERS</span>
+                        <span class="cycling-word">EXPLANATIONS</span>
+                        <span class="cycling-word">YOUR QUIZ</span>
+                        <span class="cycling-word">QUESTIONS</span>
                     </div>
                 </div>
             </div>
