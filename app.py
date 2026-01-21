@@ -1949,101 +1949,35 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     st.session_state.question_timer_start = time.time()
                 
                 question_time_limit = 15  # 15 seconds per question
-                timer_start = st.session_state.question_timer_start
-                
-                import streamlit.components.v1 as components
-                
-                timer_html = f"""
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <style>
-                        body {{ margin: 0; padding: 0; overflow: hidden; }}
-                        #timer-box {{
-                            background: #d1fae5;
-                            border: 3px solid #10b981;
-                            border-radius: 15px;
-                            padding: 12px 20px;
-                            text-align: center;
-                            font-family: 'Nunito', Arial, sans-serif;
-                            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-                            display: inline-block;
-                        }}
-                        .timer-label {{
-                            font-size: 0.8rem;
-                            font-weight: 600;
-                            color: #374151;
-                        }}
-                        #timer-value {{
-                            font-size: 2rem;
-                            font-weight: 800;
-                            color: #10b981;
-                        }}
-                        .timer-hint {{
-                            font-size: 0.7rem;
-                            color: #4b5563;
-                        }}
-                    </style>
-                </head>
-                <body>
-                    <div id="timer-box">
-                        <div class="timer-label">⏱️ QUESTION TIMER</div>
-                        <div id="timer-value">15</div>
-                        <div class="timer-hint">seconds left</div>
-                    </div>
-                    <script>
-                        var startTime = {timer_start};
-                        var timeLimit = {question_time_limit};
-                        var display = document.getElementById('timer-value');
-                        var container = document.getElementById('timer-box');
-                        
-                        function updateTimer() {{
-                            var now = Date.now() / 1000;
-                            var elapsed = now - startTime;
-                            var remaining = Math.max(0, timeLimit - elapsed);
-                            var seconds = Math.ceil(remaining);
-                            
-                            display.textContent = seconds;
-                            
-                            if (remaining > 10) {{
-                                container.style.background = '#d1fae5';
-                                container.style.borderColor = '#10b981';
-                                display.style.color = '#10b981';
-                            }} else if (remaining > 5) {{
-                                container.style.background = '#fef3c7';
-                                container.style.borderColor = '#f59e0b';
-                                display.style.color = '#f59e0b';
-                            }} else {{
-                                container.style.background = '#fee2e2';
-                                container.style.borderColor = '#ef4444';
-                                display.style.color = '#ef4444';
-                            }}
-                            
-                            if (remaining > 0) {{
-                                setTimeout(updateTimer, 100);
-                            }}
-                        }}
-                        
-                        updateTimer();
-                    </script>
-                </body>
-                </html>
-                """
-                
-                # Create a container that floats to the right
-                timer_col1, timer_col2 = st.columns([3, 1])
-                with timer_col2:
-                    components.html(timer_html, height=100)
+                # Timer will be shown inline with each unanswered question below
             
             st.markdown("")
             
             if 'quiz_error' not in st.session_state:
                 st.session_state.quiz_error = None
             
+            # Find the first unanswered question to show timer there
+            first_unanswered = None
+            for i in range(num_questions):
+                if st.session_state.get(f"q{i+1}") is None:
+                    first_unanswered = i
+                    break
+            
             for idx, q in enumerate(parsed_questions[:num_questions]):
                 emoji = QUESTION_EMOJIS[idx] if idx < len(QUESTION_EMOJIS) else "❓"
                 
-                st.markdown(f"""
+                # Check if this question needs the timer (first unanswered in timed mode)
+                show_timer_here = (
+                    st.session_state.get('timed_mode') and 
+                    st.session_state.get('quiz_start_time') and 
+                    idx == first_unanswered
+                )
+                
+                if show_timer_here:
+                    # Show question with timer side by side
+                    q_col, timer_col = st.columns([4, 1])
+                    with q_col:
+                        st.markdown(f"""
 <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
             padding: 20px; 
             border-radius: 15px; 
@@ -2052,7 +1986,99 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
     <h4 style="color: #667eea; margin-bottom: 10px;">Question {q['number']} {emoji}</h4>
     <p style="font-size: 1.15rem; font-weight: 600; color: #6b7280;">{q['text']}</p>
 </div>
-                """, unsafe_allow_html=True)
+                        """, unsafe_allow_html=True)
+                    with timer_col:
+                        import streamlit.components.v1 as components
+                        timer_start = st.session_state.question_timer_start
+                        question_time_limit = 15
+                        timer_html = f"""
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <style>
+                                body {{ margin: 0; padding: 0; overflow: hidden; }}
+                                #timer-box {{
+                                    background: #d1fae5;
+                                    border: 3px solid #10b981;
+                                    border-radius: 15px;
+                                    padding: 10px 15px;
+                                    text-align: center;
+                                    font-family: 'Nunito', Arial, sans-serif;
+                                    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+                                    margin-top: 15px;
+                                }}
+                                .timer-label {{
+                                    font-size: 0.7rem;
+                                    font-weight: 600;
+                                    color: #374151;
+                                }}
+                                #timer-value {{
+                                    font-size: 1.8rem;
+                                    font-weight: 800;
+                                    color: #10b981;
+                                }}
+                                .timer-hint {{
+                                    font-size: 0.65rem;
+                                    color: #4b5563;
+                                }}
+                            </style>
+                        </head>
+                        <body>
+                            <div id="timer-box">
+                                <div class="timer-label">⏱️ TIMER</div>
+                                <div id="timer-value">15</div>
+                                <div class="timer-hint">seconds</div>
+                            </div>
+                            <script>
+                                var startTime = {timer_start};
+                                var timeLimit = {question_time_limit};
+                                var display = document.getElementById('timer-value');
+                                var container = document.getElementById('timer-box');
+                                
+                                function updateTimer() {{
+                                    var now = Date.now() / 1000;
+                                    var elapsed = now - startTime;
+                                    var remaining = Math.max(0, timeLimit - elapsed);
+                                    var seconds = Math.ceil(remaining);
+                                    
+                                    display.textContent = seconds;
+                                    
+                                    if (remaining > 10) {{
+                                        container.style.background = '#d1fae5';
+                                        container.style.borderColor = '#10b981';
+                                        display.style.color = '#10b981';
+                                    }} else if (remaining > 5) {{
+                                        container.style.background = '#fef3c7';
+                                        container.style.borderColor = '#f59e0b';
+                                        display.style.color = '#f59e0b';
+                                    }} else {{
+                                        container.style.background = '#fee2e2';
+                                        container.style.borderColor = '#ef4444';
+                                        display.style.color = '#ef4444';
+                                    }}
+                                    
+                                    if (remaining > 0) {{
+                                        setTimeout(updateTimer, 100);
+                                    }}
+                                }}
+                                
+                                updateTimer();
+                            </script>
+                        </body>
+                        </html>
+                        """
+                        components.html(timer_html, height=110)
+                else:
+                    st.markdown(f"""
+<div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
+            padding: 20px; 
+            border-radius: 15px; 
+            margin: 15px 0;
+            border-left: 5px solid #667eea;">
+    <h4 style="color: #667eea; margin-bottom: 10px;">Question {q['number']} {emoji}</h4>
+    <p style="font-size: 1.15rem; font-weight: 600; color: #6b7280;">{q['text']}</p>
+</div>
+                    """, unsafe_allow_html=True)
                 
                 # Text-to-Speech button for this question
                 tts_col1, tts_col2 = st.columns([1, 8])
