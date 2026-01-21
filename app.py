@@ -1122,7 +1122,8 @@ st.markdown("<style>" + animation_css + """
         border-radius: 10px !important;
         outline: 2px solid #6366f1 !important;
         border: 0 !important;
-        background-color: #f0f0f5 !important;
+        background-color: #1e1e2e !important;
+        color: #ffffff !important;
         outline-offset: 3px;
         padding: 10px 1rem !important;
         transition: 0.25s !important;
@@ -1130,7 +1131,11 @@ st.markdown("<style>" + animation_css + """
     
     .stTextInput input:focus {
         outline-offset: 5px;
-        background-color: #fff !important;
+        background-color: #2a2a3e !important;
+    }
+    
+    .stTextInput input::placeholder {
+        color: #a0a0b0 !important;
     }
     
     .block-container {
