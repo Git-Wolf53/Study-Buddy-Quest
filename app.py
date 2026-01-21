@@ -2133,78 +2133,11 @@ st.markdown("")
 if 'quiz_generating' not in st.session_state:
     st.session_state.quiz_generating = False
 
-# Uiverse Generate button - styled Streamlit button
-st.markdown("""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400&display=swap');
-
-/* Style the generate button */
-div[data-testid="stButton"]:has(button[kind="secondary"]):has(button:contains("Generate")) > button,
-.generate-btn-wrap .stButton > button {
-    --highlight-hue: 270deg;
-    background-color: #101010 !important;
-    color: rgba(255,255,255,0.5) !important;
-    border: solid 1px rgba(255,255,255,0.13) !important;
-    border-radius: 24px !important;
-    padding: 0.7em 2em !important;
-    font-family: "Poppins", sans-serif !important;
-    font-size: 1.1em !important;
-    font-weight: 400 !important;
-    box-shadow:
-        inset 0px 1px 1px rgba(255, 255, 255, 0.2),
-        inset 0px 2px 2px rgba(255, 255, 255, 0.15),
-        inset 0px 4px 4px rgba(255, 255, 255, 0.1),
-        inset 0px 8px 8px rgba(255, 255, 255, 0.05),
-        0px -2px 2px rgba(0, 0, 0, 0.03),
-        0px -4px 4px rgba(0, 0, 0, 0.05),
-        0px -8px 8px rgba(0, 0, 0, 0.06) !important;
-    transition: all 0.4s ease !important;
-    animation: gen-btn-glow 2s ease-in-out infinite !important;
-}
-
-@keyframes gen-btn-glow {
-    0%, 100% { 
-        color: rgba(255,255,255,0.4) !important;
-        text-shadow: none;
-    }
-    50% { 
-        color: #fff !important;
-        text-shadow: 0 0 8px rgba(139, 92, 246, 0.6);
-    }
-}
-
-.generate-btn-wrap .stButton > button:hover {
-    border: solid 1px hsla(270deg, 100%, 80%, 50%) !important;
-    color: #fff !important;
-    text-shadow: 0 0 12px rgba(139, 92, 246, 0.9) !important;
-    box-shadow:
-        inset 0px 1px 1px rgba(255, 255, 255, 0.3),
-        inset 0px 4px 8px rgba(139, 92, 246, 0.15),
-        0px 0px 25px rgba(139, 92, 246, 0.4),
-        0px -4px 8px rgba(0, 0, 0, 0.08) !important;
-    animation: none !important;
-}
-
-.generate-btn-wrap .stButton > button:active {
-    border: solid 1px hsla(270deg, 100%, 80%, 70%) !important;
-    background-color: hsla(270deg, 50%, 15%, 0.6) !important;
-    transform: scale(0.98) !important;
-}
-
-.generate-btn-wrap .stButton > button:disabled {
-    animation: none !important;
-    color: #8b5cf6 !important;
-    opacity: 0.8 !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
-# Show appropriate button state
+# Simple generate button
 button_disabled = st.session_state.quiz_generating
-button_text = "✨ Generating..." if button_disabled else "✨ Generate"
+button_text = "⬇️ SCROLL DOWN ⬇️" if button_disabled else "🎲 GENERATE QUIZ!"
 
-st.markdown('<div class="generate-btn-wrap">', unsafe_allow_html=True)
-if st.button(button_text, use_container_width=True, disabled=button_disabled, key="gen_quiz_btn"):
+if st.button(button_text, use_container_width=True, disabled=button_disabled):
     # Check if image quiz mode with uploaded image
     is_image_quiz = st.session_state.get('image_quiz_mode', False) and st.session_state.get('uploaded_image')
     
@@ -2228,8 +2161,6 @@ if st.button(button_text, use_container_width=True, disabled=button_disabled, ke
         # Set generating state to show updated button text
         st.session_state.quiz_generating = True
         st.rerun()
-
-st.markdown('</div>', unsafe_allow_html=True)
 
 # Handle the actual quiz generation after rerun
 if st.session_state.get('quiz_generating', False):
