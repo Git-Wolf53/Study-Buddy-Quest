@@ -2026,18 +2026,6 @@ if st.session_state.get('quiz_generating', False):
     clean_topic = sanitize_topic(full_topic) if full_topic else ""
     
     if is_image_quiz or clean_topic:
-        st.markdown("""
-        <div style="text-align: center; padding: 20px;">
-            <div style="font-size: 3rem; animation: spin 2s linear infinite;">⚙️</div>
-            <style>
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-            </style>
-        </div>
-        """, unsafe_allow_html=True)
-        
         st.session_state.answers_submitted = False
         st.session_state.balloons_shown = False
         st.session_state.correct_answers = []
@@ -2056,18 +2044,22 @@ if st.session_state.get('quiz_generating', False):
         st.session_state.time_bonus = 0
         st.session_state.base_score = 0
         st.session_state.level_bonus = 0
-        st.session_state.question_timer_start = None  # Will be set when questions display
+        st.session_state.question_timer_start = None
         st.session_state.last_answered_count = 0
-        st.session_state.timer_initialized_for_quiz = False  # Reset so timer starts fresh when displayed
+        st.session_state.timer_initialized_for_quiz = False
         
-        progress_bar = st.progress(0)
         status_text = st.empty()
         
         try:
-            for i, msg in enumerate(LOADING_MESSAGES):
-                status_text.markdown(f'<div class="loading-box">{msg}</div>', unsafe_allow_html=True)
-                progress_bar.progress((i + 1) * 20)
-                time.sleep(0.3)
+            generation_steps = [
+                "Step 1/4: Analyzing your topic...",
+                "Step 2/4: Creating questions...",
+                "Step 3/4: Adding answer choices...",
+                "Step 4/4: Finalizing your quiz..."
+            ]
+            for step in generation_steps:
+                status_text.markdown(f'<div class="loading-box">{step}</div>', unsafe_allow_html=True)
+                time.sleep(0.4)
             
             # Generate quiz based on mode (image or text)
             if is_image_quiz:
@@ -2095,9 +2087,7 @@ if st.session_state.get('quiz_generating', False):
             st.session_state.correct_answers = correct_answers
             st.session_state.explanations = explanations
             
-            progress_bar.progress(100)
             status_text.empty()
-            progress_bar.empty()
             
             # Reset generating state
             st.session_state.quiz_generating = False
@@ -2109,7 +2099,6 @@ if st.session_state.get('quiz_generating', False):
             # Reset generating state on error
             st.session_state.quiz_generating = False
             
-            progress_bar.empty()
             status_text.empty()
             error_msg = str(e)
             print(f"Quiz generation error: {type(e).__name__}: {e}")
