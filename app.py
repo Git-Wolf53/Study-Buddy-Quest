@@ -1343,7 +1343,7 @@ st.markdown("<style>" + animation_css + """
     
     .stProgress > div > div > div {
         background: linear-gradient(90deg, #667eea 0%, #764ba2 100%) !important;
-        border-radius: 10px !important;
+        border-radius: 20px !important;
     }
     
     .stRadio > div {
@@ -1900,8 +1900,8 @@ if st.session_state.quiz_history and len(st.session_state.quiz_history) >= 2:
             st.markdown(f"""
             <div style="display: flex; align-items: center; margin: 5px 0;">
                 <div style="flex: 1; font-size: 0.9rem;">{topic}</div>
-                <div style="width: 150px; background: #e5e7eb; border-radius: 10px; height: 20px; margin-left: 10px;">
-                    <div style="width: {min(avg, 100)}%; background: {color}; border-radius: 10px; height: 100%;"></div>
+                <div style="width: 150px; background: #e5e7eb; border-radius: 20px; height: 20px; margin-left: 10px;">
+                    <div style="width: {min(avg, 100)}%; background: {color}; border-radius: 20px; height: 100%;"></div>
                 </div>
                 <div style="width: 50px; text-align: right; font-weight: 600; margin-left: 10px;">{avg:.0f}%</div>
             </div>
@@ -2119,7 +2119,7 @@ with timed_col2:
 if timed_mode:
     st.markdown("""
     <div style="background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); 
-                color: white; padding: 12px 20px; border-radius: 10px; text-align: center;">
+                color: white; padding: 12px 20px; border-radius: 20px; text-align: center;">
         <strong>⚡ TIMED MODE ACTIVE!</strong> Answer quickly for bonus points!
     </div>
     """, unsafe_allow_html=True)
@@ -2220,7 +2220,7 @@ if st.session_state.get('quiz_generating', False):
                 height: 40px;
                 padding: 10px 10px;
                 display: flex;
-                border-radius: 8px;
+                border-radius: 20px;
             }
             .cycling-words {
                 overflow: hidden;
@@ -3125,7 +3125,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 safe_content = html.escape(msg["content"]).replace('\n', '<br>')
                 if msg["role"] == "user":
                     st.markdown(f"""
-                    <div style="background: #e0e7ff; padding: 12px 16px; border-radius: 20px 15px 5px 15px; 
+                    <div style="background: #e0e7ff; padding: 12px 16px; border-radius: 20px; 
                                 margin: 8px 0; max-width: 85%; margin-left: auto; text-align: right;">
                         <strong>You:</strong> {safe_content}
                     </div>
@@ -3133,7 +3133,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 else:
                     st.markdown(f"""
                     <div style="background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%); 
-                                color: white; padding: 12px 16px; border-radius: 20px 15px 15px 5px; 
+                                color: white; padding: 12px 16px; border-radius: 20px; 
                                 margin: 8px 0; max-width: 85%;">
                         <strong>🤖 Tutor:</strong> {safe_content}
                     </div>
