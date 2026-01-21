@@ -3080,13 +3080,15 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         </style>
         """, unsafe_allow_html=True)
         
+        # Toggle callback for instant response
+        def toggle_tutor():
+            st.session_state.tutor_panel_open = not st.session_state.tutor_panel_open
+        
         # Center the button with sparkle styling
         st.markdown('<div class="tutor-sparkle-container">', unsafe_allow_html=True)
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
-            if st.button("✨ Ask AI Tutor", key="sparkle_tutor_btn", use_container_width=True):
-                st.session_state.tutor_panel_open = not st.session_state.tutor_panel_open
-                st.rerun()
+            st.button("✨ Ask AI Tutor", key="sparkle_tutor_btn", use_container_width=True, on_click=toggle_tutor)
         st.markdown('</div>', unsafe_allow_html=True)
         
         if st.session_state.tutor_panel_open:
