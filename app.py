@@ -1774,6 +1774,16 @@ if image_quiz_mode:
         )
     
     if uploaded_image:
+        # Add white background CSS for the image to ensure visibility in all modes
+        st.markdown("""
+        <style>
+            [data-testid="stImage"] img {
+                background-color: white !important;
+                padding: 10px;
+                border-radius: 10px;
+            }
+        </style>
+        """, unsafe_allow_html=True)
         st.image(uploaded_image, caption="Your uploaded image", use_container_width=True)
         st.session_state.uploaded_image = uploaded_image.getvalue()
         st.session_state.uploaded_image_type = uploaded_image.type
