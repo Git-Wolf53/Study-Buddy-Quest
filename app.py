@@ -1428,8 +1428,7 @@ st.markdown("""
     .right-sidebar {
         position: fixed;
         right: 20px;
-        top: 50%;
-        transform: translateY(-50%);
+        top: 80px;
         z-index: 9999;
         display: flex;
         flex-direction: column;
