@@ -1323,6 +1323,26 @@ st.markdown("<style>" + animation_css + """
         border-radius: 20px !important;
     }
     
+    .stSelectbox [data-baseweb="select"] {
+        border-radius: 20px !important;
+    }
+    
+    .stSelectbox [data-baseweb="select"] > div {
+        border-radius: 20px !important;
+    }
+    
+    div[data-baseweb="select"] > div:first-child {
+        border-radius: 20px !important;
+    }
+    
+    div[data-baseweb="popover"] > div {
+        border-radius: 20px !important;
+    }
+    
+    ul[role="listbox"] {
+        border-radius: 20px !important;
+    }
+    
     .result-correct {
         background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
         border-left: 5px solid #28a745;
