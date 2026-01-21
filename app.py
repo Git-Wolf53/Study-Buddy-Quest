@@ -1427,7 +1427,7 @@ st.markdown("""
     /* Right sidebar */
     .right-sidebar {
         position: fixed;
-        right: 20px;
+        left: 20px;
         top: 80px;
         z-index: 9999;
         display: flex;
@@ -1458,7 +1458,7 @@ st.markdown("""
     
     @media (max-width: 768px) {
         .right-sidebar {
-            right: 10px;
+            left: 10px;
         }
         
         .sidebar-btn {
