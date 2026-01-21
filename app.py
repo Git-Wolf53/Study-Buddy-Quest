@@ -1089,7 +1089,18 @@ animation_css = "" if reduce_anims else """
     }
     
     .quiz-fade-in {
-        animation: fadeInUp 0.5s ease-out;
+        animation: quizFadeIn 0.8s ease-out;
+    }
+    
+    @keyframes quizFadeIn {
+        0% {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 """
 
