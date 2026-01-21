@@ -1423,87 +1423,20 @@ st.markdown("""
     .page-padding {
         padding-bottom: 80px !important;
     }
-    
-    /* Right sidebar */
-    .right-sidebar {
-        position: fixed;
-        left: 20px;
-        top: 80px;
-        z-index: 9999;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .sidebar-btn {
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        font-size: 1.5rem;
-        cursor: pointer;
-        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .sidebar-btn:hover {
-        transform: scale(1.1);
-        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
-    }
-    
-    @media (max-width: 768px) {
-        .right-sidebar {
-            left: 10px;
-        }
-        
-        .sidebar-btn {
-            width: 45px;
-            height: 45px;
-            font-size: 1.3rem;
-        }
-    }
 </style>
 """, unsafe_allow_html=True)
 
 # ============================================================
-# TOP RIGHT BUTTONS - HOME AND THEME TOGGLE
+# TOP RIGHT BUTTONS - THEME TOGGLE
 # ============================================================
 theme_icon = "☀️" if st.session_state.dark_mode else "🌙"
 theme_text = "Light" if st.session_state.dark_mode else "Dark"
 
-col_spacer, col_home, col_theme = st.columns([9, 1, 1])
-with col_home:
-    if st.button("🏠", key="home_btn", help="Go to Choose Your Quest"):
-        st.session_state.scroll_to_quest = True
-        st.rerun()
+col_spacer, col_theme = st.columns([10, 1])
 with col_theme:
     if st.button(f"{theme_icon}", key="theme_btn", help=f"Switch to {theme_text} Mode"):
         st.session_state.dark_mode = not st.session_state.dark_mode
         st.rerun()
-
-# Handle scroll to quest section
-if st.session_state.get('scroll_to_quest', False):
-    st.session_state.scroll_to_quest = False
-    import streamlit.components.v1 as components
-    components.html("""
-    <script>
-        function scrollToQuest() {
-            const doc = window.parent.document;
-            const anchor = doc.getElementById('choose-quest');
-            if (anchor) {
-                anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-        scrollToQuest();
-        setTimeout(scrollToQuest, 100);
-        setTimeout(scrollToQuest, 300);
-    </script>
-    """, height=0)
 
 # ============================================================
 # MAIN TITLE AND WELCOME
@@ -1859,7 +1792,6 @@ if st.session_state.quiz_history and len(st.session_state.quiz_history) >= 2:
 # ============================================================
 # USER INPUT SECTION
 # ============================================================
-st.markdown('<div id="choose-quest"></div>', unsafe_allow_html=True)
 st.markdown("### 🎯 Choose Your Quest!")
 
 example_topics = [
@@ -1879,7 +1811,6 @@ if 'topic_placeholder' not in st.session_state:
 retake_topic = st.session_state.get('retake_topic', '')
 if retake_topic:
     del st.session_state['retake_topic']
-
 
 col1, col2 = st.columns(2)
 
@@ -3177,7 +3108,6 @@ st.markdown("""
     <br><small>Think critically. Question everything. Stay curious!</small>
 </div>
 """, unsafe_allow_html=True)
-
 
 st.markdown("""
 <div class="cool-footer">
