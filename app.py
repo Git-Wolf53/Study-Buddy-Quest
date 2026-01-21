@@ -1252,36 +1252,146 @@ st.markdown("""
         font-weight: 600;
     }
     
-    @media (max-width: 768px) {
+    /* Responsive Design - Large screens (1200px+) */
+    @media (min-width: 1200px) {
+        .block-container {
+            max-width: 900px;
+        }
+    }
+    
+    /* Responsive Design - Tablets (768px - 1024px) */
+    @media (max-width: 1024px) and (min-width: 769px) {
+        .block-container {
+            max-width: 700px;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+        
         .mega-title {
-            font-size: 2rem;
+            font-size: 2.4rem;
         }
         
         .subtitle {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+        }
+        
+        .level-card {
+            padding: 20px;
         }
         
         .level-number {
-            font-size: 2.5rem;
+            font-size: 2.7rem;
+        }
+    }
+    
+    /* Responsive Design - Mobile (768px and below) */
+    @media (max-width: 768px) {
+        .block-container {
+            max-width: 100%;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        
+        .mega-title {
+            font-size: 1.8rem;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+        }
+        
+        .level-card {
+            padding: 15px;
+            border-radius: 15px;
+            margin: 15px 0;
+        }
+        
+        .level-number {
+            font-size: 2.2rem;
+        }
+        
+        .level-title {
+            font-size: 1.1rem;
         }
         
         .stats-row {
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
         
         .stat-item {
             display: block;
+            padding: 6px 12px;
         }
         
-        .stButton > button {
-            font-size: 1.2rem !important;
-            padding: 18px 30px !important;
+        .encourage-box {
+            padding: 12px 15px;
+            font-size: 1rem;
+            max-width: 100%;
+        }
+        
+        .badge-showcase {
+            padding: 15px;
         }
         
         .badge-icons {
-            font-size: 2rem;
-            letter-spacing: 5px;
+            font-size: 1.8rem;
+            letter-spacing: 3px;
+        }
+        
+        .stButton > button {
+            font-size: 1rem !important;
+            padding: 14px 20px !important;
+        }
+        
+        .stRadio > div > label {
+            padding: 10px 14px !important;
+            font-size: 0.95rem !important;
+        }
+        
+        .result-correct, .result-wrong {
+            padding: 15px;
+            font-size: 1rem;
+        }
+        
+        .loading-box {
+            padding: 18px;
+            font-size: 1.1rem;
+        }
+        
+        /* Make columns stack on mobile */
+        [data-testid="column"] {
+            width: 100% !important;
+            flex: 1 1 100% !important;
+        }
+    }
+    
+    /* Responsive Design - Small phones (480px and below) */
+    @media (max-width: 480px) {
+        .mega-title {
+            font-size: 1.5rem;
+        }
+        
+        .subtitle {
+            font-size: 0.9rem;
+        }
+        
+        .level-number {
+            font-size: 1.8rem;
+        }
+        
+        .level-title {
+            font-size: 1rem;
+        }
+        
+        .stButton > button {
+            font-size: 0.9rem !important;
+            padding: 12px 16px !important;
+        }
+        
+        .badge-icons {
+            font-size: 1.5rem;
+            letter-spacing: 2px;
         }
     }
     
