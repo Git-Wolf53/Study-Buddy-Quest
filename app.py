@@ -1319,27 +1319,26 @@ st.markdown("<style>" + animation_css + """
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2) !important;
     }
     
-    .stSelectbox > div > div {
+    /* Selectbox/Dropdown styling - all elements */
+    .stSelectbox > div > div,
+    .stSelectbox [data-baseweb="select"],
+    .stSelectbox [data-baseweb="select"] > div,
+    .stSelectbox div[data-baseweb="select"] > div,
+    div[data-baseweb="select"],
+    div[data-baseweb="select"] > div,
+    div[data-baseweb="select"] > div:first-child,
+    [data-baseweb="select"] > div:first-child,
+    [data-baseweb="base-input"],
+    [data-baseweb="input-container"],
+    div[data-baseweb="popover"] > div,
+    ul[role="listbox"],
+    [role="listbox"] {
         border-radius: 20px !important;
     }
     
-    .stSelectbox [data-baseweb="select"] {
-        border-radius: 20px !important;
-    }
-    
-    .stSelectbox [data-baseweb="select"] > div {
-        border-radius: 20px !important;
-    }
-    
-    div[data-baseweb="select"] > div:first-child {
-        border-radius: 20px !important;
-    }
-    
-    div[data-baseweb="popover"] > div {
-        border-radius: 20px !important;
-    }
-    
-    ul[role="listbox"] {
+    /* Selectbox inner input element */
+    .stSelectbox input,
+    [data-baseweb="select"] input {
         border-radius: 20px !important;
     }
     
