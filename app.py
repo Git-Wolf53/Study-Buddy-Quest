@@ -1804,7 +1804,7 @@ st.markdown("")
 timed_col1, timed_col2 = st.columns([3, 1])
 with timed_col1:
     st.markdown("**⏱️ Timed Challenge Mode**")
-    st.caption("Race against the clock! 15 seconds per question - timer resets when you answer.")
+    st.caption("Race against the clock! 8 seconds per question - timer resets when you answer.")
 with timed_col2:
     default_timed = st.session_state.get('default_timed_mode', False)
     timed_mode = st.toggle("Enable Timer", value=st.session_state.get('timed_mode', default_timed), key="timed_toggle")
