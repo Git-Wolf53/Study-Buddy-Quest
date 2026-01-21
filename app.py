@@ -1948,7 +1948,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 if 'question_timer_start' not in st.session_state:
                     st.session_state.question_timer_start = time.time()
                 
-                question_time_limit = 15  # 15 seconds per question
+                question_time_limit = 8  # 8 seconds per question
                 # Timer will be shown inline with each unanswered question below
             
             st.markdown("")
@@ -1990,7 +1990,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     with timer_col:
                         import streamlit.components.v1 as components
                         timer_start = st.session_state.question_timer_start
-                        question_time_limit = 15
+                        question_time_limit = 8
                         timer_html = f"""
                         <!DOCTYPE html>
                         <html>
