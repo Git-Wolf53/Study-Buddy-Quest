@@ -1999,29 +1999,49 @@ st.markdown("<style>" + animation_css + """
 </style>
 """, unsafe_allow_html=True)
 
-# Light mode detection popup
-st.markdown("""
-<div id="lightModePopup" class="light-mode-popup">
-    <span>🌙 This app looks better in dark mode!</span>
-    <button onclick="this.parentElement.style.display='none'" title="Dismiss">✕</button>
-</div>
+# Light mode detection popup - inject into parent document
+import streamlit.components.v1 as components
+components.html("""
 <script>
 (function() {
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-        var popup = document.getElementById('lightModePopup');
-        if (popup && !sessionStorage.getItem('lightModePopupDismissed')) {
-            popup.classList.add('show');
-            setTimeout(function() {
-                popup.style.display = 'none';
-            }, 6000);
-        }
+    var parent = window.parent.document;
+    
+    // Check if already shown or dismissed
+    if (parent.getElementById('lightModePopup') || sessionStorage.getItem('lightModePopupDismissed')) {
+        return;
     }
-    document.querySelector('#lightModePopup button')?.addEventListener('click', function() {
+    
+    // Only show in light mode
+    if (!window.parent.matchMedia || !window.parent.matchMedia('(prefers-color-scheme: light)').matches) {
+        return;
+    }
+    
+    // Create and inject popup
+    var popup = parent.createElement('div');
+    popup.id = 'lightModePopup';
+    popup.innerHTML = '<span style="margin-right: 12px;">🌙 This app looks better in dark mode!</span><button id="dismissPopupBtn" style="background: transparent; border: none; color: #a78bfa; cursor: pointer; font-size: 1.2rem; padding: 0;">✕</button>';
+    popup.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: 16px 24px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); z-index: 9999; font-family: Nunito, sans-serif; font-size: 0.95rem; display: flex; align-items: center; border: 1px solid rgba(167, 139, 250, 0.3); animation: slideInUp 0.4s ease-out;';
+    
+    // Add animation keyframes
+    var style = parent.createElement('style');
+    style.textContent = '@keyframes slideInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }';
+    parent.head.appendChild(style);
+    
+    parent.body.appendChild(popup);
+    
+    // Add dismiss handler
+    parent.getElementById('dismissPopupBtn').addEventListener('click', function() {
+        popup.remove();
         sessionStorage.setItem('lightModePopupDismissed', 'true');
     });
+    
+    // Auto-dismiss after 6 seconds
+    setTimeout(function() {
+        if (popup.parentNode) popup.remove();
+    }, 6000);
 })();
 </script>
-""", unsafe_allow_html=True)
+""", height=0)
 
 # ============================================================
 # MAIN TITLE AND WELCOME
