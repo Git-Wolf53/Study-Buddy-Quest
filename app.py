@@ -2009,21 +2009,19 @@ components.html("""
         var parentDoc = window.parent.document;
         var parentWin = window.parent;
         
+        // Track if popup was shown this page load (resets on reload)
+        if (!parentWin._lightModePopupShown) {
+            parentWin._lightModePopupShown = false;
+        }
+        
         function showLightModePopup() {
-            // Check if already shown this session or currently showing
-            if (parentDoc.getElementById('lightModePopup')) {
+            // Check if already shown this page load or currently showing
+            if (parentWin._lightModePopupShown || parentDoc.getElementById('lightModePopup')) {
                 return;
             }
             
-            // Use parent's sessionStorage
-            try {
-                if (parentWin.sessionStorage.getItem('lightModePopupShown')) {
-                    return;
-                }
-                parentWin.sessionStorage.setItem('lightModePopupShown', 'true');
-            } catch(e) {
-                // If can't access parent sessionStorage, just continue
-            }
+            // Mark as shown for this page load
+            parentWin._lightModePopupShown = true;
             
             // Create and inject popup
             var popup = parentDoc.createElement('div');
