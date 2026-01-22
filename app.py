@@ -1481,10 +1481,10 @@ st.markdown("<style>" + animation_css + """
     /* Question Card - Neumorphic style */
     .question-card {
         width: 100%;
-        background: #212121;
+        background: #07182E;
         border-radius: 30px;
-        box-shadow: 15px 15px 30px rgb(25, 25, 25),
-                    -15px -15px 30px rgb(60, 60, 60);
+        box-shadow: 15px 15px 30px rgb(4, 12, 23),
+                    -15px -15px 30px rgb(14, 38, 70);
         padding: 25px;
         margin: 15px 0;
     }
