@@ -1485,6 +1485,8 @@ st.markdown("<style>" + animation_css + """
         position: relative;
         display: flex;
         flex-direction: column;
+        place-content: center;
+        place-items: center;
         overflow: hidden;
         border-radius: 20px;
         padding: 25px;
@@ -1494,22 +1496,20 @@ st.markdown("<style>" + animation_css + """
     .question-card::before {
         content: '';
         position: absolute;
-        width: 100px;
-        background-image: linear-gradient(180deg, rgb(0, 183, 255), rgb(255, 48, 255));
-        height: 130%;
+        width: 200%;
+        height: 200%;
+        background-image: conic-gradient(from 0deg, rgb(0, 183, 255), rgb(255, 48, 255), rgb(0, 183, 255));
         animation: rotBGimg 3s linear infinite;
-        transition: all 0.2s linear;
-        left: 50%;
         top: 50%;
-        transform: translate(-50%, -50%) rotate(0deg);
+        left: 50%;
         transform-origin: center center;
     }
     
     @keyframes rotBGimg {
-        from {
+        0% {
             transform: translate(-50%, -50%) rotate(0deg);
         }
-        to {
+        100% {
             transform: translate(-50%, -50%) rotate(360deg);
         }
     }
@@ -1518,13 +1518,15 @@ st.markdown("<style>" + animation_css + """
         content: '';
         position: absolute;
         background: #07182E;
-        inset: 5px;
-        border-radius: 15px;
+        inset: 4px;
+        border-radius: 16px;
+        z-index: 0;
     }
     
     .question-card-content {
         z-index: 1;
         position: relative;
+        width: 100%;
     }
     
     .question-card-title {
