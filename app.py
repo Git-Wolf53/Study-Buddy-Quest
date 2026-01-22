@@ -3687,7 +3687,10 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         st.markdown("### 🏆 Achievement Showcase")
         st.markdown("*Create a certificate to show off your progress!*")
         
-        with st.expander("📜 Generate Your Certificate"):
+        # Keep expander open when certificate is generated
+        cert_expander_open = st.session_state.get('generated_certificate') is not None
+        
+        with st.expander("📜 Generate Your Certificate", expanded=cert_expander_open):
             student_name = st.text_input(
                 "Your Name (for the certificate):",
                 value=st.session_state.get('student_name', ''),
@@ -3701,6 +3704,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             if st.button("🎨 Generate Certificate", use_container_width=True, type="primary"):
                 st.session_state.generated_certificate = generate_certificate_html(student_name)
                 st.session_state.certificate_name = student_name
+                st.rerun()
             
             # Show certificate if it exists in session state
             if st.session_state.get('generated_certificate'):
