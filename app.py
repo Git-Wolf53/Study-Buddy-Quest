@@ -1481,10 +1481,10 @@ st.markdown("<style>" + animation_css + """
     /* Question Card - Neumorphic style */
     .question-card {
         width: 100%;
-        background: #1a3a5c;
+        background: #07182E;
         border-radius: 30px;
-        box-shadow: 10px 10px 20px #0d1f33,
-                    -10px -10px 20px #275585;
+        box-shadow: 15px 15px 30px rgb(4, 12, 23),
+                    -15px -15px 30px rgb(14, 38, 70);
         padding: 25px;
         margin: 15px 0;
     }
@@ -1698,11 +1698,8 @@ st.markdown("<style>" + animation_css + """
     }
     
     .stRadio > div > label:hover {
-        border-color: transparent !important;
-        background: linear-gradient(135deg, rgb(0, 183, 255), rgb(255, 48, 255)) !important;
-        color: white !important;
-        transform: scale(1.02);
-        box-shadow: 0 4px 15px rgba(0, 183, 255, 0.3);
+        border-color: #667eea !important;
+        background: rgba(102, 126, 234, 0.1) !important;
     }
     
     .stSuccess, .stInfo, .stWarning, .stError {
