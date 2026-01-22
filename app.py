@@ -176,6 +176,14 @@ def get_popup_html():
     
     text_color = "#1a1a2e" if popup_type in ["warning", "success"] else "#ffffff"
     
+    # Progress line color based on type
+    if popup_type == "error":
+        progress_gradient = "linear-gradient(90deg, #ff6b6b 0%, #ee5a5a 100%)"
+    elif popup_type == "success":
+        progress_gradient = "linear-gradient(90deg, #51cf66 0%, #40c057 100%)"
+    else:
+        progress_gradient = "linear-gradient(90deg, #ffd43b 0%, #fab005 100%)"
+    
     return f'''
     <script>
     (function() {{
@@ -185,11 +193,11 @@ def get_popup_html():
         
         var popup = parentDoc.createElement('div');
         popup.id = 'notificationPopup';
-        popup.innerHTML = '<span style="font-size: 1.3rem; margin-right: 12px;">{icon}</span><span style="flex: 1;">{message}</span><button onclick="this.parentElement.style.animation=\\'slideOutRight 0.4s ease forwards\\'; setTimeout(() => this.parentElement.remove(), 400);" style="background: none; border: none; color: {text_color}; font-size: 1.2rem; cursor: pointer; padding: 0; margin-left: 10px; opacity: 0.7;">&times;</button>';
-        popup.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: {bg_gradient}; color: {text_color}; padding: 16px 20px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25); z-index: 9999; font-family: Nunito, sans-serif; font-size: 0.95rem; display: flex; align-items: center; border: 2px solid {border_color}; animation: fadeSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); max-width: 400px;';
+        popup.innerHTML = '<div style="display: flex; align-items: center; padding: 16px 20px;"><span style="font-size: 1.3rem; margin-right: 12px;">{icon}</span><span style="flex: 1;">{message}</span><button onclick="this.closest(\\'#notificationPopup\\').style.animation=\\'slideOutRight 0.4s ease forwards\\'; setTimeout(() => document.getElementById(\\'notificationPopup\\').remove(), 400);" style="background: none; border: none; color: {text_color}; font-size: 1.2rem; cursor: pointer; padding: 0; margin-left: 10px; opacity: 0.7;">&times;</button></div><div style="position: absolute; bottom: 0; left: 0; height: 4px; background: {progress_gradient}; border-radius: 0 0 16px 16px; animation: shrinkLine 5s linear forwards; filter: brightness(0.8);"></div>';
+        popup.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: {bg_gradient}; color: {text_color}; border-radius: 16px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25); z-index: 9999; font-family: Nunito, sans-serif; font-size: 0.95rem; border: 2px solid {border_color}; animation: fadeSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); max-width: 400px; overflow: hidden;';
         
         var style = parentDoc.createElement('style');
-        style.textContent = '@keyframes fadeSlideIn {{ 0% {{ opacity: 0; transform: translateX(50px) scale(0.95); }} 50% {{ opacity: 0.8; transform: translateX(-5px) scale(1.02); }} 100% {{ opacity: 1; transform: translateX(0) scale(1); }} }} @keyframes slideOutRight {{ 0% {{ opacity: 1; transform: translateX(0); }} 100% {{ opacity: 0; transform: translateX(100px); }} }}';
+        style.textContent = '@keyframes fadeSlideIn {{ 0% {{ opacity: 0; transform: translateX(50px) scale(0.95); }} 50% {{ opacity: 0.8; transform: translateX(-5px) scale(1.02); }} 100% {{ opacity: 1; transform: translateX(0) scale(1); }} }} @keyframes slideOutRight {{ 0% {{ opacity: 1; transform: translateX(0); }} 100% {{ opacity: 0; transform: translateX(100px); }} }} @keyframes shrinkLine {{ 0% {{ width: 100%; }} 100% {{ width: 0%; }} }}';
         parentDoc.head.appendChild(style);
         parentDoc.body.appendChild(popup);
         
