@@ -1484,7 +1484,8 @@ st.markdown("<style>" + animation_css + """
         background: #07182E;
         border-radius: 30px;
         box-shadow: 15px 15px 30px rgb(4, 12, 23),
-                    -15px -15px 30px rgb(14, 38, 70);
+                    -15px -15px 30px rgb(14, 38, 70),
+                    0 20px 40px rgba(0, 0, 0, 0.4);
         padding: 25px;
         margin: 15px 0;
     }
