@@ -1951,7 +1951,76 @@ st.markdown("<style>" + animation_css + """
     .page-padding {
         padding-bottom: 80px !important;
     }
+    
+    /* Light mode popup styling */
+    .light-mode-popup {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        color: white;
+        padding: 16px 24px;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        z-index: 9999;
+        font-family: 'Nunito', sans-serif;
+        font-size: 0.95rem;
+        display: none;
+        animation: slideInUp 0.4s ease-out;
+        border: 1px solid rgba(167, 139, 250, 0.3);
+    }
+    
+    .light-mode-popup.show {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .light-mode-popup button {
+        background: transparent;
+        border: none;
+        color: #a78bfa;
+        cursor: pointer;
+        font-size: 1.2rem;
+        padding: 0;
+        margin-left: 8px;
+    }
+    
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 </style>
+""", unsafe_allow_html=True)
+
+# Light mode detection popup
+st.markdown("""
+<div id="lightModePopup" class="light-mode-popup">
+    <span>🌙 This app looks better in dark mode!</span>
+    <button onclick="this.parentElement.style.display='none'" title="Dismiss">✕</button>
+</div>
+<script>
+(function() {
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+        var popup = document.getElementById('lightModePopup');
+        if (popup && !sessionStorage.getItem('lightModePopupDismissed')) {
+            popup.classList.add('show');
+            setTimeout(function() {
+                popup.style.display = 'none';
+            }, 6000);
+        }
+    }
+    document.querySelector('#lightModePopup button')?.addEventListener('click', function() {
+        sessionStorage.setItem('lightModePopupDismissed', 'true');
+    });
+})();
+</script>
 """, unsafe_allow_html=True)
 
 # ============================================================
