@@ -3796,7 +3796,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     )
                     st.success("Your certificate is ready to download!")
                 except Exception as e:
-                    show_popup("Certificate image generation unavailable. Use screenshot to save!", "warning")
+                    show_popup("Certificate image generation unavailable. Use screenshot to save!", "error")
                 
                 st.info("📸 **Tip:** You can also take a screenshot or use your browser's print function (Ctrl+P / Cmd+P) to save as PDF!")
                 
