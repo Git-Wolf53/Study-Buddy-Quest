@@ -1944,6 +1944,165 @@ if st.session_state.get('compact_mode', False):
     </style>
     """, unsafe_allow_html=True)
 
+# Dark Mode CSS (default on)
+if st.session_state.get('dark_mode', True):
+    st.markdown("""
+    <style>
+        /* Dark Mode */
+        .stApp {
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%) !important;
+        }
+        
+        .stApp > header {
+            background-color: transparent !important;
+        }
+        
+        section[data-testid="stSidebar"] {
+            background: linear-gradient(180deg, #1a1a2e 0%, #0f0f23 100%) !important;
+        }
+        
+        section[data-testid="stSidebar"] > div {
+            background-color: transparent !important;
+        }
+        
+        .stMarkdown, .stMarkdown p, .stMarkdown span, .stMarkdown div,
+        .stTextInput label, .stSelectbox label, .stRadio label, .stCheckbox label,
+        h1, h2, h3, h4, h5, h6, .stCaption, small, .stExpander p {
+            color: #e4e4e7 !important;
+        }
+        
+        .stTextInput input, .stSelectbox > div > div,
+        [data-baseweb="select"] > div {
+            background-color: #2d2d44 !important;
+            color: #e4e4e7 !important;
+            border-color: #4a4a6a !important;
+        }
+        
+        .stExpander {
+            background-color: #1e1e32 !important;
+            border-color: #3d3d5c !important;
+        }
+        
+        .stExpander > div > div > div > div {
+            color: #e4e4e7 !important;
+        }
+        
+        hr {
+            border-color: #3d3d5c !important;
+        }
+        
+        .stProgress > div > div > div {
+            background: linear-gradient(90deg, #8b5cf6 0%, #a855f7 100%) !important;
+        }
+        
+        .stProgress > div > div {
+            background-color: #2d2d44 !important;
+        }
+        
+        /* Dark mode for cards and elements */
+        .practice-areas {
+            background: linear-gradient(135deg, #2d2d44 0%, #1e1e32 100%) !important;
+            border-color: #4a4a6a !important;
+        }
+        
+        .practice-title {
+            color: #a78bfa !important;
+        }
+        
+        .practice-item {
+            background: rgba(139, 92, 246, 0.2) !important;
+            color: #e4e4e7 !important;
+        }
+        
+        .badge-showcase {
+            background: #1e1e32 !important;
+            border-color: #3d3d5c !important;
+        }
+        
+        .badge-title {
+            color: #a78bfa !important;
+        }
+        
+        /* Question boxes in dark mode */
+        .result-correct {
+            background: linear-gradient(135deg, #1a3a2e 0%, #0d2818 100%) !important;
+            color: #a7f3d0 !important;
+        }
+        
+        .result-wrong {
+            background: linear-gradient(135deg, #3a1a1a 0%, #280d0d 100%) !important;
+            color: #fca5a5 !important;
+        }
+        
+        /* Radio buttons */
+        .stRadio > div > label > div {
+            color: #e4e4e7 !important;
+        }
+        
+        /* File uploader */
+        [data-testid="stFileUploader"] {
+            background-color: #1e1e32 !important;
+        }
+        
+        [data-testid="stFileUploader"] label {
+            color: #e4e4e7 !important;
+        }
+        
+        /* Dropdown menus */
+        [data-baseweb="popover"] {
+            background-color: #2d2d44 !important;
+        }
+        
+        [data-baseweb="menu"] {
+            background-color: #2d2d44 !important;
+        }
+        
+        [data-baseweb="menu"] li {
+            color: #e4e4e7 !important;
+        }
+        
+        [data-baseweb="menu"] li:hover {
+            background-color: #3d3d5c !important;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+else:
+    # Light Mode - ensure proper light styling
+    st.markdown("""
+    <style>
+        /* Light Mode overrides */
+        .stApp {
+            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%) !important;
+        }
+        
+        section[data-testid="stSidebar"] {
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+        }
+        
+        .level-card {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+        }
+        
+        .level-card:before {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+        }
+        
+        .level-number {
+            color: white !important;
+        }
+        
+        .level-title {
+            color: rgba(255,255,255,0.95) !important;
+        }
+        
+        .stat-item {
+            background: rgba(255,255,255,0.25) !important;
+            color: white !important;
+            border: none !important;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
 # ============================================================
 # QUIZ HISTORY
 # ============================================================
@@ -3495,6 +3654,84 @@ with st.expander("⚙️ Settings"):
             st.session_state.font_size = "large"
             st.rerun()
     st.caption(f"Current: {st.session_state.font_size.title()}")
+    
+    st.markdown("---")
+    
+    # Theme Toggle (Uiverse-style sun/moon)
+    is_dark = st.session_state.get('dark_mode', True)
+    
+    # Style Streamlit toggle to look like Uiverse design
+    st.markdown(f"""
+    <style>
+        /* Uiverse-style theme toggle */
+        .theme-toggle-wrapper {{
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+        }}
+        
+        .theme-icon {{
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }}
+        
+        .theme-icon:hover {{
+            transform: scale(1.1);
+        }}
+        
+        .theme-text {{
+            font-weight: 600;
+            font-size: 1rem;
+            color: {'#a78bfa' if is_dark else '#f97316'};
+        }}
+        
+        /* Style the Streamlit toggle to match Uiverse */
+        div[data-testid="stToggle"] > label > div:first-child {{
+            width: 70px !important;
+            height: 34px !important;
+            background: {'linear-gradient(to right, #3b82f6, #6366f1)' if is_dark else 'linear-gradient(to right, #fbbf24, #f97316)'} !important;
+            border-radius: 34px !important;
+            transition: background 0.5s ease !important;
+        }}
+        
+        div[data-testid="stToggle"] > label > div:first-child > div {{
+            width: 28px !important;
+            height: 28px !important;
+            top: 3px !important;
+            left: {'38px' if is_dark else '4px'} !important;
+            background: white !important;
+            border-radius: 50% !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+            transition: left 0.5s ease !important;
+        }}
+        
+        div[data-testid="stToggle"] > label > div:first-child > div::after {{
+            content: "{'🌙' if is_dark else '☀️'}" !important;
+            font-size: 16px !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+        }}
+    </style>
+    
+    <div class="theme-toggle-wrapper">
+        <span class="theme-icon">{'🌙' if is_dark else '☀️'}</span>
+        <span class="theme-text">{'Dark Mode' if is_dark else 'Light Mode'}</span>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Use Streamlit toggle for functionality
+    dark_mode = st.toggle(
+        "Theme",
+        value=st.session_state.get('dark_mode', True),
+        help="Toggle between dark and light theme",
+        label_visibility="collapsed"
+    )
+    if dark_mode != st.session_state.dark_mode:
+        st.session_state.dark_mode = dark_mode
+        st.rerun()
     
     st.markdown("---")
     
