@@ -3812,7 +3812,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 }}
                 </style>
                 <div class="share-btn">
-                    <span class="label">SHARE</span>
+                    <span class="label">SHARE CERTIFICATE</span>
                     <div class="icons">
                         <a href="{twitter_url}" target="_blank" title="Share on X">🐦 X</a>
                         <span class="divider">|</span>
