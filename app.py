@@ -1478,6 +1478,68 @@ st.markdown("<style>" + animation_css + """
         position: relative;
     }
     
+    /* Question Card - Uiverse dangerous-quail-58 style */
+    .question-card {
+        width: 100%;
+        background: #07182E;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border-radius: 20px;
+        padding: 25px;
+        margin: 15px 0;
+    }
+    
+    .question-card::before {
+        content: '';
+        position: absolute;
+        width: 100px;
+        background-image: linear-gradient(180deg, rgb(0, 183, 255), rgb(255, 48, 255));
+        height: 130%;
+        animation: rotBGimg 3s linear infinite;
+        transition: all 0.2s linear;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) rotate(0deg);
+        transform-origin: center center;
+    }
+    
+    @keyframes rotBGimg {
+        from {
+            transform: translate(-50%, -50%) rotate(0deg);
+        }
+        to {
+            transform: translate(-50%, -50%) rotate(360deg);
+        }
+    }
+    
+    .question-card::after {
+        content: '';
+        position: absolute;
+        background: #07182E;
+        inset: 5px;
+        border-radius: 15px;
+    }
+    
+    .question-card-content {
+        z-index: 1;
+        position: relative;
+    }
+    
+    .question-card-title {
+        color: #00b7ff;
+        margin-bottom: 10px;
+        font-size: 1.1rem;
+        font-weight: 700;
+    }
+    
+    .question-card-text {
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: #e0e7ff;
+    }
+    
     /* ========== LIGHT MODE OVERRIDES ========== */
     @media (prefers-color-scheme: light) {
         .level-card {
@@ -1547,6 +1609,28 @@ st.markdown("<style>" + animation_css + """
         
         .practice-tip {
             color: rgba(255,255,255,0.9) !important;
+        }
+        
+        .question-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+        }
+        
+        .question-card::before {
+            display: none;
+        }
+        
+        .question-card::after {
+            display: none;
+        }
+        
+        .question-card-title {
+            color: white !important;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        .question-card-text {
+            color: rgba(255,255,255,0.95) !important;
         }
     }
     
@@ -2706,13 +2790,11 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     q_col, timer_col = st.columns([4, 1])
                     with q_col:
                         st.markdown(f"""
-<div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
-            padding: 20px; 
-            border-radius: 28px; 
-            margin: 15px 0;
-            border-left: 5px solid #667eea;">
-    <h4 style="color: #667eea; margin-bottom: 10px;">Question {q['number']} {emoji}</h4>
-    <p style="font-size: 1.15rem; font-weight: 600; color: #6b7280;">{q['text']}</p>
+<div class="question-card">
+    <div class="question-card-content">
+        <h4 class="question-card-title">Question {q['number']} {emoji}</h4>
+        <p class="question-card-text">{q['text']}</p>
+    </div>
 </div>
                         """, unsafe_allow_html=True)
                     with timer_col:
@@ -2798,13 +2880,11 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                         components.html(timer_html, height=110)
                 else:
                     st.markdown(f"""
-<div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
-            padding: 20px; 
-            border-radius: 28px; 
-            margin: 15px 0;
-            border-left: 5px solid #667eea;">
-    <h4 style="color: #667eea; margin-bottom: 10px;">Question {q['number']} {emoji}</h4>
-    <p style="font-size: 1.15rem; font-weight: 600; color: #6b7280;">{q['text']}</p>
+<div class="question-card">
+    <div class="question-card-content">
+        <h4 class="question-card-title">Question {q['number']} {emoji}</h4>
+        <p class="question-card-text">{q['text']}</p>
+    </div>
 </div>
                     """, unsafe_allow_html=True)
                 
