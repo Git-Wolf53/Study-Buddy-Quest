@@ -2007,10 +2007,13 @@ components.html("""
     var parent = window.parent.document;
     
     function showLightModePopup() {
-        // Check if already showing or permanently dismissed
-        if (parent.getElementById('lightModePopup')) {
+        // Check if already shown this session or currently showing
+        if (parent.getElementById('lightModePopup') || sessionStorage.getItem('lightModePopupShown')) {
             return;
         }
+        
+        // Mark as shown for this session
+        sessionStorage.setItem('lightModePopupShown', 'true');
         
         // Create and inject popup
         var popup = parent.createElement('div');
