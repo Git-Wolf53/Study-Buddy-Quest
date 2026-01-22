@@ -1594,22 +1594,27 @@ st.markdown("<style>" + animation_css + """
     }
     
     .stButton > button {
-        background: #6366f1 !important;
-        color: white !important;
+        background: #1a1a2e !important;
+        color: #a78bfa !important;
         font-size: 1.2rem !important;
         font-weight: 600 !important;
         padding: 16px 32px !important;
         border-radius: 20px !important;
-        border: none !important;
+        border: 2px solid #a78bfa !important;
         width: 100% !important;
         transition: all 0.2s ease !important;
-        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25) !important;
+        box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.4),
+                    -4px -4px 15px rgba(50, 50, 80, 0.3),
+                    0 10px 25px rgba(0, 0, 0, 0.3) !important;
     }
     
     .stButton > button:hover {
-        background: #4f46e5 !important;
+        background: #a78bfa !important;
+        color: #1a1a2e !important;
         transform: translateY(-2px) !important;
-        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3) !important;
+        box-shadow: 8px 8px 25px rgba(0, 0, 0, 0.5),
+                    -4px -4px 20px rgba(50, 50, 80, 0.4),
+                    0 15px 35px rgba(167, 139, 250, 0.3) !important;
     }
     
     .stButton > button:active {
@@ -1617,13 +1622,20 @@ st.markdown("<style>" + animation_css + """
     }
     
     .stFormSubmitButton > button {
-        background: #10b981 !important;
-        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25) !important;
+        background: #1a1a2e !important;
+        color: #34d399 !important;
+        border: 2px solid #34d399 !important;
+        box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.4),
+                    -4px -4px 15px rgba(50, 50, 80, 0.3),
+                    0 10px 25px rgba(0, 0, 0, 0.3) !important;
     }
     
     .stFormSubmitButton > button:hover {
-        background: #059669 !important;
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
+        background: #34d399 !important;
+        color: #1a1a2e !important;
+        box-shadow: 8px 8px 25px rgba(0, 0, 0, 0.5),
+                    -4px -4px 20px rgba(50, 50, 80, 0.4),
+                    0 15px 35px rgba(52, 211, 153, 0.3) !important;
     }
     
     .stTextInput > div > div > input {
