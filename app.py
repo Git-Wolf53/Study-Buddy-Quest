@@ -93,6 +93,8 @@ defaults = {
     "uploaded_image": None,
     "xp_history": [],
     "quiz_score_history": [],
+    "popup_message": None,
+    "popup_type": None,
 }
 
 # ============================================================
@@ -137,6 +139,69 @@ for key, value in defaults.items():
 if 'timed_mode_initialized' not in st.session_state:
     st.session_state.timed_mode = st.session_state.get('default_timed_mode', False)
     st.session_state.timed_mode_initialized = True
+
+# ============================================================
+# POPUP NOTIFICATION SYSTEM
+# ============================================================
+def show_popup(message, popup_type="warning"):
+    """Show a popup notification. Type can be 'warning', 'error', or 'success'."""
+    st.session_state.popup_message = message
+    st.session_state.popup_type = popup_type
+
+def get_popup_html():
+    """Generate popup HTML if there's a message to show."""
+    if not st.session_state.get('popup_message'):
+        return None
+    
+    message = st.session_state.popup_message
+    popup_type = st.session_state.popup_type or "warning"
+    
+    # Clear the message after getting it
+    st.session_state.popup_message = None
+    st.session_state.popup_type = None
+    
+    # Colors based on type
+    if popup_type == "error":
+        bg_gradient = "linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%)"
+        icon = "&#10060;"  # X mark
+        border_color = "rgba(255, 107, 107, 0.5)"
+    elif popup_type == "success":
+        bg_gradient = "linear-gradient(135deg, #51cf66 0%, #40c057 100%)"
+        icon = "&#10004;"  # Check mark
+        border_color = "rgba(81, 207, 102, 0.5)"
+    else:  # warning
+        bg_gradient = "linear-gradient(135deg, #ffd43b 0%, #fab005 100%)"
+        icon = "&#9888;"  # Warning triangle
+        border_color = "rgba(255, 212, 59, 0.5)"
+    
+    text_color = "#1a1a2e" if popup_type in ["warning", "success"] else "#ffffff"
+    
+    return f'''
+    <script>
+    (function() {{
+        var parentDoc = window.parent.document;
+        var existingPopup = parentDoc.getElementById('notificationPopup');
+        if (existingPopup) existingPopup.remove();
+        
+        var popup = parentDoc.createElement('div');
+        popup.id = 'notificationPopup';
+        popup.innerHTML = '<span style="font-size: 1.3rem; margin-right: 12px;">{icon}</span><span style="flex: 1;">{message}</span><button onclick="this.parentElement.style.animation=\\'slideOutRight 0.4s ease forwards\\'; setTimeout(() => this.parentElement.remove(), 400);" style="background: none; border: none; color: {text_color}; font-size: 1.2rem; cursor: pointer; padding: 0; margin-left: 10px; opacity: 0.7;">&times;</button>';
+        popup.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: {bg_gradient}; color: {text_color}; padding: 16px 20px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25); z-index: 9999; font-family: Nunito, sans-serif; font-size: 0.95rem; display: flex; align-items: center; border: 2px solid {border_color}; animation: fadeSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); max-width: 400px;';
+        
+        var style = parentDoc.createElement('style');
+        style.textContent = '@keyframes fadeSlideIn {{ 0% {{ opacity: 0; transform: translateX(50px) scale(0.95); }} 50% {{ opacity: 0.8; transform: translateX(-5px) scale(1.02); }} 100% {{ opacity: 1; transform: translateX(0) scale(1); }} }} @keyframes slideOutRight {{ 0% {{ opacity: 1; transform: translateX(0); }} 100% {{ opacity: 0; transform: translateX(100px); }} }}';
+        parentDoc.head.appendChild(style);
+        parentDoc.body.appendChild(popup);
+        
+        setTimeout(function() {{
+            if (parentDoc.getElementById('notificationPopup')) {{
+                popup.style.animation = 'slideOutRight 0.4s ease forwards';
+                setTimeout(() => popup.remove(), 400);
+            }}
+        }}, 5000);
+    }})();
+    </script>
+    '''
 
 # ============================================================
 # BADGE SYSTEM
@@ -2542,7 +2607,7 @@ if difficulty == "Easy 🌱":
 elif difficulty == "Medium 🌿":
     st.info("🔥 Ready for a challenge! You've got this!")
 else:
-    st.warning("🏆 Brave choice! Time to show what you're made of!")
+    show_popup("🏆 Brave choice! Time to show what you're made of!", "warning")
 
 # Image Quiz Mode
 st.markdown("")
@@ -2660,9 +2725,9 @@ if not st.session_state.quiz_generating:
         
         # Validation - either need topic OR image
         if not is_image_quiz and not clean_topic:
-            st.warning("⚠️ Oops! Enter a topic first! What do you want to learn about today? 🤔")
+            show_popup("⚠️ Oops! Enter a topic first! What do you want to learn about today? 🤔", "warning")
         elif not is_image_quiz and len(clean_topic) < 2:
-            st.warning("⚠️ That topic is too short! Try something like 'volcanoes' or 'ancient Egypt' 🤔")
+            show_popup("⚠️ That topic is too short! Try something like 'volcanoes' or 'ancient Egypt' 🤔", "warning")
         elif is_image_quiz or clean_topic:
             # Set generating state
             st.session_state.quiz_generating = True
@@ -2808,13 +2873,13 @@ if st.session_state.get('quiz_generating', False):
             error_msg = str(e)
             print(f"Quiz generation error: {type(e).__name__}: {e}")
             if "API_KEY" in error_msg or "API key" in error_msg or "invalid" in error_msg.lower():
-                st.error("🔑 There's an issue with the AI connection. Please try again or contact support!")
+                show_popup("🔑 There's an issue with the AI connection. Please try again or contact support!", "error")
             elif "timeout" in error_msg.lower():
-                st.error("⏱️ The request took too long. Please try again!")
+                show_popup("⏱️ The request took too long. Please try again!", "error")
             elif "quota" in error_msg.lower() or "limit" in error_msg.lower():
-                st.error("📊 API rate limit reached. Please wait a moment and try again!")
+                show_popup("📊 API rate limit reached. Please wait a moment and try again!", "error")
             else:
-                st.error(f"😅 Oops! Something went wrong: {error_msg[:200]}")
+                show_popup(f"😅 Oops! Something went wrong: {error_msg[:100]}", "error")
             st.info("💡 **Tip:** Try a different topic or refresh the page!")
             st.rerun()
 
@@ -3046,7 +3111,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                             '''
                             st.markdown(audio_html, unsafe_allow_html=True)
                         except Exception as e:
-                            st.warning("Could not generate audio. Please try again.")
+                            show_popup("Could not generate audio. Please try again.", "warning")
                 with tts_col2:
                     st.markdown("**👆 Pick your answer:**")
                 
@@ -3077,7 +3142,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             
             # Show error below submit button if there's one
             if st.session_state.quiz_error:
-                st.error(st.session_state.quiz_error)
+                show_popup(st.session_state.quiz_error, "error")
             
             if submit_clicked:
                 user_answers = [st.session_state.get(f"q{i+1}") for i in range(num_questions)]
@@ -3198,9 +3263,9 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     unanswered = [i+1 for i, ans in enumerate(user_answers) if ans is None]
                     if unanswered:
                         if len(unanswered) == 1:
-                            st.error(f"Please answer Question {unanswered[0]} before submitting!")
+                            show_popup(f"Please answer Question {unanswered[0]} before submitting!", "error")
                         else:
-                            st.error(f"Please answer Questions {', '.join(map(str, unanswered))} before submitting!")
+                            show_popup(f"Please answer Questions {', '.join(map(str, unanswered))} before submitting!", "error")
                         st.stop()
                     
                     st.session_state.user_answers = user_answers
@@ -3676,7 +3741,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                         })
                         st.rerun()
                     else:
-                        st.warning("Please type a question first!")
+                        show_popup("Please type a question first!", "warning")
             with col2:
                 if st.button("🗑️ Clear Chat", use_container_width=True):
                     st.session_state.tutor_chat_history = []
@@ -3723,7 +3788,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     )
                     st.success("Your certificate is ready to download!")
                 except Exception as e:
-                    st.warning("Certificate image generation unavailable. Use screenshot to save!")
+                    show_popup("Certificate image generation unavailable. Use screenshot to save!", "warning")
                 
                 st.info("📸 **Tip:** You can also take a screenshot or use your browser's print function (Ctrl+P / Cmd+P) to save as PDF!")
                 
@@ -4157,5 +4222,12 @@ st.markdown("""
     <small>🧠 Learn. Level Up. Repeat! 🚀</small>
 </div>
 """, unsafe_allow_html=True)
+
+# ============================================================
+# POPUP NOTIFICATION DISPLAY
+# ============================================================
+popup_html = get_popup_html()
+if popup_html:
+    components.html(popup_html, height=0)
 
 
