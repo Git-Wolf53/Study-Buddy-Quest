@@ -1327,24 +1327,69 @@ st.markdown("<style>" + animation_css + """
     }
     
     .badge-showcase {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        isolation: isolate;
+        position: relative;
+        width: 100%;
+        background: #29292c;
         border-radius: 20px;
+        overflow: hidden;
+        --gradient: linear-gradient(to bottom, #10b981, #059669, #34d399);
+        --color: #34d399;
+        padding: 20px;
         margin: 20px 0;
         text-align: center;
+    }
+    
+    .badge-showcase:before {
+        position: absolute;
+        content: "";
+        inset: 2px;
+        border-radius: 18px;
+        background: #18181b;
+        z-index: 2;
+    }
+    
+    .badge-showcase:after {
+        position: absolute;
+        content: "";
+        width: 5px;
+        inset: 10px auto 10px 8px;
+        border-radius: 3px;
+        background: var(--gradient);
+        transition: transform 300ms ease;
+        z-index: 4;
+    }
+    
+    .badge-showcase:hover:after {
+        transform: translateX(2px);
     }
     
     .badge-title {
         font-size: 1.2rem;
         font-weight: 700;
-        color: #6366f1;
+        color: var(--color);
         margin-bottom: 15px;
+        z-index: 5;
+        position: relative;
+        transition: transform 300ms ease;
+    }
+    
+    .badge-showcase:hover .badge-title {
+        transform: translateX(3px);
     }
     
     .badge-icons {
         font-size: 2.2rem;
         letter-spacing: 8px;
+        z-index: 5;
+        position: relative;
+        transition: transform 300ms ease;
+    }
+    
+    .badge-showcase:hover .badge-icons {
+        transform: translateX(4px);
     }
     
     .new-badge-alert {
@@ -1363,24 +1408,69 @@ st.markdown("<style>" + animation_css + """
     }
     
     .practice-areas {
-        background: #fffbeb;
-        border-left: 4px solid #f59e0b;
-        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        isolation: isolate;
+        position: relative;
+        width: 100%;
+        background: #29292c;
         border-radius: 20px;
+        overflow: hidden;
+        --gradient: linear-gradient(to bottom, #f59e0b, #d97706, #fbbf24);
+        --color: #fbbf24;
+        padding: 20px;
         margin: 20px 0;
+    }
+    
+    .practice-areas:before {
+        position: absolute;
+        content: "";
+        inset: 2px;
+        border-radius: 18px;
+        background: #18181b;
+        z-index: 2;
+    }
+    
+    .practice-areas:after {
+        position: absolute;
+        content: "";
+        width: 5px;
+        inset: 10px auto 10px 8px;
+        border-radius: 3px;
+        background: var(--gradient);
+        transition: transform 300ms ease;
+        z-index: 4;
+    }
+    
+    .practice-areas:hover:after {
+        transform: translateX(2px);
     }
     
     .practice-title {
         font-weight: 700;
-        color: #b45309;
+        color: var(--color);
         font-size: 1.1rem;
         margin-bottom: 10px;
+        z-index: 5;
+        position: relative;
+        transition: transform 300ms ease;
+    }
+    
+    .practice-areas:hover .practice-title {
+        transform: translateX(3px);
     }
     
     .practice-item {
-        color: #78716c;
+        color: #a1a1aa;
         padding: 5px 0;
         font-size: 1rem;
+        z-index: 5;
+        position: relative;
+        transition: transform 300ms ease;
+    }
+    
+    .practice-areas:hover .practice-item {
+        transform: translateX(4px);
     }
     
     .stButton > button {
@@ -1829,7 +1919,7 @@ if st.session_state.weak_topics:
     <div class="practice-areas">
         <div class="practice-title">📖 Areas to Level Up</div>
         {topics_list}
-        <small style="color: #7f5539;">Pro tip: Try these topics again! 💪</small>
+        <small style="color: #fbbf24; z-index: 5; position: relative;">Pro tip: Try these topics again! 💪</small>
     </div>
     """, unsafe_allow_html=True)
 
