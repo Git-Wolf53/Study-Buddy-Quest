@@ -1591,6 +1591,16 @@ st.markdown("<style>" + animation_css + """
         .question-card-text {
             color: rgba(255,255,255,0.95) !important;
         }
+        
+        .stTextInput > div > div > input {
+            background: #f8f9fa !important;
+            color: #1a1a2e !important;
+            border: 2px solid #dfe6e9 !important;
+        }
+        
+        .stTextInput > div > div > input::placeholder {
+            color: #6b7280 !important;
+        }
     }
     
     .stButton > button {
