@@ -3735,37 +3735,142 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 share_text = f"{share_name} just reached Level {level} ({title_clean}) on Study Buddy Quest! Completed {st.session_state.quizzes_completed} quizzes and earned {st.session_state.total_score} XP!"
                 share_text_encoded = urllib.parse.quote_plus(share_text)
                 
-                share_col1, share_col2, share_col3 = st.columns(3)
+                twitter_url = f"https://twitter.com/intent/tweet?text={share_text_encoded}"
+                facebook_url = f"https://www.facebook.com/sharer/sharer.php?quote={share_text_encoded}"
+                linkedin_url = f"https://www.linkedin.com/sharing/share-offsite/?url=https://replit.com"
                 
-                with share_col1:
-                    twitter_url = f"https://twitter.com/intent/tweet?text={share_text_encoded}"
-                    st.markdown(f'''
-                    <a href="{twitter_url}" target="_blank" style="text-decoration: none;">
-                        <div style="background: #1DA1F2; color: white; padding: 12px; border-radius: 20px; text-align: center; font-weight: 600;">
-                            🐦 Share on X
-                        </div>
-                    </a>
-                    ''', unsafe_allow_html=True)
+                share_card_html = f'''
+                <style>
+                .share-card {{
+                    position: relative;
+                    width: 220px;
+                    height: 220px;
+                    background: #1a1a2e;
+                    border-radius: 30px;
+                    overflow: hidden;
+                    box-shadow: rgba(167, 139, 250, 0.2) 0px 7px 29px 0px;
+                    transition: all 0.5s ease-in-out;
+                    border: 2px solid rgba(167, 139, 250, 0.3);
+                    margin: 0 auto;
+                }}
+                .share-card .background {{
+                    position: absolute;
+                    inset: 0;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #ec4899 100%);
+                }}
+                .share-card .logo {{
+                    position: absolute;
+                    right: 50%;
+                    bottom: 50%;
+                    transform: translate(50%, 50%);
+                    transition: all 0.6s ease-in-out;
+                    font-size: 1.1em;
+                    font-weight: 600;
+                    color: #ffffff;
+                    letter-spacing: 2px;
+                    text-align: center;
+                }}
+                .share-card .box {{
+                    position: absolute;
+                    padding: 10px;
+                    text-align: right;
+                    background: rgba(255, 255, 255, 0.2);
+                    border-top: 2px solid rgba(255, 255, 255, 0.5);
+                    border-right: 1px solid rgba(255, 255, 255, 0.3);
+                    border-radius: 10% 13% 42% 0%/10% 12% 75% 0%;
+                    box-shadow: rgba(100, 100, 111, 0.3) -7px 7px 29px 0px;
+                    transform-origin: bottom left;
+                    transition: all 0.6s ease-in-out;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }}
+                .share-card .box::before {{
+                    content: "";
+                    position: absolute;
+                    inset: 0;
+                    border-radius: inherit;
+                    opacity: 0;
+                    transition: all 0.4s ease-in-out;
+                }}
+                .share-card .box a {{
+                    color: rgba(255, 255, 255, 0.9);
+                    font-size: 1.5rem;
+                    text-decoration: none;
+                    transition: all 0.3s ease;
+                }}
+                .share-card .box:hover a {{
+                    filter: drop-shadow(0 0 8px white);
+                    transform: scale(1.2);
+                }}
+                .share-card .box1 {{
+                    width: 70%;
+                    height: 70%;
+                    bottom: -70%;
+                    left: -70%;
+                }}
+                .share-card .box1::before {{
+                    background: linear-gradient(135deg, #1DA1F2 0%, #00ACEE 100%);
+                }}
+                .share-card .box1:hover::before {{
+                    opacity: 1;
+                }}
+                .share-card .box2 {{
+                    width: 50%;
+                    height: 50%;
+                    bottom: -50%;
+                    left: -50%;
+                    transition-delay: 0.1s;
+                }}
+                .share-card .box2::before {{
+                    background: linear-gradient(135deg, #4267B2 0%, #5b7bd5 100%);
+                }}
+                .share-card .box2:hover::before {{
+                    opacity: 1;
+                }}
+                .share-card .box3 {{
+                    width: 30%;
+                    height: 30%;
+                    bottom: -30%;
+                    left: -30%;
+                    transition-delay: 0.2s;
+                }}
+                .share-card .box3::before {{
+                    background: linear-gradient(135deg, #0077B5 0%, #00a0dc 100%);
+                }}
+                .share-card .box3:hover::before {{
+                    opacity: 1;
+                }}
+                .share-card:hover {{
+                    transform: scale(1.05);
+                    box-shadow: rgba(167, 139, 250, 0.4) 0px 10px 40px 0px;
+                }}
+                .share-card:hover .box {{
+                    bottom: -1px;
+                    left: -1px;
+                }}
+                .share-card:hover .logo {{
+                    transform: translate(50px, -45px);
+                    letter-spacing: 0px;
+                    font-size: 0.9em;
+                }}
+                </style>
+                <div class="share-card">
+                    <div class="background"></div>
+                    <div class="logo">📢<br>SHARE</div>
+                    <div class="box box1">
+                        <a href="{twitter_url}" target="_blank" title="Share on X/Twitter">🐦</a>
+                    </div>
+                    <div class="box box2">
+                        <a href="{facebook_url}" target="_blank" title="Share on Facebook">📘</a>
+                    </div>
+                    <div class="box box3">
+                        <a href="{linkedin_url}" target="_blank" title="Share on LinkedIn">💼</a>
+                    </div>
+                </div>
+                '''
                 
-                with share_col2:
-                    facebook_url = f"https://www.facebook.com/sharer/sharer.php?quote={share_text_encoded}"
-                    st.markdown(f'''
-                    <a href="{facebook_url}" target="_blank" style="text-decoration: none;">
-                        <div style="background: #4267B2; color: white; padding: 12px; border-radius: 20px; text-align: center; font-weight: 600;">
-                            📘 Share on Facebook
-                        </div>
-                    </a>
-                    ''', unsafe_allow_html=True)
-                
-                with share_col3:
-                    linkedin_url = f"https://www.linkedin.com/sharing/share-offsite/?url=https://replit.com"
-                    st.markdown(f'''
-                    <a href="{linkedin_url}" target="_blank" style="text-decoration: none;">
-                        <div style="background: #0077B5; color: white; padding: 12px; border-radius: 20px; text-align: center; font-weight: 600;">
-                            💼 Share on LinkedIn
-                        </div>
-                    </a>
-                    ''', unsafe_allow_html=True)
+                components.html(share_card_html, height=260)
                 
                 # Copy to clipboard
                 st.markdown("")
