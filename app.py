@@ -3827,13 +3827,137 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 
                 # Copy to clipboard
                 st.markdown("")
-                st.text_area(
-                    "📋 Copy this message to share anywhere:",
-                    value=share_text,
-                    height=80,
-                    key="share_text_area"
-                )
-                st.caption("Copy the text above and paste it anywhere you want to share!")
+                st.markdown("**📋 Copy this message to share anywhere:**")
+                
+                copy_section_html = f'''
+                <style>
+                .copy-container {{
+                    display: flex;
+                    gap: 10px;
+                    align-items: stretch;
+                }}
+                .copy-text {{
+                    flex: 1;
+                    background: #1a1a2e;
+                    border: 2px solid rgba(167, 139, 250, 0.3);
+                    border-radius: 12px;
+                    padding: 12px 15px;
+                    color: #e0e0e0;
+                    font-size: 14px;
+                    line-height: 1.4;
+                    font-family: 'Nunito', sans-serif;
+                }}
+                .copy-btn {{
+                    --button-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    --button-hover-bg: linear-gradient(135deg, #764ba2 0%, #ec4899 100%);
+                    --button-text-color: #FFFFFF;
+                    --button-hover-text-color: #FFFFFF;
+                    --button-border-radius: 12px;
+                    --tooltip-bg: #1a1a2e;
+                    --tootip-text-color: #e0e0e0;
+                    box-sizing: border-box;
+                    width: 50px;
+                    min-height: 60px;
+                    border-radius: var(--button-border-radius);
+                    background: var(--button-bg);
+                    color: var(--button-text-color);
+                    border: 2px solid rgba(167, 139, 250, 0.3);
+                    cursor: pointer;
+                    position: relative;
+                    outline: none;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.3s ease;
+                }}
+                .copy-btn:hover {{
+                    background: var(--button-hover-bg);
+                    transform: scale(1.05);
+                    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+                }}
+                .copy-btn .tooltip {{
+                    position: absolute;
+                    opacity: 0;
+                    visibility: hidden;
+                    top: 0;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    white-space: nowrap;
+                    font-size: 12px;
+                    font-family: 'Nunito', sans-serif;
+                    color: var(--tootip-text-color);
+                    background: var(--tooltip-bg);
+                    padding: 6px 10px;
+                    border-radius: 8px;
+                    pointer-events: none;
+                    transition: all 0.3s ease;
+                    border: 1px solid rgba(167, 139, 250, 0.3);
+                }}
+                .copy-btn .tooltip::after {{
+                    content: "";
+                    position: absolute;
+                    bottom: -4px;
+                    width: 8px;
+                    height: 8px;
+                    background: inherit;
+                    border: inherit;
+                    left: 50%;
+                    transform: translateX(-50%) rotate(45deg);
+                    z-index: -1;
+                    border-top: none;
+                    border-left: none;
+                }}
+                .copy-btn:hover .tooltip {{
+                    opacity: 1;
+                    visibility: visible;
+                    top: -40px;
+                }}
+                .copy-btn svg {{
+                    width: 20px;
+                    height: 20px;
+                }}
+                .copy-btn .checkmark {{
+                    display: none;
+                }}
+                .copy-btn.copied .clipboard {{
+                    display: none;
+                }}
+                .copy-btn.copied .checkmark {{
+                    display: block;
+                }}
+                </style>
+                <div class="copy-container">
+                    <div class="copy-text" id="shareText">{share_text}</div>
+                    <button class="copy-btn" onclick="copyText()" id="copyBtn">
+                        <span class="tooltip" id="tooltipText">Copy</span>
+                        <svg class="clipboard" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </button>
+                </div>
+                <script>
+                function copyText() {{
+                    const text = document.getElementById('shareText').innerText;
+                    navigator.clipboard.writeText(text).then(() => {{
+                        const btn = document.getElementById('copyBtn');
+                        const tooltip = document.getElementById('tooltipText');
+                        btn.classList.add('copied');
+                        tooltip.innerText = 'Copied!';
+                        setTimeout(() => {{
+                            btn.classList.remove('copied');
+                            tooltip.innerText = 'Copy';
+                        }}, 2000);
+                    }});
+                }}
+                </script>
+                '''
+                
+                components.html(copy_section_html, height=100)
+                st.caption("Click the button to copy, then paste anywhere you want to share!")
         
         st.markdown("---")
         if correct_count >= 4:
