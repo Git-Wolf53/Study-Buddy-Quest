@@ -1204,43 +1204,126 @@ st.markdown("<style>" + animation_css + """
     }
     
     .level-card {
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-        color: white;
-        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        isolation: isolate;
+        position: relative;
+        width: 100%;
+        background: #29292c;
         border-radius: 28px;
+        overflow: hidden;
+        font-family: 'Nunito', sans-serif;
+        --gradient: linear-gradient(to bottom, #8b5cf6, #6366f1, #a855f7);
+        --color: #a78bfa;
+        padding: 25px;
         text-align: center;
         margin: 20px 0;
-        box-shadow: 0 4px 20px rgba(99, 102, 241, 0.25);
+    }
+    
+    .level-card:before {
+        position: absolute;
+        content: "";
+        inset: 2px;
+        border-radius: 26px;
+        background: #18181b;
+        z-index: 2;
+    }
+    
+    .level-card:after {
+        position: absolute;
+        content: "";
+        width: 6px;
+        inset: 12px auto 12px 10px;
+        border-radius: 4px;
+        background: var(--gradient);
+        transition: transform 300ms ease;
+        z-index: 4;
+    }
+    
+    .level-card:hover:after {
+        transform: translateX(3px);
+    }
+    
+    .level-card .notiglow,
+    .level-card .notiborderglow {
+        position: absolute;
+        width: 20rem;
+        height: 20rem;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: radial-gradient(circle closest-side at center, #a78bfa, transparent);
+        opacity: 0;
+        transition: opacity 300ms ease;
+        pointer-events: none;
+    }
+    
+    .level-card .notiglow {
+        z-index: 3;
+    }
+    
+    .level-card .notiborderglow {
+        z-index: 1;
+    }
+    
+    .level-card:hover .notiglow {
+        opacity: 0.15;
+    }
+    
+    .level-card:hover .notiborderglow {
+        opacity: 0.15;
     }
     
     .level-number {
-        font-size: 3rem;
+        color: var(--color);
+        font-size: 2.5rem;
         font-weight: 800;
         margin: 0;
-        text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        transition: transform 300ms ease;
+        z-index: 5;
+        position: relative;
+    }
+    
+    .level-card:hover .level-number {
+        transform: translateX(3px);
     }
     
     .level-title {
+        color: #d4d4d8;
         font-size: 1.3rem;
-        opacity: 0.95;
         margin: 5px 0;
         font-weight: 600;
+        transition: transform 300ms ease;
+        z-index: 5;
+        position: relative;
+    }
+    
+    .level-card:hover .level-title {
+        transform: translateX(5px);
     }
     
     .stats-row {
         display: flex;
         justify-content: center;
-        gap: 20px;
+        gap: 15px;
         flex-wrap: wrap;
         margin-top: 15px;
-        font-size: 1.1rem;
+        font-size: 1rem;
+        transition: transform 300ms ease;
+        z-index: 5;
+        position: relative;
+    }
+    
+    .level-card:hover .stats-row {
+        transform: translateX(5px);
     }
     
     .stat-item {
-        background: rgba(255,255,255,0.2);
-        padding: 8px 16px;
+        background: rgba(139, 92, 246, 0.3);
+        color: #e4e4e7;
+        padding: 8px 14px;
         border-radius: 20px;
-        backdrop-filter: blur(10px);
+        border: 1px solid rgba(139, 92, 246, 0.4);
     }
     
     .badge-showcase {
@@ -1718,6 +1801,8 @@ progress_percentage = points_into_level / points_needed
 
 st.markdown(f"""
 <div class="level-card">
+    <div class="notiglow"></div>
+    <div class="notiborderglow"></div>
     <p class="level-number">⭐ Level {current_level} ⭐</p>
     <p class="level-title">{level_title}</p>
     <div class="stats-row">
