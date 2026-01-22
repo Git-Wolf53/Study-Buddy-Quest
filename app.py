@@ -3788,13 +3788,18 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 }}
                 .share-btn .icons a {{
                     color: white;
-                    font-size: 1.5rem;
+                    font-size: 1rem;
                     text-decoration: none;
                     transition: all 0.3s ease;
+                    font-weight: 600;
                 }}
                 .share-btn .icons a:hover {{
-                    transform: scale(1.3);
+                    transform: scale(1.1);
                     filter: drop-shadow(0 0 8px white);
+                }}
+                .share-btn .icons .divider {{
+                    color: rgba(255, 255, 255, 0.5);
+                    font-size: 1.2rem;
                 }}
                 .share-btn:hover .label {{
                     width: 0;
@@ -3809,9 +3814,11 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 <div class="share-btn">
                     <span class="label">SHARE</span>
                     <div class="icons">
-                        <a href="{twitter_url}" target="_blank" title="Share on X">🐦</a>
-                        <a href="{facebook_url}" target="_blank" title="Share on Facebook">📘</a>
-                        <a href="{linkedin_url}" target="_blank" title="Share on LinkedIn">💼</a>
+                        <a href="{twitter_url}" target="_blank" title="Share on X">🐦 X</a>
+                        <span class="divider">|</span>
+                        <a href="{facebook_url}" target="_blank" title="Share on Facebook">📘 Facebook</a>
+                        <span class="divider">|</span>
+                        <a href="{linkedin_url}" target="_blank" title="Share on LinkedIn">💼 LinkedIn</a>
                     </div>
                 </div>
                 '''
