@@ -3699,16 +3699,21 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 st.session_state.student_name = student_name
             
             if st.button("🎨 Generate Certificate", use_container_width=True, type="primary"):
-                certificate_html = generate_certificate_html(student_name)
-                components.html(certificate_html, height=550, scrolling=False)
+                st.session_state.generated_certificate = generate_certificate_html(student_name)
+                st.session_state.certificate_name = student_name
+            
+            # Show certificate if it exists in session state
+            if st.session_state.get('generated_certificate'):
+                components.html(st.session_state.generated_certificate, height=550, scrolling=False)
                 
                 # Generate downloadable PNG certificate
                 try:
-                    cert_image = generate_certificate_image(student_name)
+                    cert_name = st.session_state.get('certificate_name', student_name)
+                    cert_image = generate_certificate_image(cert_name)
                     st.download_button(
                         label="📥 Download Certificate (PNG)",
                         data=cert_image,
-                        file_name=f"study_buddy_certificate_{student_name.replace(' ', '_') if student_name else 'champion'}.png",
+                        file_name=f"study_buddy_certificate_{cert_name.replace(' ', '_') if cert_name else 'champion'}.png",
                         mime="image/png",
                         use_container_width=True
                     )
