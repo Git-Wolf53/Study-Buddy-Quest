@@ -1326,6 +1326,136 @@ st.markdown("<style>" + animation_css + """
         border: 1px solid rgba(139, 92, 246, 0.4);
     }
     
+    /* Uiverse Toggle Checkbox Styles */
+    .uiverse-checkbox-wrapper * {
+        -webkit-tap-highlight-color: transparent;
+        outline: none;
+    }
+    
+    .uiverse-checkbox-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin: 12px 0;
+    }
+    
+    .uiverse-checkbox-wrapper input[type="checkbox"] {
+        display: none;
+    }
+    
+    .uiverse-checkbox-wrapper label {
+        --size: 40px;
+        --shadow: calc(var(--size) * .07) calc(var(--size) * .1);
+        position: relative;
+        display: block;
+        width: var(--size);
+        height: var(--size);
+        background-color: #6366f1;
+        background-image: linear-gradient(43deg, #6366f1 0%, #8b5cf6 46%, #a855f7 100%);
+        border-radius: 50%;
+        box-shadow: 0 var(--shadow) rgba(139, 92, 246, 0.4);
+        cursor: pointer;
+        transition: 0.2s ease transform, 0.2s ease background-color, 0.2s ease box-shadow;
+        overflow: hidden;
+        z-index: 1;
+        flex-shrink: 0;
+    }
+    
+    .uiverse-checkbox-wrapper label:before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: 0;
+        left: 0;
+        width: calc(var(--size) * .7);
+        height: calc(var(--size) * .7);
+        margin: 0 auto;
+        background-color: #fff;
+        transform: translateY(-50%);
+        border-radius: 50%;
+        box-shadow: inset 0 var(--shadow) rgba(139, 92, 246, 0.3);
+        transition: 0.2s ease width, 0.2s ease height;
+    }
+    
+    .uiverse-checkbox-wrapper label:hover:before {
+        width: calc(var(--size) * .55);
+        height: calc(var(--size) * .55);
+        box-shadow: inset 0 var(--shadow) rgba(139, 92, 246, 0.5);
+    }
+    
+    .uiverse-checkbox-wrapper label:active {
+        transform: scale(0.9);
+    }
+    
+    .uiverse-checkbox-wrapper .tick_mark {
+        position: absolute;
+        top: -1px;
+        right: 0;
+        left: calc(var(--size) * -.05);
+        width: calc(var(--size) * .6);
+        height: calc(var(--size) * .6);
+        margin: 0 auto;
+        margin-left: calc(var(--size) * .14);
+        transform: rotateZ(-40deg);
+    }
+    
+    .uiverse-checkbox-wrapper .tick_mark:before,
+    .uiverse-checkbox-wrapper .tick_mark:after {
+        content: "";
+        position: absolute;
+        background-color: #fff;
+        border-radius: 2px;
+        opacity: 0;
+        transition: 0.2s ease transform, 0.2s ease opacity;
+    }
+    
+    .uiverse-checkbox-wrapper .tick_mark:before {
+        left: 0;
+        bottom: 0;
+        width: calc(var(--size) * .1);
+        height: calc(var(--size) * .3);
+        box-shadow: -2px 0 5px rgba(0, 0, 0, 0.23);
+        transform: translateY(calc(var(--size) * -.68));
+    }
+    
+    .uiverse-checkbox-wrapper .tick_mark:after {
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        height: calc(var(--size) * .1);
+        box-shadow: 0 3px 5px rgba(0, 0, 0, 0.23);
+        transform: translateX(calc(var(--size) * .78));
+    }
+    
+    .uiverse-checkbox-wrapper input[type="checkbox"]:checked + label {
+        background-color: #6366f1;
+        background-image: linear-gradient(43deg, #6366f1 0%, #8b5cf6 46%, #a855f7 100%);
+        box-shadow: rgba(99, 102, 241, 0.4) 0px 10px 20px, rgba(139, 92, 246, 0.3) 0px 6px 6px;
+    }
+    
+    .uiverse-checkbox-wrapper input[type="checkbox"]:checked + label:before {
+        width: 0;
+        height: 0;
+    }
+    
+    .uiverse-checkbox-wrapper input[type="checkbox"]:checked + label .tick_mark:before,
+    .uiverse-checkbox-wrapper input[type="checkbox"]:checked + label .tick_mark:after {
+        transform: translate(0);
+        opacity: 1;
+    }
+    
+    .uiverse-checkbox-label {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #4b5563;
+    }
+    
+    .uiverse-checkbox-help {
+        font-size: 0.8rem;
+        color: #9ca3af;
+        margin-top: 2px;
+    }
+    
     .badge-showcase {
         background: #f8fafc;
         border: 1px solid #e2e8f0;
@@ -3498,35 +3628,97 @@ with st.expander("⚙️ Settings"):
     
     st.markdown("---")
     
+    # Custom Uiverse-style toggles
+    def render_uiverse_toggle(label, emoji, help_text, key, current_value):
+        checked_attr = "checked" if current_value else ""
+        return f"""
+        <div class="uiverse-checkbox-wrapper">
+            <input type="checkbox" id="{key}" {checked_attr}>
+            <label for="{key}">
+                <span class="tick_mark"></span>
+            </label>
+            <div>
+                <div class="uiverse-checkbox-label">{emoji} {label}</div>
+                <div class="uiverse-checkbox-help">{help_text}</div>
+            </div>
+        </div>
+        """
+    
     # High Contrast Mode
-    high_contrast = st.toggle(
-        "🔲 High Contrast Mode",
-        value=st.session_state.get('high_contrast', False),
-        help="Stronger colors for better visibility"
-    )
-    if high_contrast != st.session_state.high_contrast:
-        st.session_state.high_contrast = high_contrast
-        st.rerun()
+    st.markdown(render_uiverse_toggle(
+        "High Contrast Mode", "🔲",
+        "Stronger colors for better visibility",
+        "high_contrast_cb",
+        st.session_state.get('high_contrast', False)
+    ), unsafe_allow_html=True)
+    
+    hc_col1, hc_col2 = st.columns([1, 1])
+    with hc_col1:
+        if st.button("Enable" if not st.session_state.high_contrast else "Enabled ✓", 
+                     key="hc_on", use_container_width=True,
+                     type="primary" if st.session_state.high_contrast else "secondary"):
+            if not st.session_state.high_contrast:
+                st.session_state.high_contrast = True
+                st.rerun()
+    with hc_col2:
+        if st.button("Disable" if st.session_state.high_contrast else "Disabled", 
+                     key="hc_off", use_container_width=True,
+                     type="secondary" if st.session_state.high_contrast else "primary"):
+            if st.session_state.high_contrast:
+                st.session_state.high_contrast = False
+                st.rerun()
+    
+    st.markdown("<br>", unsafe_allow_html=True)
     
     # Compact Mode
-    compact_mode = st.toggle(
-        "📐 Compact Mode",
-        value=st.session_state.get('compact_mode', False),
-        help="Reduce spacing for more content on screen"
-    )
-    if compact_mode != st.session_state.compact_mode:
-        st.session_state.compact_mode = compact_mode
-        st.rerun()
+    st.markdown(render_uiverse_toggle(
+        "Compact Mode", "📐",
+        "Reduce spacing for more content on screen",
+        "compact_mode_cb",
+        st.session_state.get('compact_mode', False)
+    ), unsafe_allow_html=True)
+    
+    cm_col1, cm_col2 = st.columns([1, 1])
+    with cm_col1:
+        if st.button("Enable" if not st.session_state.compact_mode else "Enabled ✓", 
+                     key="cm_on", use_container_width=True,
+                     type="primary" if st.session_state.compact_mode else "secondary"):
+            if not st.session_state.compact_mode:
+                st.session_state.compact_mode = True
+                st.rerun()
+    with cm_col2:
+        if st.button("Disable" if st.session_state.compact_mode else "Disabled", 
+                     key="cm_off", use_container_width=True,
+                     type="secondary" if st.session_state.compact_mode else "primary"):
+            if st.session_state.compact_mode:
+                st.session_state.compact_mode = False
+                st.rerun()
+    
+    st.markdown("<br>", unsafe_allow_html=True)
     
     # Reduce Animations
-    reduce_animations = st.toggle(
-        "🎯 Reduce Animations",
-        value=st.session_state.get('reduce_animations', False),
-        help="Turn off balloons and celebration effects"
-    )
-    if reduce_animations != st.session_state.reduce_animations:
-        st.session_state.reduce_animations = reduce_animations
-        st.rerun()
+    st.markdown(render_uiverse_toggle(
+        "Reduce Animations", "🎯",
+        "Turn off balloons and celebration effects",
+        "reduce_animations_cb",
+        st.session_state.get('reduce_animations', False)
+    ), unsafe_allow_html=True)
+    
+    ra_col1, ra_col2 = st.columns([1, 1])
+    with ra_col1:
+        if st.button("Enable" if not st.session_state.reduce_animations else "Enabled ✓", 
+                     key="ra_on", use_container_width=True,
+                     type="primary" if st.session_state.reduce_animations else "secondary"):
+            if not st.session_state.reduce_animations:
+                st.session_state.reduce_animations = True
+                st.rerun()
+    with ra_col2:
+        if st.button("Disable" if st.session_state.reduce_animations else "Disabled", 
+                     key="ra_off", use_container_width=True,
+                     type="secondary" if st.session_state.reduce_animations else "primary"):
+            if st.session_state.reduce_animations:
+                st.session_state.reduce_animations = False
+                st.rerun()
     
     st.markdown("---")
     st.markdown("### Quiz Preferences")
@@ -3541,15 +3733,33 @@ with st.expander("⚙️ Settings"):
     if default_quiz_length != st.session_state.default_quiz_length:
         st.session_state.default_quiz_length = default_quiz_length
     
+    st.markdown("<br>", unsafe_allow_html=True)
+    
     # Default Timer Setting
-    default_timed_mode = st.toggle(
-        "⏱️ Enable Timer by Default",
-        value=st.session_state.get('default_timed_mode', False),
-        help="Automatically enable timed mode for new quizzes"
-    )
-    if default_timed_mode != st.session_state.default_timed_mode:
-        st.session_state.default_timed_mode = default_timed_mode
-        st.session_state.timed_mode = default_timed_mode
+    st.markdown(render_uiverse_toggle(
+        "Enable Timer by Default", "⏱️",
+        "Automatically enable timed mode for new quizzes",
+        "timed_mode_cb",
+        st.session_state.get('default_timed_mode', False)
+    ), unsafe_allow_html=True)
+    
+    tm_col1, tm_col2 = st.columns([1, 1])
+    with tm_col1:
+        if st.button("Enable" if not st.session_state.default_timed_mode else "Enabled ✓", 
+                     key="tm_on", use_container_width=True,
+                     type="primary" if st.session_state.default_timed_mode else "secondary"):
+            if not st.session_state.default_timed_mode:
+                st.session_state.default_timed_mode = True
+                st.session_state.timed_mode = True
+                st.rerun()
+    with tm_col2:
+        if st.button("Disable" if st.session_state.default_timed_mode else "Disabled", 
+                     key="tm_off", use_container_width=True,
+                     type="secondary" if st.session_state.default_timed_mode else "primary"):
+            if st.session_state.default_timed_mode:
+                st.session_state.default_timed_mode = False
+                st.session_state.timed_mode = False
+                st.rerun()
 
 # ============================================================
 # FOOTER
