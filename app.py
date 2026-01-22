@@ -1478,54 +1478,18 @@ st.markdown("<style>" + animation_css + """
         position: relative;
     }
     
-    /* Question Card - Uiverse dangerous-quail-58 style */
+    /* Question Card - Neumorphic style */
     .question-card {
         width: 100%;
-        background: #07182E;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        place-content: center;
-        place-items: center;
-        overflow: hidden;
-        border-radius: 20px;
+        background: #212121;
+        border-radius: 30px;
+        box-shadow: 15px 15px 30px rgb(25, 25, 25),
+                    -15px -15px 30px rgb(60, 60, 60);
         padding: 25px;
         margin: 15px 0;
     }
     
-    .question-card::before {
-        content: '';
-        position: absolute;
-        width: 200%;
-        height: 200%;
-        background-image: conic-gradient(from 0deg, rgba(99, 102, 241, 0.6), rgba(139, 92, 246, 0.6), rgba(99, 102, 241, 0.6));
-        animation: rotBGimg 8s linear infinite;
-        top: 50%;
-        left: 50%;
-        transform-origin: center center;
-    }
-    
-    @keyframes rotBGimg {
-        0% {
-            transform: translate(-50%, -50%) rotate(0deg);
-        }
-        100% {
-            transform: translate(-50%, -50%) rotate(360deg);
-        }
-    }
-    
-    .question-card::after {
-        content: '';
-        position: absolute;
-        background: #07182E;
-        inset: 4px;
-        border-radius: 16px;
-        z-index: 0;
-    }
-    
     .question-card-content {
-        z-index: 1;
-        position: relative;
         width: 100%;
     }
     
@@ -1616,14 +1580,6 @@ st.markdown("<style>" + animation_css + """
         .question-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
-        }
-        
-        .question-card::before {
-            display: none;
-        }
-        
-        .question-card::after {
-            display: none;
         }
         
         .question-card-title {
