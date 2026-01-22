@@ -2023,26 +2023,34 @@ components.html("""
             var popup = parentDoc.createElement('div');
             popup.id = 'lightModePopup';
             popup.innerHTML = '<span style="margin-right: 12px;">🌙 This app looks better in dark mode!</span><button id="dismissPopupBtn" style="background: transparent; border: none; color: #a78bfa; cursor: pointer; font-size: 1.2rem; padding: 0;">✕</button>';
-            popup.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: 16px 24px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); z-index: 9999; font-family: Nunito, sans-serif; font-size: 0.95rem; display: flex; align-items: center; border: 1px solid rgba(167, 139, 250, 0.3); animation: slideInUp 0.4s ease-out;';
+            popup.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: 16px 24px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); z-index: 9999; font-family: Nunito, sans-serif; font-size: 0.95rem; display: flex; align-items: center; border: 1px solid rgba(167, 139, 250, 0.3); animation: fadeSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);';
             
             // Add animation keyframes if not already added
             if (!parentDoc.getElementById('lightModePopupStyles')) {
                 var style = parentDoc.createElement('style');
                 style.id = 'lightModePopupStyles';
-                style.textContent = '@keyframes slideInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }';
+                style.textContent = '@keyframes fadeSlideIn { 0% { opacity: 0; transform: translateX(50px) scale(0.95); } 50% { opacity: 0.8; transform: translateX(-5px) scale(1.02); } 100% { opacity: 1; transform: translateX(0) scale(1); } } @keyframes slideOutRight { 0% { opacity: 1; transform: translateX(0); } 100% { opacity: 0; transform: translateX(100px); } }';
                 parentDoc.head.appendChild(style);
             }
             
             parentDoc.body.appendChild(popup);
             
-            // Add dismiss handler
+            // Add dismiss handler with slide-out animation
             parentDoc.getElementById('dismissPopupBtn').addEventListener('click', function() {
-                popup.remove();
+                popup.style.animation = 'slideOutRight 0.4s ease-in forwards';
+                setTimeout(function() {
+                    if (popup.parentNode) popup.remove();
+                }, 400);
             });
             
-            // Auto-dismiss after specified duration
+            // Auto-dismiss after specified duration with slide-out animation
             setTimeout(function() {
-                if (popup.parentNode) popup.remove();
+                if (popup.parentNode) {
+                    popup.style.animation = 'slideOutRight 0.4s ease-in forwards';
+                    setTimeout(function() {
+                        if (popup.parentNode) popup.remove();
+                    }, 400);
+                }
             }, duration);
         }
         
