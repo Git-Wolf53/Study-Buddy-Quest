@@ -1747,7 +1747,7 @@ st.markdown("<style>" + animation_css + """
     
     .stRadio > div > label:hover {
         border-color: #667eea !important;
-        background: rgba(102, 126, 234, 0.1) !important;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 226, 0.2) 50%, rgba(236, 72, 153, 0.2) 100%) !important;
         box-shadow: 0 0 15px rgba(102, 126, 234, 0.5), 0 0 30px rgba(118, 75, 226, 0.3), 0 0 45px rgba(236, 72, 153, 0.2) !important;
     }
     
