@@ -3814,6 +3814,13 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     z-index: 2;
                     width: 100%;
                 }}
+                @media (prefers-color-scheme: light) {{
+                    .share-btn .label {{
+                        background-color: #ffffff;
+                        color: #667eea;
+                        box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+                    }}
+                }}
                 </style>
                 <div class="share-btn">
                     <span class="label">SHARE CERTIFICATE</span>
@@ -3925,6 +3932,17 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 }}
                 .copy-btn.copied .checkmark {{
                     display: block;
+                }}
+                @media (prefers-color-scheme: light) {{
+                    .copy-text {{
+                        background: #ffffff;
+                        border: 2px solid rgba(102, 126, 234, 0.3);
+                        color: #333333;
+                        box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+                    }}
+                    .copy-btn {{
+                        border: 2px solid rgba(102, 126, 234, 0.3);
+                    }}
                 }}
                 </style>
                 <div class="copy-container">
