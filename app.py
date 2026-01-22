@@ -73,7 +73,6 @@ defaults = {
     "wrong_questions": [],
     "badges": [],
     "quiz_error": None,
-    "dark_mode": True,
     "quiz_history": [],
     "quiz_length": 5,
     "font_size": "medium",
@@ -1209,24 +1208,15 @@ st.markdown("<style>" + animation_css + """
         isolation: isolate;
         position: relative;
         width: 100%;
-        background: #29292c;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
         border-radius: 28px;
         overflow: hidden;
         font-family: 'Nunito', sans-serif;
-        --gradient: linear-gradient(to bottom, #8b5cf6, #6366f1, #a855f7);
-        --color: #a78bfa;
+        --gradient: linear-gradient(to bottom, #c4b5fd, #a78bfa, #e9d5ff);
         padding: 25px;
         text-align: center;
         margin: 20px 0;
-    }
-    
-    .level-card:before {
-        position: absolute;
-        content: "";
-        inset: 2px;
-        border-radius: 26px;
-        background: #18181b;
-        z-index: 2;
+        box-shadow: 0 8px 32px rgba(99, 102, 241, 0.25);
     }
     
     .level-card:after {
@@ -1252,7 +1242,7 @@ st.markdown("<style>" + animation_css + """
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background: radial-gradient(circle closest-side at center, #a78bfa, transparent);
+        background: radial-gradient(circle closest-side at center, rgba(255,255,255,0.4), transparent);
         opacity: 0;
         transition: opacity 300ms ease;
         pointer-events: none;
@@ -1267,21 +1257,22 @@ st.markdown("<style>" + animation_css + """
     }
     
     .level-card:hover .notiglow {
-        opacity: 0.15;
+        opacity: 0.3;
     }
     
     .level-card:hover .notiborderglow {
-        opacity: 0.15;
+        opacity: 0.3;
     }
     
     .level-number {
-        color: var(--color);
+        color: white;
         font-size: 2.5rem;
         font-weight: 800;
         margin: 0;
         transition: transform 300ms ease;
         z-index: 5;
         position: relative;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
     
     .level-card:hover .level-number {
@@ -1289,7 +1280,7 @@ st.markdown("<style>" + animation_css + """
     }
     
     .level-title {
-        color: #d4d4d8;
+        color: rgba(255,255,255,0.95);
         font-size: 1.3rem;
         margin: 5px 0;
         font-weight: 600;
@@ -1319,11 +1310,11 @@ st.markdown("<style>" + animation_css + """
     }
     
     .stat-item {
-        background: rgba(139, 92, 246, 0.3);
-        color: #e4e4e7;
+        background: rgba(255, 255, 255, 0.25);
+        color: white;
         padding: 8px 14px;
         border-radius: 20px;
-        border: 1px solid rgba(139, 92, 246, 0.4);
+        backdrop-filter: blur(10px);
     }
     
     .badge-showcase {
@@ -1332,23 +1323,14 @@ st.markdown("<style>" + animation_css + """
         isolation: isolate;
         position: relative;
         width: 100%;
-        background: #29292c;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         border-radius: 20px;
         overflow: hidden;
-        --gradient: linear-gradient(to bottom, #10b981, #059669, #34d399);
-        --color: #34d399;
+        --gradient: linear-gradient(to bottom, #6ee7b7, #34d399, #a7f3d0);
         padding: 20px;
         margin: 20px 0;
         text-align: center;
-    }
-    
-    .badge-showcase:before {
-        position: absolute;
-        content: "";
-        inset: 2px;
-        border-radius: 18px;
-        background: #18181b;
-        z-index: 2;
+        box-shadow: 0 8px 32px rgba(16, 185, 129, 0.25);
     }
     
     .badge-showcase:after {
@@ -1369,7 +1351,7 @@ st.markdown("<style>" + animation_css + """
     .badge-title {
         font-size: 1.2rem;
         font-weight: 700;
-        color: var(--color);
+        color: white;
         margin-bottom: 15px;
         z-index: 5;
         position: relative;
@@ -1413,22 +1395,13 @@ st.markdown("<style>" + animation_css + """
         isolation: isolate;
         position: relative;
         width: 100%;
-        background: #29292c;
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         border-radius: 20px;
         overflow: hidden;
-        --gradient: linear-gradient(to bottom, #f59e0b, #d97706, #fbbf24);
-        --color: #fbbf24;
+        --gradient: linear-gradient(to bottom, #fde68a, #fbbf24, #fef3c7);
         padding: 20px;
         margin: 20px 0;
-    }
-    
-    .practice-areas:before {
-        position: absolute;
-        content: "";
-        inset: 2px;
-        border-radius: 18px;
-        background: #18181b;
-        z-index: 2;
+        box-shadow: 0 8px 32px rgba(245, 158, 11, 0.25);
     }
     
     .practice-areas:after {
@@ -1448,7 +1421,7 @@ st.markdown("<style>" + animation_css + """
     
     .practice-title {
         font-weight: 700;
-        color: var(--color);
+        color: white;
         font-size: 1.1rem;
         margin-bottom: 10px;
         z-index: 5;
@@ -1461,7 +1434,7 @@ st.markdown("<style>" + animation_css + """
     }
     
     .practice-item {
-        color: #a1a1aa;
+        color: rgba(255,255,255,0.95);
         padding: 5px 0;
         font-size: 1rem;
         z-index: 5;
@@ -1788,18 +1761,6 @@ st.markdown("<style>" + animation_css + """
 """, unsafe_allow_html=True)
 
 # ============================================================
-# TOP RIGHT BUTTONS - THEME TOGGLE
-# ============================================================
-theme_icon = "☀️" if st.session_state.dark_mode else "🌙"
-theme_text = "Light" if st.session_state.dark_mode else "Dark"
-
-col_spacer, col_theme = st.columns([10, 1])
-with col_theme:
-    if st.button(f"{theme_icon}", key="theme_btn", help=f"Switch to {theme_text} Mode"):
-        st.session_state.dark_mode = not st.session_state.dark_mode
-        st.rerun()
-
-# ============================================================
 # MAIN TITLE AND WELCOME
 # ============================================================
 st.markdown('<h1 class="mega-title">📚 Study Buddy Quest 🧠</h1>', unsafe_allow_html=True)
@@ -1919,7 +1880,7 @@ if st.session_state.weak_topics:
     <div class="practice-areas">
         <div class="practice-title">📖 Areas to Level Up</div>
         {topics_list}
-        <small style="color: #fbbf24; z-index: 5; position: relative;">Pro tip: Try these topics again! 💪</small>
+        <small style="color: rgba(255,255,255,0.9); z-index: 5; position: relative;">Pro tip: Try these topics again! 💪</small>
     </div>
     """, unsafe_allow_html=True)
 
@@ -3670,83 +3631,3 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-if not st.session_state.dark_mode:
-    st.markdown("""
-    <style>
-        .stApp {
-            background-color: #ffffff !important;
-        }
-        
-        /* All text in light mode - dark for readability */
-        .stMarkdown, .stMarkdown p, .stMarkdown span, .stMarkdown div,
-        .stTextInput label, .stSelectbox label,
-        .stRadio label, .stRadio div, .stRadio span,
-        .stExpander, .stExpander summary, .stExpander summary span,
-        .streamlit-expanderHeader,
-        [data-testid="stExpander"] summary,
-        [data-testid="stExpander"] summary span,
-        [data-testid="stRadio"] label,
-        [data-testid="stRadio"] div[role="radiogroup"] label,
-        p, span, div, label, h1, h2, h3, h4, h5, h6, strong, em, small {
-            color: #1f2937 !important;
-        }
-        
-        /* Light mode: Quest boxes and form elements */
-        .stSelectbox > div > div,
-        .stRadio > div,
-        [data-baseweb="select"] > div,
-        [data-baseweb="popover"] > div,
-        .stSelectbox [data-baseweb="select"],
-        div[data-baseweb="select"] > div:first-child {
-            background-color: #f8f9fa !important;
-            border-color: #e9ecef !important;
-        }
-        
-        /* Dropdown text - keep dark for readability */
-        .stSelectbox div[data-baseweb="select"] span,
-        .stSelectbox [data-baseweb="select"] div,
-        [data-baseweb="select"] span {
-            color: #1f2937 !important;
-        }
-        
-        /* Dropdown arrow icon */
-        .stSelectbox svg,
-        [data-baseweb="select"] svg {
-            fill: #1f2937 !important;
-        }
-        
-        /* Dropdown menu items */
-        [data-baseweb="menu"],
-        [data-baseweb="popover"],
-        ul[role="listbox"] {
-            background-color: #f8f9fa !important;
-        }
-        
-        [data-baseweb="menu"] li,
-        ul[role="listbox"] li {
-            background-color: #f8f9fa !important;
-            color: #1f2937 !important;
-        }
-        
-        [data-baseweb="menu"] li:hover,
-        ul[role="listbox"] li:hover {
-            background-color: #e9ecef !important;
-        }
-        
-        /* Radio buttons */
-        .stRadio > div > label > div:first-child {
-            background-color: #f8f9fa !important;
-        }
-        
-        /* Text input boxes */
-        .stTextInput > div > div > input {
-            background-color: #f8f9fa !important;
-            border-color: #e9ecef !important;
-            color: #4b5563 !important;
-        }
-        
-        .stTextInput > div > div {
-            background-color: #f8f9fa !important;
-        }
-    </style>
-    """, unsafe_allow_html=True)
