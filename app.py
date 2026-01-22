@@ -3835,6 +3835,8 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     display: flex;
                     gap: 10px;
                     align-items: stretch;
+                    padding-top: 45px;
+                    position: relative;
                 }}
                 .copy-text {{
                     flex: 1;
@@ -3879,38 +3881,33 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     position: absolute;
                     opacity: 0;
                     visibility: hidden;
-                    top: 0;
+                    bottom: calc(100% + 10px);
                     left: 50%;
                     transform: translateX(-50%);
                     white-space: nowrap;
                     font-size: 12px;
                     font-family: 'Nunito', sans-serif;
-                    color: var(--tootip-text-color);
-                    background: var(--tooltip-bg);
-                    padding: 6px 10px;
+                    color: #fff;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    padding: 8px 14px;
                     border-radius: 8px;
                     pointer-events: none;
                     transition: all 0.3s ease;
-                    border: 1px solid rgba(167, 139, 250, 0.3);
+                    z-index: 1000;
+                    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
                 }}
                 .copy-btn .tooltip::after {{
                     content: "";
                     position: absolute;
-                    bottom: -4px;
-                    width: 8px;
-                    height: 8px;
-                    background: inherit;
-                    border: inherit;
+                    top: 100%;
                     left: 50%;
-                    transform: translateX(-50%) rotate(45deg);
-                    z-index: -1;
-                    border-top: none;
-                    border-left: none;
+                    transform: translateX(-50%);
+                    border: 6px solid transparent;
+                    border-top-color: #764ba2;
                 }}
                 .copy-btn:hover .tooltip {{
                     opacity: 1;
                     visibility: visible;
-                    top: -40px;
                 }}
                 .copy-btn svg {{
                     width: 20px;
@@ -3956,7 +3953,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 </script>
                 '''
                 
-                components.html(copy_section_html, height=100)
+                components.html(copy_section_html, height=140)
                 st.caption("Click the button to copy, then paste anywhere you want to share!")
         
         st.markdown("---")
