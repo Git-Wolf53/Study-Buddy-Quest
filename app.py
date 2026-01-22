@@ -2009,19 +2009,15 @@ components.html("""
         var parentDoc = window.parent.document;
         var parentWin = window.parent;
         
-        // Track if popup was shown this page load (resets on reload)
-        if (!parentWin._lightModePopupShown) {
-            parentWin._lightModePopupShown = false;
+        // Track if switch popup was shown this page load (resets on reload)
+        if (typeof parentWin._switchPopupShown === 'undefined') {
+            parentWin._switchPopupShown = false;
         }
         
-        function showLightModePopup() {
-            // Check if already shown this page load or currently showing
-            if (parentWin._lightModePopupShown || parentDoc.getElementById('lightModePopup')) {
-                return;
-            }
-            
-            // Mark as shown for this page load
-            parentWin._lightModePopupShown = true;
+        function createPopup(duration) {
+            // Remove existing popup if any
+            var existing = parentDoc.getElementById('lightModePopup');
+            if (existing) existing.remove();
             
             // Create and inject popup
             var popup = parentDoc.createElement('div');
@@ -2044,23 +2040,34 @@ components.html("""
                 popup.remove();
             });
             
-            // Auto-dismiss after 6 seconds
+            // Auto-dismiss after specified duration
             setTimeout(function() {
                 if (popup.parentNode) popup.remove();
-            }, 6000);
+            }, duration);
         }
         
-        // Show immediately if in light mode
-        if (parentWin.matchMedia && parentWin.matchMedia('(prefers-color-scheme: light)').matches) {
-            showLightModePopup();
+        // Check if started in light mode (session-based, 12 seconds)
+        var startedInLight = parentWin.matchMedia && parentWin.matchMedia('(prefers-color-scheme: light)').matches;
+        
+        if (startedInLight) {
+            // Session-based: only show once per session (until tab closed)
+            try {
+                if (!parentWin.sessionStorage.getItem('lightModeSessionPopupShown')) {
+                    parentWin.sessionStorage.setItem('lightModeSessionPopupShown', 'true');
+                    createPopup(12000); // 12 seconds
+                }
+            } catch(e) {
+                createPopup(12000);
+            }
         }
         
-        // Listen for changes from dark to light mode
+        // Listen for dark-to-light switch (reload-based, 8 seconds)
         if (parentWin.matchMedia) {
             var mediaQuery = parentWin.matchMedia('(prefers-color-scheme: light)');
             mediaQuery.addEventListener('change', function(e) {
-                if (e.matches) {
-                    showLightModePopup();
+                if (e.matches && !parentWin._switchPopupShown) {
+                    parentWin._switchPopupShown = true;
+                    createPopup(8000); // 8 seconds
                 }
             });
         }
