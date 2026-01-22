@@ -3743,7 +3743,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                 <style>
                 .share-btn {{
                     height: 4em;
-                    width: 15em;
+                    width: 100%;
                     border: none;
                     border-radius: 40px;
                     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -3764,7 +3764,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
                     display: inline-block;
                     background-color: #1a1a2e;
                     height: 3em;
-                    width: 11.5em;
+                    width: calc(100% - 1em);
                     border-radius: 25px;
                     color: #fff;
                     line-height: 55px;
