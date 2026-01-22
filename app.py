@@ -3704,7 +3704,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             
             # Show certificate if it exists in session state
             if st.session_state.get('generated_certificate'):
-                components.html(st.session_state.generated_certificate, height=650, scrolling=False)
+                components.html(st.session_state.generated_certificate, height=800, scrolling=False)
                 
                 # Generate downloadable PNG certificate
                 try:
