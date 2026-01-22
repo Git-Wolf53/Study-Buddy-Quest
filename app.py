@@ -1483,8 +1483,8 @@ st.markdown("<style>" + animation_css + """
         width: 100%;
         background: #0f2744;
         border-radius: 30px;
-        box-shadow: 15px 15px 30px rgb(8, 20, 35),
-                    -15px -15px 30px rgb(20, 50, 85);
+        box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.4),
+                    -8px -8px 16px rgba(30, 60, 100, 0.15);
         padding: 25px;
         margin: 15px 0;
     }
@@ -1698,8 +1698,11 @@ st.markdown("<style>" + animation_css + """
     }
     
     .stRadio > div > label:hover {
-        border-color: #667eea !important;
-        background: rgba(102, 126, 234, 0.1) !important;
+        border-color: transparent !important;
+        background: linear-gradient(135deg, rgb(0, 183, 255), rgb(255, 48, 255)) !important;
+        color: white !important;
+        transform: scale(1.02);
+        box-shadow: 0 4px 15px rgba(0, 183, 255, 0.3);
     }
     
     .stSuccess, .stInfo, .stWarning, .stError {
