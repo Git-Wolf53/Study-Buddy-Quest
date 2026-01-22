@@ -3700,7 +3700,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             
             if st.button("🎨 Generate Certificate", use_container_width=True, type="primary"):
                 certificate_html = generate_certificate_html(student_name)
-                st.markdown(certificate_html, unsafe_allow_html=True)
+                components.html(certificate_html, height=550, scrolling=False)
                 
                 # Generate downloadable PNG certificate
                 try:
