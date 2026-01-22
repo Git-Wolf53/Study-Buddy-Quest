@@ -1498,8 +1498,8 @@ st.markdown("<style>" + animation_css + """
         position: absolute;
         width: 200%;
         height: 200%;
-        background-image: conic-gradient(from 0deg, rgb(0, 183, 255), rgb(255, 48, 255), rgb(0, 183, 255));
-        animation: rotBGimg 3s linear infinite;
+        background-image: conic-gradient(from 0deg, rgba(99, 102, 241, 0.6), rgba(139, 92, 246, 0.6), rgba(99, 102, 241, 0.6));
+        animation: rotBGimg 8s linear infinite;
         top: 50%;
         left: 50%;
         transform-origin: center center;
@@ -1530,7 +1530,7 @@ st.markdown("<style>" + animation_css + """
     }
     
     .question-card-title {
-        color: #00b7ff;
+        color: #a78bfa;
         margin-bottom: 10px;
         font-size: 1.1rem;
         font-weight: 700;
@@ -1539,7 +1539,7 @@ st.markdown("<style>" + animation_css + """
     .question-card-text {
         font-size: 1.15rem;
         font-weight: 600;
-        color: #e0e7ff;
+        color: #d4d4d8;
     }
     
     /* ========== LIGHT MODE OVERRIDES ========== */
