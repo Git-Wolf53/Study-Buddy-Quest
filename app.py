@@ -2863,6 +2863,45 @@ st.markdown("")
 if 'quiz_generating' not in st.session_state:
     st.session_state.quiz_generating = False
 
+# Auto-regenerate quiz when parameters change (only if quiz already generated)
+if st.session_state.quiz_generated and not st.session_state.quiz_generating:
+    # Get current parameters
+    current_params = {
+        'topic': topic,
+        'category': selected_category,
+        'difficulty': difficulty,
+        'quiz_length': quiz_length,
+        'grade_level': grade_level,
+        'timed_mode': timed_mode,
+        'image_mode': st.session_state.get('image_quiz_mode', False)
+    }
+    
+    # Get previous parameters (stored when quiz was generated)
+    prev_params = st.session_state.get('last_quiz_params', None)
+    
+    # Check if any parameter changed
+    if prev_params is not None:
+        params_changed = any(current_params.get(key) != prev_params.get(key) for key in current_params)
+        
+        if params_changed:
+            # Validate that we have enough info to regenerate
+            is_image_quiz = current_params['image_mode'] and st.session_state.get('uploaded_image')
+            
+            if current_params['category'] and current_params['category'] != "Any Topic":
+                if current_params['topic']:
+                    full_topic = f"{current_params['category']}: {current_params['topic']}"
+                else:
+                    full_topic = current_params['category']
+            else:
+                full_topic = current_params['topic']
+            
+            clean_topic = sanitize_topic(full_topic) if full_topic else ""
+            
+            # Only auto-regenerate if we have valid input
+            if is_image_quiz or (clean_topic and len(clean_topic) >= 2):
+                st.session_state.quiz_generating = True
+                st.rerun()
+
 # Generate button - hide while generating
 if not st.session_state.quiz_generating:
     if st.button("🎲 GENERATE QUIZ!", use_container_width=True):
@@ -3013,6 +3052,17 @@ if st.session_state.get('quiz_generating', False):
             st.session_state.quiz_generated = True
             st.session_state.correct_answers = correct_answers
             st.session_state.explanations = explanations
+            
+            # Store current parameters for auto-regeneration detection
+            st.session_state.last_quiz_params = {
+                'topic': topic,
+                'category': selected_category,
+                'difficulty': difficulty,
+                'quiz_length': quiz_length,
+                'grade_level': grade_level,
+                'timed_mode': timed_mode,
+                'image_mode': st.session_state.get('image_quiz_mode', False)
+            }
             
             status_text.empty()
             
