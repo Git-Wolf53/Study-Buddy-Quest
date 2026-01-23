@@ -1786,13 +1786,18 @@ st.markdown("<style>" + animation_css + """
         border-radius: 20px !important;
     }
     
-    /* Selectbox - disable typing, click-only */
+    /* Selectbox - disable typing, click-only with pointer cursor */
     .stSelectbox input {
         pointer-events: none !important;
         caret-color: transparent !important;
+        cursor: pointer !important;
     }
     
-    .stSelectbox [data-baseweb="select"] {
+    .stSelectbox,
+    .stSelectbox > div,
+    .stSelectbox > div > div,
+    .stSelectbox [data-baseweb="select"],
+    .stSelectbox [data-baseweb="select"] * {
         cursor: pointer !important;
     }
     
