@@ -1223,18 +1223,18 @@ st.markdown("<style>" + animation_css + """
     /* Custom input styling */
     .stTextInput input {
         border-radius: 20px !important;
-        outline: 2px solid #6366f1 !important;
-        border: 0 !important;
+        outline: none !important;
+        border: 2px solid rgba(99, 102, 241, 0.4) !important;
         background-color: #1e1e2e !important;
         color: #ffffff !important;
-        outline-offset: 3px;
         padding: 10px 1rem !important;
-        transition: 0.25s !important;
+        transition: all 0.25s ease !important;
     }
     
     .stTextInput input:focus {
-        outline-offset: 5px;
+        border-color: #667eea !important;
         background-color: #2a2a3e !important;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2) !important;
     }
     
     .stTextInput input::placeholder {
@@ -1760,13 +1760,12 @@ st.markdown("<style>" + animation_css + """
     
     .stTextInput > div > div > input:focus {
         border-color: #667eea !important;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2), 0 0 20px rgba(102, 126, 234, 0.3) !important;
-        transform: translateY(-2px) !important;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2), 0 0 15px rgba(102, 126, 234, 0.2) !important;
     }
     
     .stTextInput > div > div > input:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.25) !important;
+        border-color: #818cf8 !important;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2) !important;
     }
     
     /* Selectbox/Dropdown styling - all elements */
