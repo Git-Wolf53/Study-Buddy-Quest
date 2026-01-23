@@ -3067,8 +3067,9 @@ if st.session_state.get('quiz_generating', False):
                 'image_mode': st.session_state.get('image_quiz_mode', False)
             }
             
-            # Flag to scroll to quiz after generation
+            # Flags to scroll and fade in quiz after generation
             st.session_state.scroll_to_quiz = True
+            st.session_state.fade_in_quiz = True
             
             status_text.empty()
             
@@ -3128,30 +3129,32 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
         
         st.markdown("---")
         
-        # Fade in the entire quiz area as one unit using JavaScript
-        import streamlit.components.v1 as components
-        components.html("""
-        <script>
-            (function() {
-                const doc = window.parent.document;
-                // Find all elements after the hr and apply fade
-                setTimeout(function() {
-                    const mainArea = doc.querySelector('[data-testid="stMainBlockContainer"]');
-                    if (mainArea) {
-                        mainArea.style.animation = 'none';
-                        mainArea.offsetHeight; // trigger reflow
-                        mainArea.style.animation = 'quizFadeIn 0.8s ease-out forwards';
-                    }
-                }, 50);
-            })();
-        </script>
-        <style>
-            @keyframes quizFadeIn {
-                0% { opacity: 0; transform: translateY(25px); }
-                100% { opacity: 1; transform: translateY(0); }
-            }
-        </style>
-        """, height=0)
+        # Only fade in when quiz was just generated (not on every answer click)
+        should_fade = st.session_state.get('fade_in_quiz', False)
+        if should_fade:
+            st.session_state.fade_in_quiz = False
+            import streamlit.components.v1 as components
+            components.html("""
+            <script>
+                (function() {
+                    const doc = window.parent.document;
+                    setTimeout(function() {
+                        const mainArea = doc.querySelector('[data-testid="stMainBlockContainer"]');
+                        if (mainArea) {
+                            mainArea.style.animation = 'none';
+                            mainArea.offsetHeight;
+                            mainArea.style.animation = 'quizFadeIn 0.8s ease-out forwards';
+                        }
+                    }, 50);
+                })();
+            </script>
+            <style>
+                @keyframes quizFadeIn {
+                    0% { opacity: 0; transform: translateY(25px); }
+                    100% { opacity: 1; transform: translateY(0); }
+                }
+            </style>
+            """, height=0)
         
         parsed_questions = st.session_state.parsed_questions
         num_questions = st.session_state.get('quiz_length', 5)
