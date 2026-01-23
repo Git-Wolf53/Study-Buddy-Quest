@@ -1234,10 +1234,20 @@ st.markdown("<style>" + animation_css + """
         border-radius: 20px !important;
     }
     
-    .stTextInput [data-baseweb="base-input"] {
+    .stTextInput [data-baseweb="base-input"],
+    .stTextInput [data-baseweb="input-container"] {
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
+        outline: none !important;
+    }
+    
+    .stTextInput [data-baseweb="base-input"]:focus-within,
+    .stTextInput > div:focus-within,
+    .stTextInput > div > div:focus-within {
+        border: none !important;
+        box-shadow: none !important;
+        outline: none !important;
     }
     
     .stTextInput input {
