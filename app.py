@@ -1317,7 +1317,7 @@ st.markdown("<style>" + animation_css + """
     }
     
     .level-card:hover:after {
-        transform: translateX(3px);
+        transform: none;
     }
     
     .level-card .notiglow,
@@ -1361,7 +1361,7 @@ st.markdown("<style>" + animation_css + """
     }
     
     .level-card:hover .level-number {
-        transform: translateX(3px);
+        transform: none;
     }
     
     .level-title {
@@ -1375,7 +1375,7 @@ st.markdown("<style>" + animation_css + """
     }
     
     .level-card:hover .level-title {
-        transform: translateX(5px);
+        transform: none;
     }
     
     .stats-row {
@@ -1391,7 +1391,7 @@ st.markdown("<style>" + animation_css + """
     }
     
     .level-card:hover .stats-row {
-        transform: translateX(5px);
+        transform: none;
     }
     
     .stat-item {
