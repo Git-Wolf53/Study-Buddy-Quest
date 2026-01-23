@@ -1793,6 +1793,11 @@ st.markdown("<style>" + animation_css + """
         margin: 15px 0;
         border-radius: 28px;
         font-size: 1.1rem;
+        color: #1a5928 !important;
+    }
+    
+    .result-correct strong, .result-correct em {
+        color: #1a5928 !important;
     }
     
     .result-wrong {
@@ -1802,6 +1807,11 @@ st.markdown("<style>" + animation_css + """
         margin: 15px 0;
         border-radius: 28px;
         font-size: 1.1rem;
+        color: #721c24 !important;
+    }
+    
+    .result-wrong strong, .result-wrong em {
+        color: #721c24 !important;
     }
     
     .stProgress > div > div > div {
