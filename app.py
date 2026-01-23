@@ -1133,7 +1133,7 @@ animation_css = "" if reduce_anims else """
     }
     
     .stat-item:hover {
-        transform: scale(1.05);
+        transform: none;
     }
     
     .subtitle {
