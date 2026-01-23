@@ -1678,34 +1678,6 @@ st.markdown("<style>" + animation_css + """
         .stTextInput > div > div > input::placeholder {
             color: #6b7280 !important;
         }
-        
-        /* Light mode selectbox styling */
-        .stSelectbox [data-baseweb="select"] {
-            background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%) !important;
-            border: 2px solid rgba(99, 102, 241, 0.3) !important;
-        }
-        
-        .stSelectbox [data-baseweb="select"] svg {
-            color: #6366f1 !important;
-        }
-        
-        .stSelectbox [data-baseweb="select"]:hover {
-            border-color: #6366f1 !important;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2) !important;
-        }
-        
-        ul[role="listbox"] {
-            background: #ffffff !important;
-            border: 2px solid rgba(99, 102, 241, 0.2) !important;
-        }
-        
-        ul[role="listbox"] li:hover {
-            background: rgba(99, 102, 241, 0.1) !important;
-        }
-        
-        ul[role="listbox"] li[aria-selected="true"] {
-            background: rgba(99, 102, 241, 0.15) !important;
-        }
     }
     
     .stButton > button {
@@ -1814,28 +1786,14 @@ st.markdown("<style>" + animation_css + """
         border-radius: 20px !important;
     }
     
-    /* Selectbox/Dropdown distinct styling */
-    .stSelectbox [data-baseweb="select"] {
-        background: linear-gradient(145deg, #2a2a3e 0%, #1e1e2e 100%) !important;
-        border: 2px solid rgba(99, 102, 241, 0.4) !important;
-        border-radius: 14px !important;
-        cursor: pointer !important;
-    }
-    
-    .stSelectbox [data-baseweb="select"] > div {
-        background: transparent !important;
-        padding: 10px 14px !important;
-    }
-    
-    .stSelectbox [data-baseweb="select"] svg {
-        color: #a78bfa !important;
-        width: 20px !important;
-        height: 20px !important;
-    }
-    
+    /* Selectbox - disable typing, click-only */
     .stSelectbox input {
-        cursor: pointer !important;
+        pointer-events: none !important;
         caret-color: transparent !important;
+    }
+    
+    .stSelectbox [data-baseweb="select"] {
+        cursor: pointer !important;
     }
     
     /* Selectbox hover/focus effects */
@@ -1847,39 +1805,12 @@ st.markdown("<style>" + animation_css + """
         transform: translateY(-2px) !important;
     }
     
-    .stSelectbox [data-baseweb="select"]:hover {
-        border-color: #818cf8 !important;
-        box-shadow: 0 4px 15px rgba(129, 140, 248, 0.25) !important;
+    .stSelectbox > div:hover [data-baseweb="select"] {
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.25) !important;
     }
     
     .stSelectbox [data-baseweb="select"]:focus-within {
-        border-color: #a78bfa !important;
-        box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.2), 0 0 20px rgba(167, 139, 250, 0.3) !important;
-    }
-    
-    /* Dropdown menu styling */
-    div[data-baseweb="popover"] {
-        border-radius: 14px !important;
-        overflow: hidden !important;
-    }
-    
-    ul[role="listbox"] {
-        background: #1e1e2e !important;
-        border: 2px solid rgba(99, 102, 241, 0.3) !important;
-        border-radius: 14px !important;
-    }
-    
-    ul[role="listbox"] li {
-        padding: 12px 16px !important;
-        transition: all 0.2s ease !important;
-    }
-    
-    ul[role="listbox"] li:hover {
-        background: rgba(99, 102, 241, 0.2) !important;
-    }
-    
-    ul[role="listbox"] li[aria-selected="true"] {
-        background: rgba(99, 102, 241, 0.3) !important;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2), 0 0 20px rgba(102, 126, 234, 0.3) !important;
     }
     
     /* Toggle switch hover effects */
