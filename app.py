@@ -1760,7 +1760,13 @@ st.markdown("<style>" + animation_css + """
     
     .stTextInput > div > div > input:focus {
         border-color: #667eea !important;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2) !important;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2), 0 0 20px rgba(102, 126, 234, 0.3) !important;
+        transform: translateY(-2px) !important;
+    }
+    
+    .stTextInput > div > div > input:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.25) !important;
     }
     
     /* Selectbox/Dropdown styling - all elements */
@@ -1784,6 +1790,54 @@ st.markdown("<style>" + animation_css + """
     .stSelectbox input,
     [data-baseweb="select"] input {
         border-radius: 20px !important;
+    }
+    
+    /* Selectbox hover/focus effects */
+    .stSelectbox > div {
+        transition: all 0.3s ease !important;
+    }
+    
+    .stSelectbox > div:hover {
+        transform: translateY(-2px) !important;
+    }
+    
+    .stSelectbox > div:hover > div {
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.25) !important;
+    }
+    
+    .stSelectbox [data-baseweb="select"]:focus-within {
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2), 0 0 20px rgba(102, 126, 234, 0.3) !important;
+    }
+    
+    /* Toggle switch hover effects */
+    .stToggle > div {
+        transition: all 0.3s ease !important;
+    }
+    
+    .stToggle > div:hover {
+        transform: translateY(-2px) !important;
+    }
+    
+    .stToggle label:hover {
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2) !important;
+    }
+    
+    /* File uploader hover effects */
+    .stFileUploader > div {
+        transition: all 0.3s ease !important;
+    }
+    
+    .stFileUploader > div:hover {
+        transform: translateY(-2px) !important;
+    }
+    
+    .stFileUploader section {
+        transition: all 0.3s ease !important;
+    }
+    
+    .stFileUploader section:hover {
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.25) !important;
+        border-color: #667eea !important;
     }
     
     .result-correct {
