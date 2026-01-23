@@ -1220,34 +1220,25 @@ st.markdown("<style>" + animation_css + """
     [data-testid="stHeader"] {display: none;}
     .stDeployButton {display: none;}
     
-    /* Custom input styling */
-    .stTextInput > div {
+    /* Custom input styling - remove all container styling */
+    .stTextInput,
+    .stTextInput > div,
+    .stTextInput > div > div,
+    .stTextInput > div > div > div,
+    .stTextInput [data-baseweb],
+    .stTextInput [data-baseweb] > div {
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
-    }
-    
-    .stTextInput > div > div {
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
+        outline: none !important;
         border-radius: 20px !important;
     }
     
-    .stTextInput [data-baseweb="base-input"],
-    .stTextInput [data-baseweb="input-container"] {
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
+    .stTextInput *:focus,
+    .stTextInput *:focus-within,
+    .stTextInput *:focus-visible {
         outline: none !important;
-    }
-    
-    .stTextInput [data-baseweb="base-input"]:focus-within,
-    .stTextInput > div:focus-within,
-    .stTextInput > div > div:focus-within {
-        border: none !important;
         box-shadow: none !important;
-        outline: none !important;
     }
     
     .stTextInput input {
@@ -1257,13 +1248,14 @@ st.markdown("<style>" + animation_css + """
         background-color: #1e1e2e !important;
         color: #ffffff !important;
         padding: 10px 1rem !important;
-        transition: all 0.25s ease !important;
+        transition: border-color 0.25s ease, background-color 0.25s ease !important;
     }
     
     .stTextInput input:focus {
         border-color: #667eea !important;
         background-color: #2a2a3e !important;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2) !important;
+        outline: none !important;
+        box-shadow: none !important;
     }
     
     .stTextInput input::placeholder {
