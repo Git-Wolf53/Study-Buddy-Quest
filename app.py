@@ -1850,51 +1850,39 @@ st.markdown("<style>" + animation_css + """
         margin: 30px 0;
     }
     
-    .pledge-card {
-        background: #eff6ff;
+    .pledge-card, .remember-card {
+        background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 100%);
         border-left: 4px solid #6366f1;
         color: #4b5563;
-        padding: 15px 25px;
+        padding: 18px 25px;
         border-radius: 20px;
         text-align: center;
         margin: 15px 0;
+        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);
     }
     
-    .pledge-card strong {
+    .pledge-card strong, .remember-card strong {
         color: #4338ca;
     }
     
-    .remember-card {
-        background: #f1f5f9;
-        padding: 20px;
-        border-radius: 20px;
-        text-align: center;
-        margin-bottom: 20px;
-        color: #4b5563;
-    }
-    
-    .remember-card strong {
-        color: #374151;
+    .pledge-card small, .remember-card small {
+        color: #6b7280;
     }
     
     @media (prefers-color-scheme: dark) {
-        .pledge-card {
+        .pledge-card, .remember-card {
             background: linear-gradient(145deg, #1e1e2e 0%, #252536 100%);
             border-left: 4px solid #818cf8;
             color: #a5b4c4;
+            box-shadow: 0 2px 12px rgba(129, 140, 248, 0.15);
         }
         
-        .pledge-card strong {
+        .pledge-card strong, .remember-card strong {
             color: #a5b4fc;
         }
         
-        .remember-card {
-            background: linear-gradient(145deg, #1e1e2e 0%, #252536 100%);
-            color: #a5b4c4;
-        }
-        
-        .remember-card strong {
-            color: #c4b5fd;
+        .pledge-card small, .remember-card small {
+            color: #8b9cb5;
         }
     }
     
