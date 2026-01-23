@@ -2900,6 +2900,7 @@ if st.session_state.quiz_generated and not st.session_state.quiz_generating:
             # Only auto-regenerate if we have valid input
             if is_image_quiz or (clean_topic and len(clean_topic) >= 2):
                 st.session_state.quiz_generating = True
+                st.session_state.auto_scroll_to_quiz = True
                 st.rerun()
 
 # Generate button - hide while generating
