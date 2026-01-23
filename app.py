@@ -1223,11 +1223,21 @@ st.markdown("<style>" + animation_css + """
     /* Custom input styling */
     .stTextInput > div {
         background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
     }
     
     .stTextInput > div > div {
         background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
         border-radius: 20px !important;
+    }
+    
+    .stTextInput [data-baseweb="base-input"] {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
     }
     
     .stTextInput input {
