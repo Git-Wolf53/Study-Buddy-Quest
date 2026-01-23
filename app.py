@@ -3099,25 +3099,27 @@ if st.session_state.get('quiz_generating', False):
 if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
     
     if not st.session_state.answers_submitted:
-        # Anchor for scrolling to quiz
-        st.markdown('<div id="quiz-start"></div>', unsafe_allow_html=True)
+        # Anchor for scrolling to quiz - use unique ID based on generation time
+        quiz_anchor_id = f"quiz-start-{int(time.time() * 1000)}"
+        st.markdown(f'<div id="{quiz_anchor_id}" class="quiz-scroll-anchor"></div>', unsafe_allow_html=True)
         
         # Scroll to quiz after generation
         import streamlit.components.v1 as components
-        components.html("""
+        components.html(f"""
         <script>
-            function scrollToQuiz() {
+            function scrollToQuiz() {{
                 const doc = window.parent.document;
-                const anchor = doc.getElementById('quiz-start');
-                if (anchor) {
-                    anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            }
+                const anchor = doc.getElementById('{quiz_anchor_id}') || doc.querySelector('.quiz-scroll-anchor');
+                if (anchor) {{
+                    anchor.scrollIntoView({{ behavior: 'smooth', block: 'start' }});
+                }}
+            }}
+            // Run immediately and with delays to ensure content is loaded
             scrollToQuiz();
             setTimeout(scrollToQuiz, 100);
             setTimeout(scrollToQuiz, 300);
             setTimeout(scrollToQuiz, 500);
-            setTimeout(scrollToQuiz, 800);
+            setTimeout(scrollToQuiz, 1000);
         </script>
         """, height=0)
         
