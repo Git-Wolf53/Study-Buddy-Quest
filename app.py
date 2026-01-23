@@ -1248,14 +1248,19 @@ st.markdown("<style>" + animation_css + """
         background-color: #1e1e2e !important;
         color: #ffffff !important;
         padding: 10px 1rem !important;
-        transition: border-color 0.25s ease, background-color 0.25s ease !important;
+        transition: border-color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease !important;
+    }
+    
+    .stTextInput input:hover {
+        border-color: #667eea !important;
+        box-shadow: 0 0 15px rgba(102, 126, 234, 0.4) !important;
     }
     
     .stTextInput input:focus {
         border-color: #667eea !important;
         background-color: #2a2a3e !important;
         outline: none !important;
-        box-shadow: none !important;
+        box-shadow: 0 0 20px rgba(102, 126, 234, 0.5) !important;
     }
     
     .stTextInput input::placeholder {
@@ -1831,11 +1836,13 @@ st.markdown("<style>" + animation_css + """
     }
     
     .stSelectbox > div:hover [data-baseweb="select"] {
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.25) !important;
+        box-shadow: 0 0 20px rgba(102, 126, 234, 0.5) !important;
+        border-color: #667eea !important;
     }
     
     .stSelectbox [data-baseweb="select"]:focus-within {
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2), 0 0 20px rgba(102, 126, 234, 0.3) !important;
+        box-shadow: 0 0 25px rgba(102, 126, 234, 0.6) !important;
+        border-color: #667eea !important;
     }
     
     /* Toggle switch hover effects */
@@ -1848,7 +1855,11 @@ st.markdown("<style>" + animation_css + """
     }
     
     .stToggle label:hover {
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2) !important;
+        box-shadow: 0 0 20px rgba(102, 126, 234, 0.5) !important;
+    }
+    
+    .stToggle:focus-within label {
+        box-shadow: 0 0 25px rgba(102, 126, 234, 0.6) !important;
     }
     
     /* File uploader hover effects */
@@ -1865,7 +1876,12 @@ st.markdown("<style>" + animation_css + """
     }
     
     .stFileUploader section:hover {
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.25) !important;
+        box-shadow: 0 0 20px rgba(102, 126, 234, 0.5) !important;
+        border-color: #667eea !important;
+    }
+    
+    .stFileUploader:focus-within section {
+        box-shadow: 0 0 25px rgba(102, 126, 234, 0.6) !important;
         border-color: #667eea !important;
     }
     
