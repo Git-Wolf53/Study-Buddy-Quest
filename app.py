@@ -2864,6 +2864,7 @@ if 'quiz_generating' not in st.session_state:
     st.session_state.quiz_generating = False
 
 # Auto-regenerate quiz when parameters change (only if quiz already generated)
+should_auto_regenerate = False
 if st.session_state.quiz_generated and not st.session_state.quiz_generating:
     # Get current parameters
     current_params = {
@@ -2899,12 +2900,13 @@ if st.session_state.quiz_generated and not st.session_state.quiz_generating:
             
             # Only auto-regenerate if we have valid input
             if is_image_quiz or (clean_topic and len(clean_topic) >= 2):
+                should_auto_regenerate = True
                 st.session_state.quiz_generating = True
                 st.session_state.auto_scroll_to_quiz = True
                 st.rerun()
 
-# Generate button - hide while generating
-if not st.session_state.quiz_generating:
+# Generate button - hide while generating or auto-regenerating
+if not st.session_state.quiz_generating and not should_auto_regenerate:
     if st.button("🎲 GENERATE QUIZ!", use_container_width=True):
         # Check if image quiz mode with uploaded image
         is_image_quiz = st.session_state.get('image_quiz_mode', False) and st.session_state.get('uploaded_image')
