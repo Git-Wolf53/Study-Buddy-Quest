@@ -162,27 +162,17 @@ def get_popup_html():
     
     # Colors based on type
     if popup_type == "error":
-        bg_gradient = "linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%)"
-        icon = "&#10060;"  # X mark
-        border_color = "rgba(255, 107, 107, 0.5)"
+        accent_color = "#ff6b6b"
+        icon = "&#10060;"
+        glow_color = "rgba(255, 107, 107, 0.35)"
     elif popup_type == "success":
-        bg_gradient = "linear-gradient(135deg, #51cf66 0%, #40c057 100%)"
-        icon = "&#10004;"  # Check mark
-        border_color = "rgba(81, 207, 102, 0.5)"
+        accent_color = "#51cf66"
+        icon = "&#10004;"
+        glow_color = "rgba(81, 207, 102, 0.35)"
     else:  # warning
-        bg_gradient = "linear-gradient(135deg, #ffd43b 0%, #fab005 100%)"
-        icon = "&#9888;"  # Warning triangle
-        border_color = "rgba(255, 212, 59, 0.5)"
-    
-    text_color = "#1a1a2e" if popup_type in ["warning", "success"] else "#ffffff"
-    
-    # Progress line color based on type
-    if popup_type == "error":
-        progress_gradient = "linear-gradient(90deg, #ff6b6b 0%, #ee5a5a 100%)"
-    elif popup_type == "success":
-        progress_gradient = "linear-gradient(90deg, #51cf66 0%, #40c057 100%)"
-    else:
-        progress_gradient = "linear-gradient(90deg, #ffd43b 0%, #fab005 100%)"
+        accent_color = "#ffd43b"
+        icon = "&#9888;"
+        glow_color = "rgba(255, 212, 59, 0.35)"
     
     return f'''
     <script>
@@ -193,18 +183,32 @@ def get_popup_html():
         
         var popup = parentDoc.createElement('div');
         popup.id = 'notificationPopup';
-        popup.innerHTML = '<div style="display: flex; align-items: center; padding: 16px 20px;"><span style="font-size: 1.3rem; margin-right: 12px;">{icon}</span><span style="flex: 1;">{message}</span><button onclick="this.closest(\\'#notificationPopup\\').style.animation=\\'slideOutRight 0.4s ease forwards\\'; setTimeout(() => document.getElementById(\\'notificationPopup\\').remove(), 400);" style="background: none; border: none; color: {text_color}; font-size: 1.2rem; cursor: pointer; padding: 0; margin-left: 10px; opacity: 0.7;">&times;</button></div><div style="position: absolute; bottom: 0; left: 0; height: 4px; background: {progress_gradient}; border-radius: 0 0 16px 16px; animation: shrinkLine 5s linear forwards; filter: brightness(0.8);"></div>';
-        popup.style.cssText = 'position: fixed; bottom: 20px; right: 20px; background: {bg_gradient}; color: {text_color}; border-radius: 16px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25); z-index: 9999; font-family: Nunito, sans-serif; font-size: 0.95rem; border: 2px solid {border_color}; animation: fadeSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); max-width: 400px; overflow: hidden;';
+        popup.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 14px; padding: 16px 18px;">
+                <div style="width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, {accent_color}22 0%, {accent_color}44 100%); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0; color: {accent_color};">{icon}</div>
+                <div style="flex: 1; font-size: 0.9rem; line-height: 1.45; color: #e0e0e0;">{message}</div>
+                <button onclick="this.closest('#notificationPopup').style.animation='slideOutRight 0.35s ease forwards'; setTimeout(() => document.getElementById('notificationPopup')?.remove(), 350);" style="background: rgba(255,255,255,0.08); border: none; color: #777; font-size: 1.1rem; cursor: pointer; padding: 6px 10px; border-radius: 8px; transition: all 0.2s ease; flex-shrink: 0;" onmouseover="this.style.background='rgba(255,255,255,0.15)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.08)'; this.style.color='#777';">&#10005;</button>
+            </div>
+            <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: rgba(255,255,255,0.06); overflow: hidden;">
+                <div style="height: 100%; background: linear-gradient(90deg, {accent_color} 0%, {accent_color}aa 100%); animation: shrinkLine 5s linear forwards; box-shadow: 0 0 12px {accent_color};"></div>
+            </div>
+        `;
+        popup.style.cssText = 'position: fixed; bottom: 24px; right: 24px; background: linear-gradient(145deg, #1e1e2e 0%, #1a1a28 100%); border-radius: 16px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.06), 0 0 24px {glow_color}; z-index: 9999; font-family: Nunito, sans-serif; animation: fadeSlideIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); max-width: 380px; min-width: 300px; border-left: 3px solid {accent_color}; overflow: hidden;';
         
-        var style = parentDoc.createElement('style');
-        style.textContent = '@keyframes fadeSlideIn {{ 0% {{ opacity: 0; transform: translateX(50px) scale(0.95); }} 50% {{ opacity: 0.8; transform: translateX(-5px) scale(1.02); }} 100% {{ opacity: 1; transform: translateX(0) scale(1); }} }} @keyframes slideOutRight {{ 0% {{ opacity: 1; transform: translateX(0); }} 100% {{ opacity: 0; transform: translateX(100px); }} }} @keyframes shrinkLine {{ 0% {{ width: 100%; }} 100% {{ width: 0%; }} }}';
-        parentDoc.head.appendChild(style);
+        var existingStyle = parentDoc.getElementById('notificationStyles');
+        if (!existingStyle) {{
+            var style = parentDoc.createElement('style');
+            style.id = 'notificationStyles';
+            style.textContent = '@keyframes fadeSlideIn {{ 0% {{ opacity: 0; transform: translateX(60px) scale(0.92); }} 60% {{ opacity: 1; transform: translateX(-6px) scale(1.01); }} 100% {{ opacity: 1; transform: translateX(0) scale(1); }} }} @keyframes slideOutRight {{ 0% {{ opacity: 1; transform: translateX(0); }} 100% {{ opacity: 0; transform: translateX(80px) scale(0.95); }} }} @keyframes shrinkLine {{ 0% {{ width: 100%; }} 100% {{ width: 0%; }} }}';
+            parentDoc.head.appendChild(style);
+        }}
         parentDoc.body.appendChild(popup);
         
         setTimeout(function() {{
-            if (parentDoc.getElementById('notificationPopup')) {{
-                popup.style.animation = 'slideOutRight 0.4s ease forwards';
-                setTimeout(() => popup.remove(), 400);
+            var p = parentDoc.getElementById('notificationPopup');
+            if (p) {{
+                p.style.animation = 'slideOutRight 0.35s ease forwards';
+                setTimeout(() => p?.remove(), 350);
             }}
         }}, 5000);
     }})();
