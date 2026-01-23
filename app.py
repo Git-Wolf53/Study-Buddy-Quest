@@ -1221,6 +1221,15 @@ st.markdown("<style>" + animation_css + """
     .stDeployButton {display: none;}
     
     /* Custom input styling */
+    .stTextInput > div {
+        background: transparent !important;
+    }
+    
+    .stTextInput > div > div {
+        background: transparent !important;
+        border-radius: 20px !important;
+    }
+    
     .stTextInput input {
         border-radius: 20px !important;
         outline: none !important;
