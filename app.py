@@ -3116,6 +3116,8 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
             scrollToQuiz();
             setTimeout(scrollToQuiz, 100);
             setTimeout(scrollToQuiz, 300);
+            setTimeout(scrollToQuiz, 500);
+            setTimeout(scrollToQuiz, 800);
         </script>
         """, height=0)
         
