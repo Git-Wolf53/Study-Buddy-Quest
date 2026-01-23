@@ -2308,6 +2308,71 @@ components.html("""
 </script>
 """, height=0)
 
+# Internet connection monitor - shows warning when connection is lost
+import streamlit.components.v1 as components
+components.html("""
+<script>
+(function() {
+    // Prevent duplicate initialization
+    if (window._offlineMonitorInit) return;
+    window._offlineMonitorInit = true;
+    
+    // Create warning element in parent document (Streamlit main frame)
+    try {
+        const targetDoc = window.parent.document || document;
+        
+        // Remove any existing warning
+        const existing = targetDoc.getElementById('offline-warning-main');
+        if (existing) existing.remove();
+        
+        // Create the warning banner
+        const warning = document.createElement('div');
+        warning.id = 'offline-warning-main';
+        warning.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="background: linear-gradient(135deg, #ef4444, #dc2626); padding: 8px; border-radius: 12px;">
+                    <span style="font-size: 20px;">📡</span>
+                </div>
+                <div>
+                    <div style="color: #ef4444; font-weight: bold; font-size: 14px;">No Internet Connection</div>
+                    <div style="color: #fca5a5; font-size: 12px;">Please check your network</div>
+                </div>
+            </div>
+        `;
+        warning.style.cssText = `
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 99999;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 2px solid #ef4444;
+            border-radius: 20px;
+            padding: 15px 25px;
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
+        `;
+        
+        targetDoc.body.appendChild(warning);
+        
+        function updateStatus() {
+            const isOffline = !navigator.onLine;
+            warning.style.display = isOffline ? 'block' : 'none';
+        }
+        
+        window.addEventListener('online', updateStatus);
+        window.addEventListener('offline', updateStatus);
+        
+        // Initial check
+        updateStatus();
+    } catch(e) {
+        // Cross-origin or other error - fail silently
+        console.log('Offline monitor init failed:', e);
+    }
+})();
+</script>
+""", height=0)
+
 # ============================================================
 # MAIN TITLE AND WELCOME
 # ============================================================
@@ -3084,16 +3149,24 @@ if st.session_state.get('quiz_generating', False):
             st.session_state.quiz_generating = False
             
             status_text.empty()
-            error_msg = str(e)
-            print(f"Quiz generation error: {type(e).__name__}: {e}")
-            if "API_KEY" in error_msg or "API key" in error_msg or "invalid" in error_msg.lower():
+            error_msg = str(e).lower()
+            error_type = type(e).__name__
+            print(f"Quiz generation error: {error_type}: {e}")
+            
+            # Check for network/connection errors
+            network_errors = ['connection', 'network', 'unreachable', 'refused', 'reset', 'socket', 'dns', 'resolve', 'offline', 'errno', 'urlopen']
+            is_network_error = any(term in error_msg for term in network_errors) or error_type in ['ConnectionError', 'OSError', 'TimeoutError', 'URLError', 'socket.error']
+            
+            if is_network_error:
+                show_popup("📡 No internet connection! Please check your network and try again.", "error")
+            elif "api_key" in error_msg or "api key" in error_msg or "invalid" in error_msg:
                 show_popup("🔑 There's an issue with the AI connection. Please try again or contact support!", "error")
-            elif "timeout" in error_msg.lower():
-                show_popup("⏱️ The request took too long. Please try again!", "error")
-            elif "quota" in error_msg.lower() or "limit" in error_msg.lower():
+            elif "timeout" in error_msg:
+                show_popup("⏱️ The request took too long. Please check your connection and try again!", "error")
+            elif "quota" in error_msg or "limit" in error_msg:
                 show_popup("📊 API rate limit reached. Please wait a moment and try again!", "error")
             else:
-                show_popup(f"😅 Oops! Something went wrong: {error_msg[:100]}", "error")
+                show_popup(f"😅 Oops! Something went wrong. Please try again!", "error")
             st.info("💡 **Tip:** Try a different topic or refresh the page!")
             st.rerun()
 
