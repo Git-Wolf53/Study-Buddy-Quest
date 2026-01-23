@@ -1850,6 +1850,54 @@ st.markdown("<style>" + animation_css + """
         margin: 30px 0;
     }
     
+    .pledge-card {
+        background: #eff6ff;
+        border-left: 4px solid #6366f1;
+        color: #4b5563;
+        padding: 15px 25px;
+        border-radius: 20px;
+        text-align: center;
+        margin: 15px 0;
+    }
+    
+    .pledge-card strong {
+        color: #4338ca;
+    }
+    
+    .remember-card {
+        background: #f1f5f9;
+        padding: 20px;
+        border-radius: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+        color: #4b5563;
+    }
+    
+    .remember-card strong {
+        color: #374151;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+        .pledge-card {
+            background: linear-gradient(145deg, #1e1e2e 0%, #252536 100%);
+            border-left: 4px solid #818cf8;
+            color: #a5b4c4;
+        }
+        
+        .pledge-card strong {
+            color: #a5b4fc;
+        }
+        
+        .remember-card {
+            background: linear-gradient(145deg, #1e1e2e 0%, #252536 100%);
+            color: #a5b4c4;
+        }
+        
+        .remember-card strong {
+            color: #c4b5fd;
+        }
+    }
+    
     .cool-footer {
         text-align: center;
         padding: 30px;
@@ -4110,13 +4158,7 @@ if st.session_state.quiz_generated and st.session_state.quiz_questions_only:
 # ============================================================
 st.markdown("---")
 st.markdown("""
-<div style="background: #eff6ff; 
-            border-left: 4px solid #6366f1;
-            color: #6b7280; 
-            padding: 15px 25px; 
-            border-radius: 20px; 
-            text-align: center; 
-            margin: 15px 0;">
+<div class="pledge-card">
     <strong>Learning Pledge:</strong> This tool helps you learn and understand – always think for yourself and never use it to cheat! 
     <br><small>Real knowledge comes from real effort!</small>
 </div>
@@ -4223,12 +4265,7 @@ with st.expander("⚙️ Settings"):
 st.markdown("---")
 
 st.markdown("""
-<div style="background: #f1f5f9; 
-            padding: 20px; 
-            border-radius: 20px; 
-            text-align: center; 
-            margin-bottom: 20px;
-            color: #6b7280;">
+<div class="remember-card">
     <strong>Remember:</strong> The best learning happens when you challenge yourself! 
     <br>Use this tool to <em>strengthen</em> your understanding, not replace it.
     <br><small>Think critically. Question everything. Stay curious!</small>
